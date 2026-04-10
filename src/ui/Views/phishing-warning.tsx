@@ -4,14 +4,6 @@ import { useMemo } from 'react';
 import { LuTriangleAlert } from 'react-icons/lu';
 import { useSearchParams } from 'react-router-dom';
 import browser from 'webextension-polyfill';
-import { useBodyStyle } from '../components/Background/Background';
-
-/**
- * PhishingWarningPage — Tailwind CSS Redesign
- *
- * Requires Tailwind CSS v3+ configured in the project.
- * Use JIT mode or add the classes below to your safelist.
- */
 
 export function PhishingWarningPage() {
   const [params] = useSearchParams();
@@ -21,11 +13,6 @@ export function PhishingWarningPage() {
     [rawUrl]
   );
   const hostname = safeUrl ? safeUrl.hostname : null;
-
-  useBodyStyle({
-    backgroundColor: 'var(--negative-500)',
-    ['--body-width' as string]: '100vw',
-  });
 
   const risks = [
     'Theft of recovery phrase or password',

@@ -4,15 +4,10 @@ import { queryClient } from '@/shared/query-client/queryClient';
 import { RouteRestoration } from '@/shared/RouteRestoration';
 import { ScreenViewTracker } from '@/shared/ScreenViewTracker';
 import { urlContext } from '@/shared/url-context';
-import { useBodyStyle } from '@/ui/components/Background/Background';
 import { DesignTheme } from '@/ui/components/DesignTheme/DesignTheme';
 import { HandshakeFailure } from '@/ui/components/HandshakeFailure/HandshakeFailure';
 import { InactivityDetector } from '@/ui/components/Session/InactivityDetector';
 import { SessionResetHandler } from '@/ui/components/Session/SessionResetHandler';
-import {
-  UIContext,
-  defaultUIContextValue,
-} from '@/ui/components/UIContext/UIContext';
 import { ViewArea } from '@/ui/components/ViewArea/ViewArea';
 import { ViewSuspense } from '@/ui/components/ViewSuspense/ViewSuspense';
 import { initialize as initializeApperance } from '@/ui/features/appearance';
@@ -234,57 +229,52 @@ export function App({ initialView, inspect }: AppProps) {
   }, [isOnboardingMode, isPageLayout]);
 
   const { connected } = useStore(runtimeStore);
-
-  useBodyStyle(
-    useMemo(() => ({ opacity: connected ? '' : '0.6' }), [connected])
-  );
+  console.log('[DEBUG APP] connected', connected);
 
   const isOnboardingView =
     isOnboardingMode && initialView !== 'handshakeFailure';
 
   return (
     <AreaProvider>
-      <UIContext.Provider value={defaultUIContextValue}>
-        <QueryClientProvider client={queryClient}>
-          <DesignTheme bodyClassList={bodyClassList} />
+      <QueryClientProvider client={queryClient}>
+        <DesignTheme bodyClassList={bodyClassList} />
 
-          <Router>
-            <ScreenViewTracker />
-            <InactivityDetector />
-            <SessionResetHandler />
-            <ProgrammaticNavigationHelper />
-            <ViewSuspense logDelays={true}>
-              {inspect && (
-                <div className="bg-gray-50 border-b border-gray-200 p-2 text-[10px] text-gray-400 font-mono">
-                  {inspect.message}
-                </div>
-              )}
-              <Routes>
-                <Route
-                  path="*"
-                  element={
-                    isOnboardingView ? (
-                      <Onboarding />
-                    ) : isPageLayout ? (
-                      <PageLayoutViews />
-                    ) : (
-                      <DefiSdkClientProvider>
-                        <Views
-                          initialRoute={
-                            initialView === 'handshakeFailure'
-                              ? '/handshake-failure'
-                              : undefined
-                          }
-                        />
-                      </DefiSdkClientProvider>
-                    )
-                  }
-                />
-              </Routes>
-            </ViewSuspense>
-          </Router>
-        </QueryClientProvider>
-      </UIContext.Provider>
+        <Router>
+          <ScreenViewTracker />
+          <InactivityDetector />
+          <SessionResetHandler />
+          <ProgrammaticNavigationHelper />
+          <ViewSuspense logDelays={true}>
+            {inspect && (
+              <div className="bg-gray-50 border-b border-gray-200 p-2 text-[10px] text-gray-400 font-mono">
+                {inspect.message}
+              </div>
+            )}
+            <Routes>
+              <Route
+                path="*"
+                element={
+                  isOnboardingView ? (
+                    <Onboarding />
+                  ) : isPageLayout ? (
+                    <PageLayoutViews />
+                  ) : (
+                    <DefiSdkClientProvider>
+                      <Views
+                        initialRoute={
+                          initialView === 'handshakeFailure'
+                            ? '/handshake-failure'
+                            : undefined
+                        }
+                      />
+                    </DefiSdkClientProvider>
+                  )
+                }
+              />
+            </Routes>
+          </ViewSuspense>
+        </Router>
+      </QueryClientProvider>
     </AreaProvider>
   );
 }
