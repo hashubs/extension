@@ -1,9 +1,9 @@
 import { initialize as initializeApperance } from '@/ui/features/appearance';
-import { HandshakeFailure } from '@/ui/Views/HandshakeFailure';
+import { HandshakeFailure } from '@/ui/views/handshake-failure';
 import {
   ChooseGlobalProviderGuard,
   RequestAccounts,
-} from '@/ui/Views/request-account';
+} from '@/ui/views/request-account';
 import { Navigate, Route, Routes } from 'react-router-dom';
 import { BaseApp } from '../base/App';
 import { RequireAuth } from '../base/auth';

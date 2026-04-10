@@ -9,8 +9,8 @@ import { persistQueryClient } from '@/shared/query-client/queryClientPersistence
 import { restoreRoute } from '@/shared/RouteRestoration';
 import { initializeSidepanelEvents } from '@/shared/sidepanel/initialize.client';
 import { getPreferences } from '@/ui/features/preferences/usePreferences';
-import { OnboardingInterrupt } from '@/ui/Views/onboarding/errors';
-import { maybeOpenOnboarding } from '@/ui/Views/onboarding/initialization';
+import { OnboardingInterrupt } from '@/ui/views/onboarding/errors';
+import { maybeOpenOnboarding } from '@/ui/views/onboarding/initialization';
 import React from 'react';
 import { createRoot, Root } from 'react-dom/client';
 import browser from 'webextension-polyfill';

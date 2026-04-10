@@ -1,14 +1,13 @@
-import { queryClient } from '@/shared/query-client/queryClient';
 import { RouteRestoration } from '@/shared/RouteRestoration';
 import { getWindowType } from '@/shared/window-type';
-import { HandshakeFailure } from '@/ui/Views/HandshakeFailure';
 import React from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
-
-import { LoginView } from '@/ui/Views/LoginView';
-import { Overview } from '@/ui/Views/overview/overview';
 import { RequireAuth } from './auth';
 import { SomeKindOfResolver } from './resolver';
+
+import { HandshakeFailure } from '@/ui/views/handshake-failure';
+import { Login } from '@/ui/views/login';
+import { Overview } from '@/ui/views/overview/overview';
 
 function DefiSdkClientProvider({ children }: React.PropsWithChildren) {
   return <>{children}</>;
@@ -34,16 +33,7 @@ export function Views({ initialRoute }: { initialRoute?: string }) {
             />
           }
         />
-        <Route
-          path="/login"
-          element={
-            <LoginView
-              onAuthenticated={() =>
-                queryClient.invalidateQueries(['authState'])
-              }
-            />
-          }
-        />
+        <Route path="/login" element={<Login />} />
         <Route
           path="/overview/*"
           element={

@@ -69,7 +69,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
                 'bg-transparent border-none cursor-pointer p-0',
                 'flex items-center justify-center',
                 'transition-colors duration-200',
-                'text-[rgba(113,121,120,0.6)] hover:text-primary-2'
+                'text-muted-foreground hover:text-muted-foreground/80'
               )}
             >
               {showPassword ? (

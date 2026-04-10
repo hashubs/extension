@@ -6,7 +6,7 @@ import { getCurrentUser } from 'src/shared/get-current-user';
 import {
   ONBOARDING_ROUTES,
   TopLevelRouteValues,
-} from '../Views/onboarding/routes';
+} from '../views/onboarding/routes';
 
 export function useOnboardingSession({
   navigateOnExistingUser,
@@ -32,7 +32,9 @@ export function useOnboardingSession({
     console.log('[DEBUG] useOnboardingSession: existingUser =', existingUser);
     if (existingUser) {
       if (navigateOnExistingUser === ONBOARDING_ROUTES.SESSION_EXPIRED) {
-        console.log('[DEBUG] useOnboardingSession: Redirecting to SESSION_EXPIRED');
+        console.log(
+          '[DEBUG] useOnboardingSession: Redirecting to SESSION_EXPIRED'
+        );
         navigate('/onboarding/' + ONBOARDING_ROUTES.SESSION_EXPIRED, {
           replace: true,
         });
