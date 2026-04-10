@@ -1,5 +1,5 @@
-import { ViewArea } from '@/ui/components/ViewArea/ViewArea';
 import { initialize as initializeApperance } from '@/ui/features/appearance';
+import { HandshakeFailure } from '@/ui/Views/HandshakeFailure';
 import {
   ChooseGlobalProviderGuard,
   RequestAccounts,
@@ -18,10 +18,7 @@ export interface AppProps {
 export function App({ initialView, inspect }: AppProps) {
   return (
     <BaseApp bodyClassList={[]} inspect={inspect}>
-      <ViewArea
-        data-testid="view-area-notification"
-        className="bg-background text-primary shadow-xl overflow-hidden relative"
-      >
+      <>
         <Routes>
           {initialView ? (
             <Route path="/" element={<Navigate to={initialView} />} />
@@ -36,12 +33,13 @@ export function App({ initialView, inspect }: AppProps) {
               </ChooseGlobalProviderGuard>
             }
           />
+          <Route path="/handshake-failure" element={<HandshakeFailure />} />
           <Route
             path="*"
             element={<Navigate to="/requestAccounts" replace />}
           />
         </Routes>
-      </ViewArea>
+      </>
     </BaseApp>
   );
 }

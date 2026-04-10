@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" style="width: 400px; height: 600px">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta
@@ -12,10 +12,7 @@
         margin: 0;
         padding: 0;
         background-color: oklch(0.99 0 0);
-        --layout-popup-width: 400px;
-        --layout-popup-height: 600px;
-        width: var(--layout-popup-width);
-        height: var(--layout-popup-height);
+        width: 100%;
         overflow: hidden;
         margin-inline: auto;
       }
@@ -26,7 +23,7 @@
       }
     </style>
   </head>
-  <body style="width: 400px; height: 600px">
+  <body>
     <div id="root"></div>
     <script type="module" src="./entries/notification/index.tsx"></script>
   </body>
