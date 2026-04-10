@@ -2,6 +2,7 @@ import { FaKey } from 'react-icons/fa6';
 import { MdChevronRight, MdSync } from 'react-icons/md';
 import { useNavigate } from 'react-router-dom';
 import { SectionHeader } from '../section-header';
+import { ONBOARDING_ROUTES } from '../routes';
 
 export function TypeSelector() {
   const navigate = useNavigate();
@@ -16,7 +17,7 @@ export function TypeSelector() {
       <div className="flex flex-col gap-3 mb-8">
         <button
           className="group flex items-center gap-4 w-full bg-surface-container-lowest border border-outline-variant/20 rounded-2xl px-5 py-4.5 cursor-pointer text-left transition-all duration-200 hover:bg-surface-container hover:border-primary-container hover:shadow-[0_2px_12px_rgba(15,61,62,0.08)]"
-          onClick={() => navigate('/onboarding/import/phrase')}
+          onClick={() => navigate(ONBOARDING_ROUTES.IMPORT.PHRASE)}
           type="button"
         >
           <div className="w-10 h-10 rounded-[0.625rem] bg-surface-container-low text-primary-container flex items-center justify-center shrink-0 transition-all duration-200 group-hover:bg-primary-container group-hover:text-on-primary">
@@ -35,7 +36,7 @@ export function TypeSelector() {
 
         <button
           className="group flex items-center gap-4 w-full bg-surface-container-lowest border border-outline-variant/20 rounded-2xl px-5 py-4.5 cursor-pointer text-left transition-all duration-200 hover:bg-surface-container hover:border-primary-container hover:shadow-[0_2px_12px_rgba(15,61,62,0.08)]"
-          onClick={() => navigate('/onboarding/import/private-key')}
+          onClick={() => navigate(ONBOARDING_ROUTES.IMPORT.PRIVATE_KEY)}
           type="button"
         >
           <div className="w-10 h-10 rounded-[0.625rem] bg-surface-container-low text-primary-container flex items-center justify-center shrink-0 transition-all duration-200 group-hover:bg-primary-container group-hover:text-on-primary">

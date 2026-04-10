@@ -24,6 +24,8 @@ import { useCreateWallet } from './create-context';
 import { Processing } from './processing';
 import { SelectEcosystem } from './select-ecosystem';
 
+import { ONBOARDING_ROUTES } from '../routes';
+
 export type PageMetadata = {
   onBack?: () => void;
   backIconType?: 'arrow' | 'close';
@@ -36,10 +38,16 @@ export function CreateRoute() {
   const [isInterruptOpen, setIsInterruptOpen] = useState(false);
   const [pageMetadata, setPageMetadata] = useState<PageMetadata | null>(null);
 
-  const isBackupStep = location.pathname.includes('/backup');
-  const isSuccessStep = location.pathname.includes('/success');
+  const isBackupStep = location.pathname.includes(
+    `/${ONBOARDING_ROUTES.CREATE.BACKUP}`
+  );
+  const isSuccessStep = location.pathname.includes(
+    `/${ONBOARDING_ROUTES.CREATE.SUCCESS}`
+  );
 
-  const currentStep = location.pathname.includes('/ecosystem')
+  const currentStep = location.pathname.includes(
+    `/${ONBOARDING_ROUTES.CREATE.ECOSYSTEM}`
+  )
     ? 2
     : isBackupStep || isSuccessStep
     ? undefined
@@ -62,7 +70,7 @@ export function CreateRoute() {
   const handleInterrupt = useCallback(() => {
     setIsInterruptOpen(false);
     resetContext();
-    navigate('/onboarding/welcome');
+    navigate(`../../${ONBOARDING_ROUTES.WELCOME}`);
   }, [navigate, resetContext]);
 
   const activeBackIconType = pageMetadata?.backIconType
@@ -82,17 +90,29 @@ export function CreateRoute() {
       >
         <Routes>
           <Route
-            path="password"
+            path={ONBOARDING_ROUTES.CREATE.PASSWORD}
             element={<SetPassword savePassword={setPassword} />}
           />
-          <Route path="ecosystem" element={<SelectEcosystem />} />
           <Route
-            path="backup"
+            path={ONBOARDING_ROUTES.CREATE.ECOSYSTEM}
+            element={<SelectEcosystem />}
+          />
+          <Route
+            path={ONBOARDING_ROUTES.CREATE.BACKUP}
             element={<BackupPhrase setPageMetadata={setPageMetadata} />}
           />
-          <Route path="processing" element={<Processing />} />
-          <Route path="success" element={<Success />} />
-          <Route path="*" element={<Navigate to="password" replace />} />
+          <Route
+            path={ONBOARDING_ROUTES.CREATE.PROCESSING}
+            element={<Processing />}
+          />
+          <Route
+            path={ONBOARDING_ROUTES.CREATE.SUCCESS}
+            element={<Success />}
+          />
+          <Route
+            path="*"
+            element={<Navigate to={ONBOARDING_ROUTES.CREATE.PASSWORD} replace />}
+          />
         </Routes>
       </PageLayout>
 

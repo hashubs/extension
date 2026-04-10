@@ -3,11 +3,18 @@ import { useQuery } from '@tanstack/react-query';
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getCurrentUser } from 'src/shared/get-current-user';
+import {
+  ONBOARDING_ROUTES,
+  TopLevelRouteValues,
+} from '../Views/onboarding/routes';
 
 export function useOnboardingSession({
   navigateOnExistingUser,
 }: {
-  navigateOnExistingUser: 'session-expired' | 'success';
+  navigateOnExistingUser: Extract<
+    TopLevelRouteValues,
+    typeof ONBOARDING_ROUTES.SESSION_EXPIRED | typeof ONBOARDING_ROUTES.SUCCESS
+  >;
 }) {
   const navigate = useNavigate();
 
@@ -22,11 +29,16 @@ export function useOnboardingSession({
   });
 
   useEffect(() => {
+    console.log('[DEBUG] useOnboardingSession: existingUser =', existingUser);
     if (existingUser) {
-      if (navigateOnExistingUser === 'session-expired') {
-        navigate('/onboarding/session-expired', { replace: true });
+      if (navigateOnExistingUser === ONBOARDING_ROUTES.SESSION_EXPIRED) {
+        console.log('[DEBUG] useOnboardingSession: Redirecting to SESSION_EXPIRED');
+        navigate('/onboarding/' + ONBOARDING_ROUTES.SESSION_EXPIRED, {
+          replace: true,
+        });
       } else {
-        navigate('/onboarding/success');
+        console.log('[DEBUG] useOnboardingSession: Redirecting to SUCCESS');
+        navigate('/onboarding/' + ONBOARDING_ROUTES.SUCCESS);
         emitter.emit('reloadExtension');
       }
     }

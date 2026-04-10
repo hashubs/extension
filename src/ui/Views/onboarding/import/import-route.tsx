@@ -23,6 +23,8 @@ import { Processing } from './processing';
 import { SelectWallets } from './select-wallets';
 import { TypeSelector } from './type-selector';
 
+import { ONBOARDING_ROUTES } from '../routes';
+
 export function ImportRoute() {
   const location = useLocation();
   const navigate = useNavigate();
@@ -30,11 +32,17 @@ export function ImportRoute() {
   const [isInterruptOpen, setIsInterruptOpen] = useState(false);
 
   const isTypeSelector =
-    location.pathname === '/onboarding/import' ||
-    location.pathname === '/onboarding/import/';
-  const isSelectStep = location.pathname.includes('/select-wallets');
-  const isPasswordStep = location.pathname.includes('/password');
-  const isSuccessStep = location.pathname.includes('/success');
+    location.pathname.endsWith(`/${ONBOARDING_ROUTES.IMPORT.ROOT}`) ||
+    location.pathname.endsWith(`/${ONBOARDING_ROUTES.IMPORT.ROOT}/`);
+  const isSelectStep = location.pathname.includes(
+    `/${ONBOARDING_ROUTES.IMPORT.SELECT_WALLETS}`
+  );
+  const isPasswordStep = location.pathname.includes(
+    `/${ONBOARDING_ROUTES.IMPORT.PASSWORD}`
+  );
+  const isSuccessStep = location.pathname.includes(
+    `/${ONBOARDING_ROUTES.IMPORT.SUCCESS}`
+  );
 
   const currentStep =
     isSuccessStep || isTypeSelector
@@ -53,7 +61,7 @@ export function ImportRoute() {
   const handleInterrupt = useCallback(() => {
     setIsInterruptOpen(false);
     resetContext();
-    navigate('/onboarding/welcome');
+    navigate(`../../${ONBOARDING_ROUTES.WELCOME}`);
   }, [navigate, resetContext]);
 
   return (
@@ -80,7 +88,9 @@ export function ImportRoute() {
                 size="lg"
                 className="w-full"
                 onClick={() =>
-                  navigate('/onboarding/welcome', { replace: true })
+                  navigate(`../../${ONBOARDING_ROUTES.WELCOME}`, {
+                    replace: true,
+                  })
                 }
               >
                 Back to Home
@@ -89,20 +99,29 @@ export function ImportRoute() {
           )}
         >
           <Routes>
-            <Route index element={<TypeSelector />} />
-            <Route path="phrase" element={<ImportMnemonic />} />
-            <Route path="private-key" element={<ImportPrivateKey />} />
             <Route
-              path="password"
+              index
+              element={<TypeSelector />}
+            />
+            <Route
+              path={ONBOARDING_ROUTES.IMPORT.PHRASE}
+              element={<ImportMnemonic />}
+            />
+            <Route
+              path={ONBOARDING_ROUTES.IMPORT.PRIVATE_KEY}
+              element={<ImportPrivateKey />}
+            />
+            <Route
+              path={ONBOARDING_ROUTES.IMPORT.PASSWORD}
               element={
                 <SetPassword
                   savePassword={setPassword}
-                  nextPath="../processing"
+                  nextPath={`../${ONBOARDING_ROUTES.IMPORT.PROCESSING}`}
                 />
               }
             />
             <Route
-              path="select-wallets"
+              path={ONBOARDING_ROUTES.IMPORT.SELECT_WALLETS}
               element={
                 <Suspense
                   fallback={
@@ -116,8 +135,14 @@ export function ImportRoute() {
                 </Suspense>
               }
             />
-            <Route path="processing" element={<Processing />} />
-            <Route path="success" element={<Success />} />
+            <Route
+              path={ONBOARDING_ROUTES.IMPORT.PROCESSING}
+              element={<Processing />}
+            />
+            <Route
+              path={ONBOARDING_ROUTES.IMPORT.SUCCESS}
+              element={<Success />}
+            />
           </Routes>
         </ErrorBoundary>
       </PageLayout>

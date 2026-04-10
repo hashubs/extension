@@ -6,6 +6,7 @@ import {
   useState,
 } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { ONBOARDING_ROUTES } from '../routes';
 
 interface ImportWalletContextType {
   phrase: string;
@@ -60,18 +61,18 @@ export function ImportWalletProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     const isBasePage =
-      pathname === '/onboarding/import' ||
-      pathname === '/onboarding/import/' ||
-      pathname === '/onboarding/import/success' ||
-      pathname === '/onboarding/import/success/';
+      pathname.endsWith(`/${ONBOARDING_ROUTES.IMPORT.ROOT}`) ||
+      pathname.endsWith(`/${ONBOARDING_ROUTES.IMPORT.ROOT}/`) ||
+      pathname.endsWith(`/${ONBOARDING_ROUTES.IMPORT.SUCCESS}`) ||
+      pathname.endsWith(`/${ONBOARDING_ROUTES.IMPORT.SUCCESS}/`);
 
     const isInputPage =
       isBasePage ||
-      pathname.endsWith('/phrase') ||
-      pathname.endsWith('/private-key');
+      pathname.endsWith(`/${ONBOARDING_ROUTES.IMPORT.PHRASE}`) ||
+      pathname.endsWith(`/${ONBOARDING_ROUTES.IMPORT.PRIVATE_KEY}`);
 
     if (!isInputPage && !phrase && !privateKey) {
-      navigate('/onboarding/welcome', { replace: true });
+      navigate(`../${ONBOARDING_ROUTES.WELCOME}`, { replace: true });
     }
   }, [phrase, privateKey, pathname, navigate]);
 

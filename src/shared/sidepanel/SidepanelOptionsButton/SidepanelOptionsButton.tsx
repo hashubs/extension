@@ -1,4 +1,4 @@
-import { urlContext } from '@/shared/url-context';
+import { getWindowType } from '@/shared/window-type';
 import PopupIcon from 'jsx:@/ui/assets/popup.svg';
 import SidepanelIcon from 'jsx:@/ui/assets/sidepanel.svg';
 import React, { useMemo } from 'react';
@@ -6,13 +6,13 @@ import { openSidePanel } from '../sidepanel-apis';
 import { isSidepanelSupported } from '../sidepanel-support';
 
 function closeIfNotInTab() {
-  if (urlContext.windowType !== 'tab') {
+  if (getWindowType() !== 'tab') {
     window.close();
   }
 }
 
 function SidepanelOptionsButtonComponent() {
-  const isSidepanel = urlContext.windowType === 'sidepanel';
+  const isSidepanel = getWindowType() === 'sidepanel';
 
   return (
     <div className="relative">

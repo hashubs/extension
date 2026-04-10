@@ -1,17 +1,15 @@
 import { getError } from '@/shared/errors/get-error';
-import { getPopupUrl } from '@/shared/get-popup-url';
-import { setUrlContext } from '@/shared/set-url-context';
+import { getNotificationUrl } from '@/shared/get-browser-url';
 import { nanoid } from 'nanoid';
 import type { Windows } from 'webextension-polyfill';
 import browser from 'webextension-polyfill';
 
 type WindowType = 'tab' | 'dialog';
 
-function makePopupRoute(route: string, windowType: WindowType) {
-  const popupUrl = getPopupUrl();
-  setUrlContext(popupUrl.searchParams, { windowType });
-  popupUrl.hash = route;
-  return popupUrl.toString();
+function makeNotifRoute(route: string, _windowType: WindowType) {
+  const notifUrl = getNotificationUrl();
+  notifUrl.hash = route;
+  return notifUrl.toString();
 }
 
 const IS_WINDOWS = /windows/i.test(navigator.userAgent);
@@ -69,7 +67,7 @@ export async function createBrowserWindow({
   }
   const windowOptions: Partial<Windows.CreateCreateDataType> = {
     focused: true,
-    url: makePopupRoute(`${initialRoute}?${params.toString()}`, type),
+    url: makeNotifRoute(`${initialRoute}?${params.toString()}`, type),
     type: type === 'dialog' ? 'popup' : 'normal',
     width,
     height: heightValue,

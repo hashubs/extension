@@ -12,6 +12,7 @@ import { isTruthy } from 'is-truthy-ts';
 import { useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useImportWallet } from './import-context';
+import { ONBOARDING_ROUTES } from '../routes';
 
 export function Processing() {
   const navigate = useNavigate();
@@ -78,11 +79,13 @@ export function Processing() {
     },
     onSuccess: () => {
       zeroizeAfterSubmission();
-      navigate('/onboarding/import/success', { replace: true });
+      navigate(`../${ONBOARDING_ROUTES.SUCCESS}`, { replace: true });
     },
     onError: (error) => {
       if (isSessionExpiredError(error)) {
-        navigate('/onboarding/session-expired', { replace: true });
+        navigate(`../../${ONBOARDING_ROUTES.SESSION_EXPIRED}`, {
+          replace: true,
+        });
       }
     },
     useErrorBoundary: true,

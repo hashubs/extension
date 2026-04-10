@@ -10,6 +10,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { MdCheck, MdContentCopy, MdVisibility } from 'react-icons/md';
 import { useNavigate } from 'react-router-dom';
 import { SessionExpired } from 'src/shared/errors/errors';
+import { ONBOARDING_ROUTES } from '../routes';
 import { SectionHeader } from '../section-header';
 
 export async function ensurePendingWalletAndUser() {
@@ -61,17 +62,26 @@ export function BackupPhrase({
   }, [encodedMnemonic]);
 
   const handleSessionExpired = useCallback(
-    () => navigate('/onboarding/session-expired', { replace: true }),
+    () =>
+      navigate(`../../${ONBOARDING_ROUTES.SESSION_EXPIRED}`, {
+        replace: true,
+      }),
     [navigate]
   );
 
   const handleSkip = useCallback(
-    () => navigate('../processing', { state: { isBackedUp: false } }),
+    () =>
+      navigate(`../${ONBOARDING_ROUTES.CREATE.PROCESSING}`, {
+        state: { isBackedUp: false },
+      }),
     [navigate]
   );
 
   const handleSuccess = useCallback(
-    () => navigate('../processing', { state: { isBackedUp: true } }),
+    () =>
+      navigate(`../${ONBOARDING_ROUTES.CREATE.PROCESSING}`, {
+        state: { isBackedUp: true },
+      }),
     [navigate]
   );
 

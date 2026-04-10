@@ -8,6 +8,7 @@ import { useMutation } from '@tanstack/react-query';
 import { useEffect, useRef, useState } from 'react';
 import { MdErrorOutline } from 'react-icons/md';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { ONBOARDING_ROUTES } from '../routes';
 import { ensurePendingWalletAndUser } from './backup-phrase';
 
 export function Processing() {
@@ -36,12 +37,14 @@ export function Processing() {
       await wait(1000);
     },
     onSuccess: () => {
-      navigate('../success', { replace: true });
+      navigate(`../${ONBOARDING_ROUTES.SUCCESS}`, { replace: true });
     },
     onError: (error) => {
       console.error('Failed to process wallet creation:', error);
       if (isSessionExpiredError(error)) {
-        navigate('/onboarding/session-expired', { replace: true });
+        navigate(`../../${ONBOARDING_ROUTES.SESSION_EXPIRED}`, {
+          replace: true,
+        });
         return;
       }
       setShowError(true);
@@ -71,7 +74,11 @@ export function Processing() {
           variant="secondary"
           size="lg"
           className="w-full"
-          onClick={() => navigate('../password', { replace: true })}
+          onClick={() =>
+            navigate(`../${ONBOARDING_ROUTES.CREATE.PASSWORD}`, {
+              replace: true,
+            })
+          }
         >
           Go Back
         </Button>

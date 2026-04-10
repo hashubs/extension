@@ -6,6 +6,7 @@ import { MdArrowForward, MdRefresh } from 'react-icons/md';
 import { useNavigate } from 'react-router-dom';
 import { getCurrentUser } from 'src/shared/get-current-user';
 import browser from 'webextension-polyfill';
+import { ONBOARDING_ROUTES } from './routes';
 
 function SessionExpiredIcon() {
   const handSpin = useSpring({
@@ -166,7 +167,7 @@ export function Oops() {
     if (hasExistingUser) {
       browser.action.openPopup();
     } else {
-      navigate('/onboarding');
+      navigate(`/onboarding/${ONBOARDING_ROUTES.WELCOME}`);
     }
   }, [hasExistingUser, navigate]);
 

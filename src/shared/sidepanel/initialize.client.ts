@@ -1,6 +1,5 @@
 import { emitter } from '@/shared/events';
 import browser from 'webextension-polyfill';
-import { urlContext } from '../url-context';
 import { initializeSidepanelMessaging } from './sidepanel-messaging.client';
 
 async function handleActiveTabChange() {
@@ -24,16 +23,14 @@ async function handleActiveTabChange() {
 }
 
 export function initializeSidepanelEvents() {
-  if (urlContext.windowType === 'sidepanel') {
-    initializeSidepanelMessaging();
-    handleActiveTabChange();
+  initializeSidepanelMessaging();
+  handleActiveTabChange();
 
-    const params = new URL(window.location.href).searchParams;
-    if (params.get('openPanelOnActionClick') === 'true') {
-      // TODO: remove this param after we're done?
-      chrome.sidePanel.setPanelBehavior({
-        openPanelOnActionClick: true,
-      });
-    }
+  const params = new URL(window.location.href).searchParams;
+  if (params.get('openPanelOnActionClick') === 'true') {
+    // TODO: remove this param after we're done?
+    chrome.sidePanel.setPanelBehavior({
+      openPanelOnActionClick: true,
+    });
   }
 }

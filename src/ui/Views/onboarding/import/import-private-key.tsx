@@ -6,6 +6,8 @@ import { useNavigate } from 'react-router-dom';
 import { SectionHeader } from '../section-header';
 import { useImportWallet } from './import-context';
 
+import { ONBOARDING_ROUTES } from '../routes';
+
 export function ImportPrivateKey() {
   const { setPrivateKey, setMethod } = useImportWallet();
   const navigate = useNavigate();
@@ -28,7 +30,7 @@ export function ImportPrivateKey() {
 
     setMethod('privateKey');
     setPrivateKey(key.trim());
-    navigate('/onboarding/import/password');
+    navigate(`../${ONBOARDING_ROUTES.IMPORT.PASSWORD}`);
   }
 
   return (

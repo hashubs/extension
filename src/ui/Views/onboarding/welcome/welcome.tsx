@@ -9,6 +9,8 @@ import {
 import { useNavigate } from 'react-router-dom';
 import { SectionHeader } from '../section-header';
 
+import { ONBOARDING_ROUTES } from '../routes';
+
 type WalletOption = {
   id: string;
   Icon: IconType;
@@ -23,21 +25,21 @@ const walletOptions: WalletOption[] = [
     Icon: MdAddCircle,
     title: 'Create New Wallet',
     description: 'Generate a fresh secure vault and starting keys.',
-    to: '/onboarding/create',
+    to: ONBOARDING_ROUTES.CREATE.ROOT,
   },
   {
     id: 'import',
     Icon: MdFileDownload,
     title: 'Import Existing Wallet',
     description: 'Recover your assets using a 12 or 24-word seed phrase.',
-    to: '/onboarding/import',
+    to: ONBOARDING_ROUTES.IMPORT.ROOT,
   },
   {
     id: 'ledger',
     Icon: MdAccountBalanceWallet,
     title: 'Connect Ledger',
     description: 'Use your hardware device for maximum cold-storage security.',
-    to: '/onboarding/hardware',
+    to: 'hardware',
   },
 ];
 
@@ -55,7 +57,7 @@ export function Welcome() {
         {walletOptions.map(({ id, Icon, title, description, to }) => (
           <div
             key={id}
-            onClick={() => navigate(to)}
+            onClick={() => navigate(`../${to}`)}
             className="group cursor-pointer p-5 rounded-xl bg-surface-container-lowest border border-transparent transition-[border-color,background-color] duration-300 shadow-[0_1px_3px_rgba(0,0,0,0.05)] flex items-start gap-5 hover:border-primary-fixed-dim hover:bg-surface-bright"
           >
             <div className="w-8 h-8 rounded-lg bg-surface-container-low text-primary-container flex items-center justify-center shrink-0 transition-[background-color,color] duration-200 group-hover:bg-primary-container group-hover:text-on-primary">

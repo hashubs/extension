@@ -8,7 +8,6 @@ import { runtimeStore } from '@/shared/core/runtime-store';
 import { openOnboarding } from '@/shared/open-onboarding';
 import { ORIGIN_PROTOCOL } from '@/shared/origin-protocol';
 import { initializeSidepanel } from '@/shared/sidepanel/initialize.background';
-import { UrlContextParam } from '@/shared/types/url-context';
 import { ContentScriptManager } from './content-script-manager';
 import { emitter } from './events';
 import { initialize } from './initialize';
@@ -54,10 +53,7 @@ function isOnboardingMode(port: RuntimePort) {
   if (!port.sender?.url) {
     return false;
   }
-  const portSenderUrl = new URL(port.sender.url);
-  return (
-    portSenderUrl.searchParams.get(UrlContextParam.appMode) === 'onboarding'
-  );
+  return port.sender.url.includes('#/onboarding');
 }
 
 function verifyPort(port: RuntimePort) {

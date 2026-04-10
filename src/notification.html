@@ -1,17 +1,23 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" style="width: 400px; height: 600px">
   <head>
     <meta charset="UTF-8" />
     <meta
       name="viewport"
       content="width=device-width, initial-scale=1, user-scalable=no"
     />
-    <title>Youno Wallet</title>
+    <title>Youno Wallet – Request</title>
     <style>
       body {
         margin: 0;
         padding: 0;
         background-color: oklch(0.99 0 0);
+        --layout-popup-width: 400px;
+        --layout-popup-height: 600px;
+        width: var(--layout-popup-width);
+        height: var(--layout-popup-height);
+        overflow: hidden;
+        margin-inline: auto;
       }
       @media (prefers-color-scheme: dark) {
         body {
@@ -20,8 +26,8 @@
       }
     </style>
   </head>
-  <body>
+  <body style="width: 400px; height: 600px">
     <div id="root"></div>
-    <script type="module" src="./index.tsx"></script>
+    <script type="module" src="./entries/notification/index.tsx"></script>
   </body>
 </html>

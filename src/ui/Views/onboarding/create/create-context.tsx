@@ -7,6 +7,7 @@ import {
 } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import type { BlockchainType } from 'src/shared/wallet/classifiers';
+import { ONBOARDING_ROUTES } from '../routes';
 
 interface CreateWalletContextType {
   password: string | null;
@@ -50,22 +51,22 @@ export function CreateWalletProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     const isBasePage =
-      pathname === '/onboarding/create' ||
-      pathname === '/onboarding/create/' ||
-      pathname === '/onboarding/create/backup' ||
-      pathname === '/onboarding/create/backup/' ||
-      pathname === '/onboarding/create/processing' ||
-      pathname === '/onboarding/create/processing/' ||
-      pathname === '/onboarding/create/success' ||
-      pathname === '/onboarding/create/success/';
+      pathname.endsWith(`/${ONBOARDING_ROUTES.CREATE.ROOT}`) ||
+      pathname.endsWith(`/${ONBOARDING_ROUTES.CREATE.ROOT}/`) ||
+      pathname.endsWith(`/${ONBOARDING_ROUTES.CREATE.BACKUP}`) ||
+      pathname.endsWith(`/${ONBOARDING_ROUTES.CREATE.BACKUP}/`) ||
+      pathname.endsWith(`/${ONBOARDING_ROUTES.CREATE.PROCESSING}`) ||
+      pathname.endsWith(`/${ONBOARDING_ROUTES.CREATE.PROCESSING}/`) ||
+      pathname.endsWith(`/${ONBOARDING_ROUTES.CREATE.SUCCESS}`) ||
+      pathname.endsWith(`/${ONBOARDING_ROUTES.CREATE.SUCCESS}/`);
 
     const isInputPage =
       isBasePage ||
-      pathname.endsWith('/password') ||
-      pathname.endsWith('/ecosystems');
+      pathname.endsWith(`/${ONBOARDING_ROUTES.CREATE.PASSWORD}`) ||
+      pathname.endsWith(`/${ONBOARDING_ROUTES.CREATE.ECOSYSTEM}`);
 
     if (!isInputPage && !password) {
-      navigate('/onboarding/welcome', { replace: true });
+      navigate(`../${ONBOARDING_ROUTES.WELCOME}`, { replace: true });
     }
   }, [password, pathname, navigate]);
 

@@ -1,9 +1,9 @@
 import { INTERNAL_ORIGIN } from '@/background/constants';
+import { knownDappOrigins } from '@/shared/dapps/known-dapps';
+import { getIndexUrl } from '@/shared/get-browser-url';
 import { prepareForHref } from '@/shared/prepare-for-href';
-import { setUrlContext } from '@/shared/set-url-context';
 import type { YounoApiClient } from '@/shared/youno-api/youno-api-bare';
 import { YounoAPI as YounoAPIBackground } from '@/shared/youno-api/youno-api.background';
-import { knownDappOrigins } from '@/shared/dapps/known-dapps';
 import browser from 'webextension-polyfill';
 
 export type DappSecurityStatus =
@@ -32,14 +32,9 @@ class PhishingDefence {
     const tabs = await browser.tabs.query({});
     for (const tab of tabs) {
       if (tab?.url && this.getSafeOrigin(tab.url) === origin) {
-        const rawPopupUrl = browser.runtime.getManifest().action?.default_popup;
-        if (!rawPopupUrl) {
-          return;
-        }
-        const popupUrl = new URL(browser.runtime.getURL(rawPopupUrl));
-        popupUrl.hash = `/phishing-warning?url=${origin}`;
-        setUrlContext(popupUrl.searchParams, { windowType: 'tab' });
-        browser.tabs.update(tab.id, { url: popupUrl.toString() });
+        const warningUrl = getIndexUrl();
+        warningUrl.hash = `/phishing-warning?url=${origin}`;
+        browser.tabs.update(tab.id, { url: warningUrl.toString() });
       }
     }
   }
@@ -122,7 +117,8 @@ class PhishingDefence {
     const currentStatus = (origin && this.websiteStatus[origin]) || 'unknown';
 
     return {
-      status: isWhitelisted && currentStatus === 'unknown' ? 'ok' : currentStatus,
+      status:
+        isWhitelisted && currentStatus === 'unknown' ? 'ok' : currentStatus,
       isWhitelisted,
     };
   }

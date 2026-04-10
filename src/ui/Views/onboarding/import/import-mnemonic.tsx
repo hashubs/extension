@@ -7,6 +7,8 @@ import { useNavigate } from 'react-router-dom';
 import { SectionHeader } from '../section-header';
 import { useImportWallet } from './import-context';
 
+import { ONBOARDING_ROUTES } from '../routes';
+
 const WORD_COUNT_24 = 24;
 
 export function ImportMnemonic() {
@@ -35,7 +37,7 @@ export function ImportMnemonic() {
     }
 
     setPhrase(phrase);
-    navigate('/onboarding/import/select-wallets');
+    navigate(`../${ONBOARDING_ROUTES.IMPORT.SELECT_WALLETS}`);
   }
 
   function togglePhraseMode() {

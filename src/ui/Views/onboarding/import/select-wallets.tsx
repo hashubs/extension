@@ -66,6 +66,8 @@ const ECOSYSTEM_META: Record<
   },
 };
 
+import { ONBOARDING_ROUTES } from '../routes';
+
 export function SelectWallets() {
   const {
     selectedAddresses,
@@ -177,7 +179,7 @@ export function SelectWallets() {
 
   function handleContinue() {
     if (selectedCount === 0) return;
-    navigate('/onboarding/import/password');
+    navigate(`../${ONBOARDING_ROUTES.IMPORT.PASSWORD}`);
   }
 
   const getValueAddress = (address: string) => {

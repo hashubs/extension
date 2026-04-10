@@ -20,10 +20,10 @@
       "128": "images/logo-icon-128.png"
     },
     "default_title": "Youno",
-    "default_popup": "ui/popup.html"
+    "default_popup": "popup.html"
   },
   "side_panel": {
-    "default_path": "ui/sidepanel.html"
+    "default_path": "sidepanel.html"
   },
   "commands": {
     "sidepanel_open_custom": {
@@ -52,7 +52,11 @@
   ],
   "web_accessible_resources": [
     {
-      "resources": ["content-script/in-page.ts"],
+      "resources": [
+        "content-script/in-page.ts",
+        "index.html",
+        "notification.html"
+      ],
       "matches": ["<all_urls>"]
     }
   ],

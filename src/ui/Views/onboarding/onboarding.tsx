@@ -1,5 +1,5 @@
 import { useOnboardingSession } from '@/ui/hooks/useOnboardingSession';
-import { Route, Routes } from 'react-router-dom';
+import { Navigate, Route, Routes } from 'react-router-dom';
 import { CreateRoute } from './create';
 import { CreateWalletProvider } from './create/create-context';
 import { ImportRoute, ImportWalletProvider } from './import';
@@ -10,9 +10,11 @@ import { Success } from './success';
 import { PannelRight } from './success/pannel-right';
 import { Welcome } from './welcome';
 
+import { ONBOARDING_ROUTES } from './routes';
+
 export function Onboarding() {
   const { sessionDataIsLoading } = useOnboardingSession({
-    navigateOnExistingUser: 'session-expired',
+    navigateOnExistingUser: ONBOARDING_ROUTES.SESSION_EXPIRED,
   });
 
   if (sessionDataIsLoading) {
@@ -22,7 +24,11 @@ export function Onboarding() {
   return (
     <Routes>
       <Route
-        path="/onboarding"
+        path="/"
+        element={<Navigate to={ONBOARDING_ROUTES.WELCOME} replace />}
+      />
+      <Route
+        path={ONBOARDING_ROUTES.SHARE_DATA}
         element={
           <PageLayout>
             <ShareData />
@@ -30,7 +36,7 @@ export function Onboarding() {
         }
       />
       <Route
-        path="/onboarding/welcome"
+        path={ONBOARDING_ROUTES.WELCOME}
         element={
           <PageLayout>
             <Welcome />
@@ -38,7 +44,7 @@ export function Onboarding() {
         }
       />
       <Route
-        path="/onboarding/create/*"
+        path={`${ONBOARDING_ROUTES.CREATE.ROOT}/*`}
         element={
           <CreateWalletProvider>
             <CreateRoute />
@@ -46,7 +52,7 @@ export function Onboarding() {
         }
       />
       <Route
-        path="/onboarding/import/*"
+        path={`${ONBOARDING_ROUTES.IMPORT.ROOT}/*`}
         element={
           <ImportWalletProvider>
             <ImportRoute />
@@ -54,14 +60,14 @@ export function Onboarding() {
         }
       />
       <Route
-        path="/onboarding/hardware/*"
+        path="hardware/*"
         element={
           // For hardware wallet, we don't use PageLayout (full-screen custom)
           <>{/* <Hardware /> */}</>
         }
       />
       <Route
-        path="/onboarding/success"
+        path={ONBOARDING_ROUTES.SUCCESS}
         element={
           <PageLayout customRightPanel={<PannelRight />}>
             <Success />
@@ -69,7 +75,7 @@ export function Onboarding() {
         }
       />
       <Route
-        path="/onboarding/session-expired"
+        path={ONBOARDING_ROUTES.SESSION_EXPIRED}
         element={
           <PageLayout>
             <Oops />

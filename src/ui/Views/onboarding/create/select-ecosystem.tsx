@@ -38,6 +38,8 @@ const ecosystemsList: Ecosystem[] = [
   },
 ];
 
+import { ONBOARDING_ROUTES } from '../routes';
+
 export function SelectEcosystem() {
   const { password, ecosystems, toggleEcosystem, setEcosystems, resetContext } =
     useCreateWallet();
@@ -58,11 +60,13 @@ export function SelectEcosystem() {
     onSuccess: () => {
       zeroizeAfterSubmission();
       resetContext();
-      navigate('/onboarding/create/backup');
+      navigate(`../${ONBOARDING_ROUTES.CREATE.BACKUP}`);
     },
     onError: (e) => {
       if (isSessionExpiredError(e)) {
-        navigate('/onboarding/session-expired', { replace: true });
+        navigate(`../../${ONBOARDING_ROUTES.SESSION_EXPIRED}`, {
+          replace: true,
+        });
       }
       setShowError(true);
     },
@@ -82,7 +86,7 @@ export function SelectEcosystem() {
 
   useEffect(() => {
     if (!password) {
-      navigate('/onboarding/create/password');
+      navigate(`../${ONBOARDING_ROUTES.CREATE.PASSWORD}`);
     }
   }, [password]);
 

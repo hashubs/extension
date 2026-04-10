@@ -2,7 +2,7 @@ import { accountPublicRPCPort, walletPort } from '@/shared/channel';
 import { useMutation } from '@tanstack/react-query';
 import { useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
-import { urlContext } from 'src/shared/url-context';
+import { getWindowType } from './window-type';
 
 function useAuthenticatedAppOpened() {
   const { pathname } = useLocation();
@@ -38,7 +38,7 @@ function useScreenViewChange() {
         address,
         previous: previousPathname.current,
         screenSize: `${window.screen.width}x${window.screen.height}`,
-        windowType: urlContext.windowType,
+        windowType: getWindowType(),
       });
     },
     onSuccess() {

@@ -14,7 +14,7 @@ import type { TypedData } from '@/modules/ethereum/message-signing/TypedData';
 import type { AddEthereumChainParameter } from '@/modules/ethereum/types/add-ethereum-chain-parameter';
 import type { QuoteErrorContext } from '@/shared/types/quote-error-context';
 import type { SignTransactionResult } from '@/shared/types/sign-transaction-result';
-import type { WindowType } from '@/shared/types/url-context';
+import type { WindowType } from '@/shared/window-type';
 import type { NetworksSource } from '@/shared/youno-api/shared';
 import type { State as GlobalPreferencesState } from './wallet/global-preferences';
 import type { WalletContainer } from './wallet/model/types';

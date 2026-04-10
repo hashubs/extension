@@ -1,5 +1,5 @@
 import browser from 'webextension-polyfill';
-import { getSidepanelUrl } from '../get-popup-url';
+import { getSidepanelUrl } from '../get-browser-url';
 import { invariant } from '../invariant';
 
 export async function getActiveTab() {

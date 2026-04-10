@@ -1,5 +1,5 @@
 import browser from 'webextension-polyfill';
-import { getSidepanelUrl } from '../get-popup-url';
+import { getSidepanelUrl } from '../get-browser-url';
 import { browserState } from './BrowserState';
 import { closeSidepanel } from './sidepanel-messaging.background';
 import { isSidepanelSupported } from './sidepanel-support';

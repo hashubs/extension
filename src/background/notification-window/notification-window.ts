@@ -1,7 +1,7 @@
 import { PersistentStore } from '@/modules/persistent-store';
 import type { RpcError, RpcResult } from '@/shared/custom-rpc';
 import { UserRejected } from '@/shared/errors/errors';
-import { getSidepanelUrl } from '@/shared/get-popup-url';
+import { getSidepanelUrl } from '@/shared/get-browser-url';
 import { isSidepanelOpen } from '@/shared/sidepanel/sidepanel-messaging.background';
 import type { Brand } from '@/shared/type-utils/brand';
 import type { ErrorResponse } from '@walletconnect/jsonrpc-utils';

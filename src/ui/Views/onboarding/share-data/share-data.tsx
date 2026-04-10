@@ -4,16 +4,18 @@ import { useNavigate } from 'react-router-dom';
 import { useGlobalPreferences } from '../../../features/preferences/usePreferences';
 import { useOnboardingSession } from '../../../hooks/useOnboardingSession';
 
+import { ONBOARDING_ROUTES } from '../routes';
+
 export function ShareData() {
   const navigate = useNavigate();
   const { globalPreferences, setGlobalPreferences, query } =
     useGlobalPreferences();
 
-  useOnboardingSession({ navigateOnExistingUser: 'success' });
+  useOnboardingSession({ navigateOnExistingUser: ONBOARDING_ROUTES.SUCCESS });
 
   useEffect(() => {
     if (!query.isLoading && globalPreferences?.analyticsEnabled != null) {
-      navigate('/onboarding/welcome');
+      navigate(`../${ONBOARDING_ROUTES.WELCOME}`);
     }
   }, [query.isLoading, globalPreferences?.analyticsEnabled, navigate]);
 
@@ -24,7 +26,7 @@ export function ShareData() {
       });
     },
     onSuccess: () => {
-      navigate('/onboarding/welcome');
+      navigate(`../${ONBOARDING_ROUTES.WELCOME}`);
     },
   });
 

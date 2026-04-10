@@ -5,7 +5,7 @@ import { PortMessageChannel } from '@/shared/port-message-channel';
 import type { AccountPublicRPC } from '@/shared/types/account-public-rpc';
 import type { MemoryCacheRPC } from '@/shared/types/memory-cache-rpc';
 import type { Wallet } from '@/shared/types/wallet';
-import { urlContext } from '@/shared/url-context';
+import { getWindowType } from '@/shared/window-type';
 import browser from 'webextension-polyfill';
 // import type { DnaService } from '../../modules/dna-service/dna.background';
 // import { initDnaApi } from '../../modules/dna-service/dna.client';
@@ -47,7 +47,7 @@ export const sessionCacheService = new PortMessageChannel({
 
 class WindowPort extends PortMessageChannel {
   static maybeRestoreRouteForSidepanel() {
-    if (urlContext.windowType === 'sidepanel') {
+    if (getWindowType() === 'sidepanel') {
       // TODO: navigate to location that user was on before opening the request view?
       navigateProgrammatically({ pathname: '/' });
     }
