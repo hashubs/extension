@@ -4,7 +4,7 @@ import * as React from 'react';
 import { MdVisibility, MdVisibilityOff } from 'react-icons/md';
 
 const inputVariants = cva(
-  'flex w-full rounded-lg border border-muted-foreground/10 bg-white text-black transition-all outline-none file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-[rgba(113,121,120,0.4)] focus:ring-3 disabled:cursor-not-allowed disabled:opacity-45',
+  'flex w-full rounded-lg bg-primary dark:bg-input/30 border border-input transition-all outline-none file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus:ring-3 disabled:cursor-not-allowed disabled:opacity-45',
   {
     variants: {
       size: {

@@ -14,7 +14,6 @@ import { SiteFaviconImg } from '@/ui/components/SiteFaviconImg';
 import { WalletList } from '@/ui/components/wallet-list/wallet-list';
 import { usePhishingDefenceStatus } from '@/ui/hooks/request/external/usePhishingDefenceStatus';
 import { useEvent } from '@/ui/hooks/useEvent';
-import { truncateAddress } from '@/ui/lib/utils';
 import {
   Button,
   Drawer,
@@ -206,12 +205,11 @@ function Account({
               />
             </div>
             <div className="flex flex-col">
-              <span className="text-sm font-medium leading-tight">
-                <WalletDisplayName wallet={selectedWallet} />
-              </span>
-              <span className="text-[11px] font-mono text-muted-foreground/80">
-                {truncateAddress(selectedWallet.address)}
-              </span>
+              <span className="text-sm font-medium leading-tight">Wallet</span>
+              <WalletDisplayName
+                wallet={selectedWallet}
+                className="text-[11px] font-mono text-muted-foreground/80"
+              />
             </div>
           </div>
           <TiArrowSortedDown className="size-3.5 text-muted-foreground/80" />
@@ -341,13 +339,7 @@ function RequestAccountsHeader({
   return (
     <div className="shrink-0 pt-8 pb-4 px-6 flex flex-col items-center bg-[#f6f6f8] dark:bg-[#1f1f1f]">
       <div className="relative mb-4">
-        <div className="w-16 h-16 rounded-xl bg-background flex items-center justify-center ring-1 ring-primary/20 shadow-sm overflow-hidden">
-          <SiteFaviconImg
-            size={64}
-            url={origin}
-            className="w-full h-full object-cover"
-          />
-        </div>
+        <SiteFaviconImg size={64} url={origin} className="size-16" />
         <div className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-blue-500 flex items-center justify-center ring-2 ring-[#1c1e22]">
           <FaLink className="w-2.5 h-2.5 text-white" />
         </div>

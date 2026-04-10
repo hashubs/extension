@@ -1,4 +1,9 @@
-import { truncateAddress } from '@/ui/lib/utils';
+import { middot } from '@/shared/typography';
+import { formatCurrencyToParts } from '@/shared/units/formatCurrencyValue';
+import { getAddressType } from '@/shared/wallet/classifiers';
+import { useAddressActivity } from '@/ui/hooks/request/external/useAddressActivity';
+import { WalletNameType } from '@/ui/hooks/request/internal/useProfileName';
+import { NeutralDecimals } from '@/ui/ui-kit';
 import { useMemo } from 'react';
 import { normalizeAddress } from 'src/shared/normalize-address';
 import { getWalletId } from 'src/shared/wallet/wallet-list';
@@ -6,34 +11,57 @@ import { WalletDisplayName } from 'src/ui/components/WalletDisplayName';
 import { BlockieImg } from '../BlockieImg';
 import { AnyWallet, getFullWalletList, WalletGroupInfo } from './shared';
 
+type AnyWalletWithValue = AnyWallet & {
+  valueUsd: number;
+};
+
+function getWalletKey(address: string) {
+  return getAddressType(address) === 'evm' ? address.toLowerCase() : address;
+}
+
 function WalletListItem({
   wallet,
   isSelected,
   onClick,
 }: {
-  wallet: AnyWallet;
+  wallet: AnyWalletWithValue;
   isSelected: boolean;
   onClick: () => void;
 }) {
+  const ecosystemPrefix =
+    getAddressType(wallet.address) === 'evm' ? 'ETH' : 'SOL';
+
   return (
     <div
       role="button"
       onClick={onClick}
-      className={`group relative flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-all ${
+      className={`group relative flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-all ${
         isSelected
-          ? 'border-blue-500/50 bg-blue-500/10 shadow-sm'
-          : 'hover:bg-black/5 dark:hover:bg-white/5'
+          ? 'border-teal-500/50 bg-teal-500/10 shadow-sm'
+          : 'bg-item border border-border/20 hover:bg-black/5 dark:hover:bg-white/5'
       }`}
     >
       <div className="shrink-0 flex items-center justify-center">
-        <BlockieImg address={wallet.address} size={28} borderRadius={4} />
+        <BlockieImg address={wallet.address} size={30} borderRadius={4} />
       </div>
-      <div className="flex flex-col">
-        <span className="text-sm font-medium leading-tight">
-          <WalletDisplayName wallet={wallet} />
+      <div className="flex flex-col gap-[2px]">
+        <span className="text-xs leading-none">
+          <WalletDisplayName
+            wallet={wallet}
+            render={(data) => (
+              <>
+                {data.type !== WalletNameType.domain
+                  ? `${ecosystemPrefix} ${middot} `
+                  : ''}
+                {data.value}
+              </>
+            )}
+          />
         </span>
-        <span className="text-[11px] font-mono text-muted-foreground/80">
-          {truncateAddress(wallet.address)}
+        <span className="inline-flex text-base font-medium leading-none">
+          <NeutralDecimals
+            parts={formatCurrencyToParts(wallet.valueUsd, 'en', 'USD')}
+          />
         </span>
       </div>
     </div>
@@ -69,17 +97,53 @@ export function WalletList({
     >();
     for (const group of walletGroups) {
       for (const wallet of group.walletContainer.wallets) {
-        map.set(
-          getWalletId({
-            address: wallet.address,
-            groupId: group.id,
-          }),
-          { group, wallet }
-        );
+        map.set(getWalletId({ address: wallet.address, groupId: group.id }), {
+          group,
+          wallet,
+        });
       }
     }
     return map;
   }, [walletGroups]);
+
+  const allAddresses = useMemo(
+    () =>
+      groups.flatMap(
+        (group) =>
+          group.walletIds
+            .map((walletId) => walletMap.get(walletId)?.wallet.address)
+            .filter(Boolean) as string[]
+      ),
+    [groups, walletMap]
+  );
+
+  const { data: activityData } = useAddressActivity({
+    addresses: allAddresses,
+    options: {
+      enabled: allAddresses.length > 0,
+      suspense: false,
+      useErrorBoundary: false,
+    },
+  });
+
+  const walletsWithActivity = useMemo(() => {
+    const map = new Map<
+      string,
+      { group: WalletGroupInfo; wallet: AnyWalletWithValue }
+    >();
+    for (const [walletId, { group, wallet }] of walletMap.entries()) {
+      const totalValue =
+        activityData?.[getWalletKey(wallet.address)]?.totalValue;
+      map.set(walletId, {
+        group,
+        wallet: {
+          ...wallet,
+          valueUsd: totalValue ?? 0,
+        },
+      });
+    }
+    return map;
+  }, [walletMap, activityData]);
 
   if (groups.length === 0) {
     return (
@@ -96,11 +160,12 @@ export function WalletList({
           <div className="text-[10px] font-bold uppercase tracking-widest pl-1">
             {group.title}
           </div>
-          <div className="flex flex-col gap-1.5">
+          <div className="flex flex-col space-y-2">
             {group.walletIds.map((walletId) => {
-              const { group: walletGroup, wallet } =
-                walletMap.get(walletId) || {};
-              if (!wallet || !walletGroup) return null;
+              const entry = walletsWithActivity.get(walletId);
+              if (!entry) return null;
+
+              const { group: walletGroup, wallet } = entry;
 
               const isSelected =
                 walletId === selectedAddress ||

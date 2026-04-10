@@ -6,7 +6,6 @@ import { ScreenViewTracker } from '@/shared/ScreenViewTracker';
 import { urlContext } from '@/shared/url-context';
 import { useBodyStyle } from '@/ui/components/Background/Background';
 import { DesignTheme } from '@/ui/components/DesignTheme/DesignTheme';
-import { ThemeDecoration } from '@/ui/components/DesignTheme/ThemeDecoration';
 import { HandshakeFailure } from '@/ui/components/HandshakeFailure/HandshakeFailure';
 import { InactivityDetector } from '@/ui/components/Session/InactivityDetector';
 import { SessionResetHandler } from '@/ui/components/Session/SessionResetHandler';
@@ -17,9 +16,9 @@ import {
 import { ViewArea } from '@/ui/components/ViewArea/ViewArea';
 import { ViewSuspense } from '@/ui/components/ViewSuspense/ViewSuspense';
 import { initialize as initializeApperance } from '@/ui/features/appearance';
-import { Onboarding } from '@/ui/features/onboarding/onboarding';
 import { ProgrammaticNavigationHelper } from '@/ui/shared/routing/ProgrammaticNavigationHelper';
 import * as styles from '@/ui/styles/global.module.css';
+import { Onboarding } from '@/ui/Views/onboarding/onboarding';
 import { useStore } from '@store-unit/react';
 import { QueryClientProvider, useQuery } from '@tanstack/react-query';
 import React, { useMemo } from 'react';
@@ -32,8 +31,8 @@ import {
   useLocation,
 } from 'react-router-dom';
 
-import { DashboardView } from './Views/DashboardView';
 import { LoginView } from './Views/LoginView';
+import { Overview } from './Views/overview/overview';
 import { PhishingWarningPage } from './Views/phishing-warning';
 import {
   ChooseGlobalProviderGuard,
@@ -143,7 +142,6 @@ function PageLayoutViews() {
 
 function Views({ initialRoute }: { initialRoute?: string }) {
   const isPopup = urlContext.windowType === 'popup';
-  console.log('isPopup', isPopup);
   return (
     <ViewArea
       data-testid="view-area"
@@ -179,9 +177,10 @@ function Views({ initialRoute }: { initialRoute?: string }) {
           path="/overview/*"
           element={
             <RequireAuth>
-              <DashboardView
+              {/* <DashboardView
                 onLogout={() => queryClient.invalidateQueries(['authState'])}
-              />
+              /> */}
+              <Overview />
             </RequireAuth>
           }
         />
@@ -254,7 +253,6 @@ export function App({ initialView, inspect }: AppProps) {
             <InactivityDetector />
             <SessionResetHandler />
             <ProgrammaticNavigationHelper />
-            <ThemeDecoration />
             <ViewSuspense logDelays={true}>
               {inspect && (
                 <div className="bg-gray-50 border-b border-gray-200 p-2 text-[10px] text-gray-400 font-mono">

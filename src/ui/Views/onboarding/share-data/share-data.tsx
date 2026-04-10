@@ -1,8 +1,8 @@
 import { useMutation } from '@tanstack/react-query';
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useGlobalPreferences } from '../../../features/preferences/usePreferences';
 import { useOnboardingSession } from '../../../hooks/useOnboardingSession';
-import { useGlobalPreferences } from '../../preferences/usePreferences';
 
 export function ShareData() {
   const navigate = useNavigate();

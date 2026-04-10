@@ -13,3 +13,4 @@ export * from './tabs';
 export { Card, CardItem } from './card';
 export { AnimatedCheckmark } from './checkmark';
 export { Image } from './image';
+export { NeutralDecimals } from './neutral-decimals';

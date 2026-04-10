@@ -90,10 +90,12 @@ export function SelectWallets() {
   });
 
   const { data: activeWallets, isLoading: isCheckingActivity } =
-    useAddressActivity(
-      { addresses: data?.addressesToCheck || [] },
-      { enabled: Boolean(data?.addressesToCheck) }
-    );
+    useAddressActivity({
+      addresses: data?.addressesToCheck || [],
+      options: {
+        enabled: Boolean(data?.addressesToCheck),
+      },
+    });
 
   const isScanning = !!isDeriving || !!isCheckingActivity;
   const wallets = data?.derivedWallets || [];
@@ -127,10 +129,10 @@ export function SelectWallets() {
         !suggestedAddresses.has(w.address)
     );
 
-    const activity = activeWallets ?? {};
+    const active = activeWallets ?? {};
     const sortedRemaining = [...remaining].sort((a, b) => {
-      const aActive = activity[normalizeAddress(a.address)]?.active ? 1 : 0;
-      const bActive = activity[normalizeAddress(b.address)]?.active ? 1 : 0;
+      const aActive = active[normalizeAddress(a.address)]?.active ? 1 : 0;
+      const bActive = active[normalizeAddress(b.address)]?.active ? 1 : 0;
       return bActive - aActive;
     });
 
