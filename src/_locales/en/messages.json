@@ -1,0 +1,10 @@
+{
+  "appName": {
+    "message": "Youno Wallet",
+    "description": "The name of the application"
+  },
+  "appDescription": {
+    "message": "Trade, track, and explore crypto on your terms. Manage your assets with Youno.",
+    "description": "The description of the application"
+  }
+}

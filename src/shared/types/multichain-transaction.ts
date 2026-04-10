@@ -1,0 +1,11 @@
+import type { IncomingTransactionWithChainId } from '@/modules/ethereum/types/IncomingTransaction';
+import type { SolTxSerializable } from '@/modules/solana/SolTransaction';
+import type { OneOf } from '../type-utils/OneOf';
+
+export type MultichainTransaction<
+  E extends IncomingTransactionWithChainId = IncomingTransactionWithChainId,
+  S extends SolTxSerializable = SolTxSerializable
+> = OneOf<{
+  evm: E;
+  solana: S;
+}>;

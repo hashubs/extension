@@ -1,0 +1,119 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Aeonik Pro', sans-serif;
+  font-size: 14px;
+  line-height: calc(20 / 14);
+  -webkit-font-smoothing: antialiased;
+  /**
+   * Setting display: grid allows children to use {height: 100%}
+   * even when we use {min-height} for body size. This is crucial for
+   * tab and dialog views
+   * See more: https://stackoverflow.com/q/78246951/3523645
+   */
+  display: grid;
+  --body-width: 400px;
+  --body-max-width: 400px;
+  --body-height: 600px;
+  width: var(--body-width);
+  /** TODO: check that using min-height instead of height doesn't break popup dimensions in supported browsers */
+  min-height: var(--body-height);
+  margin-inline: auto;
+}
+
+body.isDialog {
+  height: auto;
+  min-height: 100vh;
+  width: 100%;
+  margin: auto;
+}
+
+/* :root:has(body.isTab) {
+  background-color: var(--neutral-200);
+} */
+
+body.isTab {
+  /**
+   * prefer "initial" over "auto" to unset the custom-property value.
+   * This way the code that relies on var(--body-height, fallback) will be able to use the {fallback}
+   * Also "unset" seems to work, too. Not sure if it's better here than "initial"
+   */
+  --body-height: initial;
+  --body-width: 400px;
+  height: auto;
+  min-height: 100vh;
+  border-inline: 1px solid var(--neutral-300);
+  margin-inline: auto;
+}
+
+body.isSidepanel {
+  --body-width: 100%;
+  --body-height: 100%;
+  --sidepanel-border-radius: 16px;
+}
+
+body.isSidepanel :global(#root) {
+  width: 100%;
+  max-width: var(--body-max-width);
+  margin-inline: auto;
+}
+
+:root:has(body.isSidepanel) {
+  height: 100%;
+}
+
+:global(body.isIframe) {
+  --body-height: initial;
+  --body-width: initial;
+  display: block; /* display: grid for some reason creates unwanted x an y overscolls */
+  height: var(--body-height);
+  background-color: transparent;
+}
+
+/* :root:has(body.pageLayout) {
+  background-color: var(--background);
+} */
+
+body.pageLayout {
+  --body-width: 100%;
+  height: 100vh;
+  min-height: auto;
+  width: 100%;
+  border: none;
+}
+
+:global(.popup-only) {
+  display: none;
+}
+
+body:not(.pageLayout):not(.isTab):not(.isDialog) :global(.popup-only) {
+  display: block;
+}
+
+body.isDialog:not(.pageLayout) {
+  max-width: 400px;
+}
+
+:global(#root) {
+  height: 100%;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+:global(.fadeIn) {
+  animation: fadeIn 0.2s;
+}
+
+:global(#friendly-captcha) {
+  position: fixed;
+  top: 2000px;
+}

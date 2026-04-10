@@ -1,0 +1,34 @@
+import { walletPort } from '@/shared/channel';
+import { useMutation } from '@tanstack/react-query';
+import { useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
+
+export function InactivityDetector() {
+  /**
+   * Send user heardbeat on
+   * * initial mount
+   * * clicks
+   * * location change
+   */
+  const location = useLocation();
+  const { mutate: sendHeartbeat } = useMutation({
+    mutationFn: () => walletPort.request('userHeartbeat'),
+  });
+
+  useEffect(() => {
+    function handler() {
+      sendHeartbeat();
+    }
+    document.addEventListener('click', handler);
+    return () => {
+      document.removeEventListener('click', handler);
+    };
+  }, [sendHeartbeat]);
+
+  useEffect(() => {
+    // invoked both on mount and on location change
+    sendHeartbeat();
+  }, [location, sendHeartbeat]);
+
+  return null;
+}

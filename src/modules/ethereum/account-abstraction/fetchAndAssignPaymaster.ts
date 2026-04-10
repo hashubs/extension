@@ -1,0 +1,107 @@
+// import { utils as zkSyncUtils } from 'zksync-ethers';
+// import { invariant } from '@/shared/invariant';
+// import { valueToHex } from '@/shared/units/value-to-hex';
+// import { normalizeChainId } from '@/shared/normalize-chainId';
+// import type { ZerionApiClient } from '@/modules/zerion-api/zerion-api-bare';
+// import { assertProp } from '@/shared/assert-property';
+// import { getGas } from '../transactions/getGas';
+// import type { IncomingTransaction } from '../types/IncomingTransaction';
+// import { GAS_PER_PUBDATA_BYTE_DEFAULT } from './constants';
+
+// type NetworksSource = 'mainnet' | 'testnet';
+
+// export function adjustedCheckEligibility(
+//   params: Parameters<ZerionApiClient['paymasterCheckEligibility']>[0],
+//   { source, apiClient }: { source: NetworksSource; apiClient: ZerionApiClient }
+// ) {
+//   const txCopy = { ...params };
+//   const gas = getGas(txCopy);
+//   invariant(gas, 'Tx param missing: {gas}');
+//   return apiClient.paymasterCheckEligibility(txCopy, { source });
+// }
+
+// function normalizeTransactionProps(tx: IncomingTransaction) {
+//   const gasLimit = getGas(tx);
+//   invariant(gasLimit, 'transaction param missing: {gasLimit}');
+//   assertProp(tx, 'from');
+//   assertProp(tx, 'to');
+//   assertProp(tx, 'nonce');
+//   assertProp(tx, 'chainId');
+//   assertProp(tx, 'maxFeePerGas');
+//   assertProp(tx, 'maxPriorityFeePerGas');
+//   return {
+//     from: tx.from,
+//     to: tx.to,
+//     nonce: tx.nonce,
+//     chainId: tx.chainId,
+//     maxFeePerGas: tx.maxFeePerGas,
+//     maxPriorityFeePerGas: tx.maxPriorityFeePerGas,
+//     data: tx.data,
+//     value: tx.value,
+//     gas: gasLimit,
+//   };
+// }
+
+// async function getPaymasterParams(
+//   incomingTransaction: IncomingTransaction,
+//   {
+//     gasPerPubdataByte,
+//     source,
+//     apiClient,
+//   }: {
+//     gasPerPubdataByte: string;
+//     source: NetworksSource;
+//     apiClient: ZerionApiClient;
+//   }
+// ) {
+//   const transaction = normalizeTransactionProps(incomingTransaction);
+//   type Request = Parameters<ZerionApiClient['getPaymasterParams']>[0];
+//   const params: Request = {
+//     transaction: {
+//       from: transaction.from,
+//       to: transaction.to,
+//       nonce: valueToHex(transaction.nonce),
+//       chainId: normalizeChainId(transaction.chainId),
+//       gas: valueToHex(transaction.gas),
+//       gasPerPubdataByte,
+//       data: valueToHex(transaction.data ?? '0x0'),
+//       maxFee: valueToHex(transaction.maxFeePerGas),
+//       maxPriorityFee: valueToHex(transaction.maxPriorityFeePerGas),
+//       value: valueToHex(transaction.value ?? '0x0'),
+//     },
+//   };
+//   const { data } = await apiClient.getPaymasterParams(params, { source });
+//   return data;
+// }
+
+// export async function fetchAndAssignPaymaster<T extends IncomingTransaction>(
+//   tx: T,
+//   { source, apiClient }: { source: NetworksSource; apiClient: ZerionApiClient }
+// ) {
+//   const txCopy = { ...tx };
+//   const gas = getGas(txCopy);
+//   invariant(gas, 'Tx param missing: {gas}');
+//   const gasPerPubdataByte = GAS_PER_PUBDATA_BYTE_DEFAULT;
+//   const { eligible, paymasterParams, suggestedGas } = await getPaymasterParams(
+//     txCopy,
+//     {
+//       gasPerPubdataByte,
+//       source,
+//       apiClient,
+//     }
+//   );
+//   if (eligible && paymasterParams && suggestedGas) {
+//     txCopy.type = zkSyncUtils.EIP712_TX_TYPE;
+//     const normalizedSuggestedGas = valueToHex(suggestedGas);
+//     txCopy.gas = normalizedSuggestedGas;
+//     txCopy.gasLimit = normalizedSuggestedGas;
+//     txCopy.customData = {
+//       paymasterParams,
+//       gasPerPubdata: gasPerPubdataByte,
+//     };
+//     return txCopy;
+//   }
+//   // NOTE: Maybe better to throw here? If paymaster endpoint returns {eligible: false},
+//   // can it be an unexpected behavior to silently submit a transaction without a paymaster?
+//   return tx;
+// }

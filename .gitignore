@@ -1,0 +1,14 @@
+node_modules
+dist
+dist-firefox
+.env
+.eslintcache
+.parcel-cache
+.referensi
+.backup
+/test-results/
+/e2e-report/
+/blob-report/
+/playwright/.cache/
+/src/manifest.json
+settings.local.json

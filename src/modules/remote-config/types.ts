@@ -1,0 +1,29 @@
+import type { WalletNameFlag } from '@/shared/types/wallet-name-flag';
+
+export interface RemoteConfig {
+  extension_wallet_name_flags: Record<string, WalletNameFlag[]>;
+  extension_uninstall_link: string;
+  extension_loyalty_enabled: boolean;
+  extension_asset_page_enabled: boolean;
+  fee_comparison_config: Array<{
+    imgSrc: string;
+    title: string;
+    fee: number;
+    isYounoFee: boolean;
+  }>;
+  loyalty_config: Partial<{
+    referrerXpPercent: number;
+    rewardIconLevel: number;
+  }>;
+  youno_fee_learn_more_link: string;
+  premium_page_feedback_link: string;
+  quotes_refetch_interval: number;
+  tx_polling_preferences: {
+    interval_ms: number;
+    max_attempts: number;
+  };
+  swap_form_balance_pulling_params: {
+    interval_ms: number;
+    max_attempts: number;
+  };
+}

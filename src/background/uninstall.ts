@@ -1,0 +1,18 @@
+import type { RemoteConfig } from '@/modules/remote-config';
+import { getRemoteConfigValue } from '@/modules/remote-config';
+import { version } from '@/shared/package-version';
+import browser from 'webextension-polyfill';
+
+export function setUninstallURL() {
+  const uninstallLink = getRemoteConfigValue(
+    'extension_uninstall_link'
+  ) as RemoteConfig['extension_uninstall_link'];
+
+  if (uninstallLink) {
+    const uninstallURL = new URL(uninstallLink);
+    uninstallURL.hash = uninstallURL.hash
+      ? `${uninstallURL.hash}&app_version=${version}`
+      : `#app_version=${version}`;
+    browser.runtime.setUninstallURL(uninstallURL.toString());
+  }
+}

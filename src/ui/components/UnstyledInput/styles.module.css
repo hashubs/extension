@@ -1,0 +1,13 @@
+.input {
+  display: block;
+  border: none;
+  padding: 0;
+  outline: none;
+  background-color: transparent;
+  font-size: inherit;
+  font-family: inherit;
+  font-weight: inherit;
+  font-style: inherit;
+  line-height: inherit;
+  width: 100%;
+}

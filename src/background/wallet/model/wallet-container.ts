@@ -1,0 +1,283 @@
+import type {
+  Credentials,
+  SessionCredentials,
+} from '@/background/account/credentials';
+import { isSessionCredentials } from '@/background/account/credentials';
+import { encrypt } from '@/modules/crypto/aes';
+import { invariant } from '@/shared/invariant';
+import { normalizeAddress } from '@/shared/normalize-address';
+import type { PartiallyOptional } from '@/shared/type-utils/partially-optional';
+import type { PartiallyRequired } from '@/shared/type-utils/partially-required';
+import type {
+  BareMnemonicWallet,
+  BareWallet,
+} from '@/shared/types/bare-wallet';
+import type { BlockchainType } from '@/shared/wallet/classifiers';
+import {
+  generateWalletsForEcosystems,
+  restoreBareWallet,
+  walletToObject,
+} from '@/shared/wallet/create';
+import { decryptMnemonic, seedPhraseToHash } from '@/shared/wallet/encryption';
+import { immerable } from 'immer';
+import { SeedType } from './seed-type';
+
+interface PlainWalletContainer {
+  seedType: SeedType;
+  wallets: BareWallet[];
+}
+
+export interface SignerContainer {
+  /**
+   * Contains data necessary for signing, e.g. private key or a seed phrase
+   */
+  seedType: SeedType;
+  seedHash?: string;
+  wallets: BareWallet[];
+  getMnemonic(): BareWallet['mnemonic'] | null;
+  getFirstWallet(): BareWallet;
+  addWallet(wallet: BareWallet, seedHash: string): void;
+  removeWallet(address: string): void;
+  toPlainObject(): PlainWalletContainer;
+  getWalletByAddress(address: string): BareWallet | null;
+}
+
+abstract class WalletContainerImpl implements SignerContainer {
+  /**
+   * Important to add [immerable] = true property if we want
+   * to use immer to copy WalletContainers:
+   * https://immerjs.github.io/immer/complex-objects
+   * As of now, walletContainers are copied in the maskWalletGroup functions
+   */
+  [immerable] = true;
+
+  abstract wallets: BareWallet[];
+  abstract seedType: SeedType;
+  abstract seedHash?: string;
+
+  getFirstWallet() {
+    return this.wallets[0];
+  }
+
+  getMnemonic() {
+    return this.seedType === SeedType.privateKey
+      ? null
+      : this.getFirstWallet().mnemonic;
+  }
+
+  abstract addWallet(wallet: BareWallet, seedHash: string): void;
+
+  removeWallet(address: string) {
+    const pos = this.wallets.findIndex(
+      (wallet) => wallet.address.toLowerCase() === address.toLowerCase()
+    );
+    if (pos === -1) {
+      return;
+    }
+    this.wallets.splice(pos, 1);
+  }
+
+  getWalletByAddress(address: string) {
+    const wallet = this.wallets.find(
+      (wallet) => normalizeAddress(wallet.address) === normalizeAddress(address)
+    );
+    return wallet || null;
+  }
+
+  toPlainObject() {
+    return {
+      ...this,
+      wallets: this.wallets.map((wallet) => walletToObject(wallet)),
+    };
+  }
+}
+
+const MISSING_MNEMONIC =
+  'Mnemonic Container is expected to have a wallet with a mnemonic';
+
+function isMnemonicBareWallet(
+  x: BareWallet | BareMnemonicWallet
+): x is BareMnemonicWallet {
+  return Boolean(x.mnemonic?.path && x.mnemonic.phrase);
+}
+
+function assertMnemonicWallets(
+  x: BareWallet[] | BareMnemonicWallet[] | (BareMnemonicWallet | BareWallet)[]
+): asserts x is BareMnemonicWallet[] {
+  if (x.some((w) => !isMnemonicBareWallet(w))) {
+    throw new Error('Only mnemonic wallets are expected');
+  }
+}
+
+type MnemonicSeed = PartiallyOptional<
+  BareMnemonicWallet,
+  'name' | 'address' | 'privateKey'
+>;
+
+export class MnemonicWalletContainer extends WalletContainerImpl {
+  wallets: BareWallet[];
+  seedType = SeedType.mnemonic;
+  seedHash: string | undefined;
+
+  static async create({
+    wallets,
+    credentials,
+    ecosystems,
+  }: {
+    wallets?: MnemonicSeed[];
+    credentials: SessionCredentials;
+    ecosystems?: BlockchainType[];
+  }): Promise<MnemonicWalletContainer> {
+    const initial = wallets?.length
+      ? wallets
+      : generateWalletsForEcosystems(ecosystems ?? ['evm']);
+    const phrase = initial[0].mnemonic?.phrase;
+    invariant(phrase, MISSING_MNEMONIC);
+    const seedHash = await seedPhraseToHash(phrase);
+    const walletContainer = new MnemonicWalletContainer(initial, seedHash);
+    const { mnemonic } = walletContainer.getFirstWallet();
+    if (mnemonic) {
+      const encryptedMnemonic = await encrypt(
+        credentials.seedPhraseEncryptionKey,
+        mnemonic.phrase
+      );
+      walletContainer.wallets.forEach((wallet) => {
+        if (wallet.mnemonic) {
+          wallet.mnemonic.phrase = encryptedMnemonic;
+        }
+      });
+    }
+    return walletContainer;
+  }
+
+  private static async restoreFromDeprecated({
+    wallets,
+    credentials,
+  }: {
+    wallets: BareMnemonicWallet[];
+    credentials: SessionCredentials;
+  }) {
+    if (!wallets.length) {
+      return MnemonicWalletContainer.create({ wallets, credentials });
+    } else {
+      const phrase = wallets[0].mnemonic?.phrase;
+      invariant(phrase, MISSING_MNEMONIC);
+      const decryptedPhrase = await decryptMnemonic(phrase, credentials);
+      const decryptedWallets = wallets.map((wallet) => {
+        if (wallet.mnemonic) {
+          wallet.mnemonic.phrase = decryptedPhrase as string;
+        }
+        return wallet;
+      });
+      return MnemonicWalletContainer.create({
+        wallets: decryptedWallets,
+        credentials,
+      });
+    }
+  }
+
+  private static constructorDeprecated(wallets: BareMnemonicWallet[]) {
+    /** Use this method when both seedHash and seedPhraseEncryptionKey_deprecated are unknown */
+    const instance = new MnemonicWalletContainer(wallets, '<temp>');
+    instance.seedHash = undefined;
+    return instance;
+  }
+
+  static async restoreWalletContainer(
+    walletContainer: SignerContainer,
+    credentials: Credentials
+  ) {
+    const { seedType, seedHash, wallets } = walletContainer;
+    invariant(
+      seedType === SeedType.mnemonic,
+      'Must be a MnemonicWalletContainer'
+    );
+    assertMnemonicWallets(wallets);
+    if (seedHash) {
+      return new MnemonicWalletContainer(wallets, seedHash);
+    } else if (isSessionCredentials(credentials)) {
+      return await MnemonicWalletContainer.restoreFromDeprecated({
+        wallets,
+        credentials,
+      });
+    } else {
+      return MnemonicWalletContainer.constructorDeprecated(wallets);
+    }
+  }
+
+  static async decryptMnemonic(
+    phrase: string,
+    credentials: SessionCredentials
+  ) {
+    return decryptMnemonic(phrase, credentials);
+  }
+
+  constructor(wallets: MnemonicSeed[], seedHash: string) {
+    super();
+    this.seedHash = seedHash;
+    if (!wallets.length) {
+      this.wallets = [restoreBareWallet({})];
+    } else {
+      this.wallets = wallets.map((wallet) => {
+        if (!wallet.mnemonic) {
+          throw new Error(MISSING_MNEMONIC);
+        }
+        return restoreBareWallet(wallet);
+      });
+    }
+  }
+
+  addWallet(wallet: BareWallet, seedHash: string) {
+    invariant(
+      seedHash === this.seedHash,
+      'Added wallet must have the same mnemonic as other wallets in the SignerContainer'
+    );
+    if (this.wallets.some(({ address }) => address === wallet.address)) {
+      /** Seems it's better to keep existing wallet in order to save existing state, e.g. name */
+      return;
+    }
+    this.wallets.push(wallet);
+  }
+}
+
+export class PrivateKeyWalletContainer extends WalletContainerImpl {
+  wallets: BareWallet[];
+  seedType = SeedType.privateKey;
+  seedHash = undefined;
+
+  constructor(wallets: Array<PartiallyRequired<BareWallet, 'privateKey'>>) {
+    super();
+    if (!wallets || wallets.length > 1) {
+      throw new Error(
+        `Wallets array is expected to have exactly one element, instead got: ${wallets?.length}`
+      );
+    }
+    this.wallets = wallets.map((wallet) => {
+      if (!wallet.privateKey) {
+        throw new Error(
+          'PrivateKey container is expected to have a wallet with a privateKey'
+        );
+      }
+      return restoreBareWallet(wallet);
+    });
+  }
+
+  addWallet() {
+    throw new Error('PrivateKeyWalletContainer cannot have multiple wallets');
+  }
+}
+
+export class TestPrivateKeyWalletContainer extends PrivateKeyWalletContainer {
+  wallets: BareWallet[];
+  seedType = SeedType.privateKey;
+  seedHash = undefined;
+
+  constructor(wallets: BareWallet[]) {
+    super(wallets);
+    this.wallets = wallets;
+  }
+
+  addWallet() {
+    throw new Error('PrivateKeyWalletContainer cannot have multiple wallets');
+  }
+}

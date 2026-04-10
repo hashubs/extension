@@ -1,0 +1,38 @@
+.pinner {
+  position: fixed;
+  z-index: 100;
+  top: 1.5rem;
+  right: 1.5rem;
+  background: var(--surface);
+  box-shadow: 0px 12px 44px rgba(0, 38, 39, 0.15);
+  border-radius: 0.75rem;
+  padding: 1.25rem;
+}
+
+.pinnerInner {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  z-index: 50;
+}
+
+.pinnerTitle {
+  font-weight: 700;
+  color: var(--on-surface);
+  font-size: 1rem;
+  margin-bottom: 1rem;
+}
+
+@media (min-width: 768px) {
+  .pinnerTitle {
+    font-size: 1.125rem;
+  }
+}
+
+.pinnerRow {
+  color: var(--on-surface-variant);
+  font-size: 0.875rem;
+  display: flex;
+  align-items: center;
+  margin-top: 0.25rem;
+}

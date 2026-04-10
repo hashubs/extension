@@ -1,0 +1,180 @@
+import { baseToCommon } from '@/shared/units/convert';
+import type { Fungible } from '@/shared/youno-api/types/fungible';
+import type { AddressAction } from '@/shared/youno-api/types/wallet-get-actions';
+import type {
+  MessageV0,
+  Transaction,
+  VersionedTransaction,
+} from '@solana/web3.js';
+import { SystemProgram, TransactionInstruction } from '@solana/web3.js';
+import { SolanaSigning } from '../signing';
+
+function isSystemTransfer(ix: TransactionInstruction): boolean {
+  return (
+    ix.programId.equals(SystemProgram.programId) &&
+    ix.data.length === 12 &&
+    ix.data.readUInt32LE(0) === 2 // SystemProgram.transfer instruction code
+  );
+}
+
+function parseLamports(ix: TransactionInstruction): number {
+  return Number(ix.data.readBigUInt64LE(4));
+}
+
+export const SOL_ASSET_FUNGIBLE: Fungible = {
+  id: '11111111111111111111111111111111',
+  name: 'Solana',
+  symbol: 'SOL',
+  iconUrl:
+    'https://token-icons.s3.amazonaws.com/11111111111111111111111111111111.png',
+  verified: true,
+  meta: {
+    circulatingSupply: null,
+    fullyDilutedValuation: null,
+    marketCap: null,
+    price: null,
+    relativeChange1d: null,
+    relativeChange30d: null,
+    relativeChange365d: null,
+    relativeChange90d: null,
+    totalSupply: null,
+  },
+  new: false,
+  implementations: {
+    solana: {
+      address: '11111111111111111111111111111111',
+      decimals: 9,
+    },
+  },
+};
+
+export function parseSolanaTransaction(
+  from: string,
+  tx: Transaction | VersionedTransaction,
+  currency: string
+): AddressAction {
+  const timestamp = new Date().getTime();
+
+  const instructions =
+    'version' in tx
+      ? (tx.message as MessageV0).compiledInstructions.map((ix) => {
+          return new TransactionInstruction({
+            programId: tx.message.staticAccountKeys[ix.programIdIndex],
+            keys: ix.accountKeyIndexes.map((idx) => ({
+              pubkey: tx.message.staticAccountKeys[idx],
+              isSigner: false,
+              isWritable: true,
+            })),
+            data: Buffer.from(ix.data),
+          });
+        })
+      : (tx as Transaction).instructions;
+
+  const transferIx = instructions.find(isSystemTransfer);
+  const hash = SolanaSigning.getTransactionSignature(tx);
+
+  if (transferIx) {
+    const toAddr = transferIx.keys[1].pubkey.toBase58();
+    const lamports = parseLamports(transferIx);
+    const content = {
+      approvals: null,
+      transfers: [
+        {
+          amount: {
+            currency,
+            value: null,
+            usdValue: null,
+            quantity: baseToCommon(
+              lamports,
+              SOL_ASSET_FUNGIBLE.implementations.solana.decimals
+            ).toFixed(),
+          },
+          direction: 'out' as const,
+          fungible: SOL_ASSET_FUNGIBLE,
+          nft: null,
+        },
+      ],
+    };
+
+    const label = {
+      title: 'to' as const,
+      displayTitle: 'To',
+      contract: null,
+      wallet: {
+        address: toAddr,
+        name: toAddr,
+        iconUrl: null,
+      },
+    };
+
+    const type = { value: 'send' as const, displayValue: 'Send' };
+
+    const transaction = {
+      chain: {
+        id: 'solana',
+        name: 'Solana',
+        iconUrl: '',
+      },
+      hash: hash ?? '<signature>',
+      explorerUrl: hash ? `https://solscan.io/tx/${hash}` : null,
+    };
+
+    return {
+      id: crypto.randomUUID(),
+      timestamp,
+      address: from,
+      type,
+      status: 'confirmed',
+      transaction,
+      label,
+      fee: null,
+      refund: null,
+      content,
+      acts: [
+        {
+          content,
+          label,
+          rate: null,
+          status: 'confirmed',
+          type,
+          transaction,
+        },
+      ],
+    };
+  }
+
+  // fallback
+  return {
+    id: crypto.randomUUID(),
+    timestamp,
+    address: from,
+    type: { value: 'execute', displayValue: 'Execute' },
+    transaction: {
+      chain: {
+        id: 'solana',
+        name: 'Solana',
+        iconUrl: '',
+      },
+      hash: hash ?? '<signature>',
+      explorerUrl: hash ? `https://solscan.io/tx/${hash}` : null,
+    },
+    label: {
+      title: 'application',
+      displayTitle: 'Application',
+      contract: {
+        address: from,
+        dapp: {
+          id: from,
+          name: from,
+          url: null,
+          iconUrl: null,
+        },
+      },
+    },
+    acts: [],
+    content: null,
+    fee: null,
+    refund: null,
+    status: 'confirmed',
+  };
+}

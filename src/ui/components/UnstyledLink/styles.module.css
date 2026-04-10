@@ -1,0 +1,5 @@
+:where(.anchor) {
+  text-decoration: inherit;
+  color: inherit;
+  font-family: inherit;
+}

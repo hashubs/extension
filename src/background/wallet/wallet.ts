@@ -1,0 +1,2045 @@
+import {
+  INTERNAL_ORIGIN,
+  INTERNAL_ORIGIN_SYMBOL,
+} from '@/background/constants';
+import type { NotificationWindow } from '@/background/notification-window/notification-window';
+import { uint8ArrayToBase64 } from '@/modules/crypto';
+import type { Keypair } from '@solana/web3.js';
+import { Connection } from '@solana/web3.js';
+import { ethers } from 'ethers';
+import { isTruthy } from 'is-truthy-ts';
+import omit from 'lodash/omit';
+import type { Emitter } from 'nanoevents';
+import { createNanoEvents } from 'nanoevents';
+import { nanoid } from 'nanoid';
+// import { getDefiSdkClient } from '@/modules/defi-sdk/background';
+import { ERC20_ALLOWANCE_ABI } from '@/modules/ethereum/abi/allowance-abi';
+import {
+  createTypedData,
+  serializePaymasterTx,
+} from '@/modules/ethereum/account-abstraction/createTypedData';
+import {
+  broadcastTransactionPatched,
+  checkEip712Tx,
+} from '@/modules/ethereum/account-abstraction/zksync-patch';
+import { chainConfigStore } from '@/modules/ethereum/chains/chain-config-store';
+import { toCustomNetworkId } from '@/modules/ethereum/chains/helpers';
+import { prepareTypedData } from '@/modules/ethereum/message-signing/prepareTypedData';
+import { signTypedData } from '@/modules/ethereum/message-signing/signTypedData';
+import { toUtf8String } from '@/modules/ethereum/message-signing/toUtf8String';
+import type { TypedData } from '@/modules/ethereum/message-signing/TypedData';
+import { createApprovalTransaction } from '@/modules/ethereum/transactions/appovals';
+import type { ChainId } from '@/modules/ethereum/transactions/chainId';
+import { prepareGasAndNetworkFee } from '@/modules/ethereum/transactions/fetchAndAssignGasPrice';
+import { backgroundGetBestKnownTransactionCount } from '@/modules/ethereum/transactions/getBestKnownTransactionCount/backgroundGetBestKnownTransactionCount';
+import { normalizeTransactionChainId } from '@/modules/ethereum/transactions/normalizeTransactionChainId';
+import { prepareTransaction } from '@/modules/ethereum/transactions/prepareTransaction';
+import { removeSignature } from '@/modules/ethereum/transactions/removeSignature';
+import type { AddEthereumChainParameter } from '@/modules/ethereum/types/add-ethereum-chain-parameter';
+import type {
+  IncomingTransaction,
+  IncomingTransactionAA,
+  IncomingTransactionWithChainId,
+} from '@/modules/ethereum/types/IncomingTransaction';
+import type { SerializableTransactionResponse } from '@/modules/ethereum/types/transaction-response-plain';
+import type { Chain } from '@/modules/networks/chain';
+import { createChain } from '@/modules/networks/chain';
+import type { NetworkConfig } from '@/modules/networks/network-config';
+import { NetworkId } from '@/modules/networks/network-id';
+import { Networks } from '@/modules/networks/networks';
+import {
+  fetchNetworkByChainId,
+  fetchNetworkById,
+  getNetworksStore,
+} from '@/modules/networks/networks-store.background';
+import type { DappSecurityStatus } from '@/modules/phishing-defence/phishing-defence-service';
+import { phishingDefenceService } from '@/modules/phishing-defence/phishing-defence-service';
+import type { RemoteConfig } from '@/modules/remote-config';
+import { getRemoteConfigValue } from '@/modules/remote-config';
+import { fromSecretKeyToEd25519 } from '@/modules/solana/keypairs';
+import { isSolanaAddress } from '@/modules/solana/shared';
+import { SolanaSigning } from '@/modules/solana/signing';
+import {
+  solFromBase64,
+  solToBase64,
+} from '@/modules/solana/transactions/create';
+import type { SolSignTransactionResult } from '@/modules/solana/transactions/SolTransactionResponse';
+import { Disposable } from '@/shared/disposable';
+import {
+  InvalidParams,
+  OriginNotAllowed,
+  RecordNotFound,
+  SessionExpired,
+  UserRejected,
+} from '@/shared/errors/errors';
+import { getEthersError } from '@/shared/errors/get-ethers-error';
+import { parseError } from '@/shared/errors/parse-error/parse-error';
+import { invariant } from '@/shared/invariant';
+import { normalizeAddress } from '@/shared/normalize-address';
+import type { AtLeastOneOf } from '@/shared/type-utils/OneOf';
+import type { PartiallyRequired } from '@/shared/type-utils/partially-required';
+import { YounoAPI } from '@/shared/youno-api/youno-api.background';
+// import type {
+//   BannerClickedParams,
+//   ButtonClickedParams,
+// } from '@/shared/types/button-events';
+import type {
+  ChannelContext,
+  PrivateChannelContext,
+} from '@/shared/types/channel-context';
+import type { QuoteErrorContext } from '@/shared/types/quote-error-context';
+import type {
+  MessageContextParams,
+  TransactionContextParams,
+  TransactionFormedContext,
+} from '@/shared/types/signature-context-params';
+import type { StringBase64 } from '@/shared/types/string-base64';
+import { isMnemonicContainer } from '@/shared/types/validators';
+import type { BlockchainType } from '@/shared/wallet/classifiers';
+import type { LocallyEncoded } from '@/shared/wallet/encode-locally';
+import { decodeMasked } from '@/shared/wallet/encode-locally';
+// import { referralProgramService } from '@/ui/features/referral-program/ReferralProgramService.background';
+import { Provider as ZksProvider } from 'zksync-ethers';
+import type { Credentials, SessionCredentials } from '../account/credentials';
+import { isSessionCredentials } from '../account/credentials';
+import type {
+  AssetClickedParams,
+  DaylightEventParams,
+  ScreenViewParams,
+} from '../events';
+import { emitter } from '../events';
+import { searchStore } from '../search/SearchStore';
+import { transactionService } from '../transactions/transaction-service';
+import { lastUsedAddressStore } from '../user-activity';
+import { BrowserStorage } from '../webapis/storage';
+import type { State as GlobalPreferencesState } from './global-preferences';
+import { globalPreferences } from './global-preferences';
+import { maskWallet, maskWalletGroup, maskWalletGroups } from './helpers/mask';
+import { toEthersWallet } from './helpers/to-ethers-wallet';
+import type { Device, DeviceAccount } from './model/account-container';
+import {
+  DeviceAccountContainer,
+  ReadonlyAccountContainer,
+} from './model/account-container';
+import type { MaskedBareWallet } from './model/bare-wallet';
+import { toPlainTransactionResponse } from './model/ethers-v5-types';
+import type { PendingWallet, WalletRecord } from './model/types';
+import {
+  MnemonicWalletContainer,
+  PrivateKeyWalletContainer,
+} from './model/wallet-container';
+import { WalletOrigin } from './model/wallet-origin';
+import { WalletStore } from './persistence';
+import { PublicController } from './public-controller';
+import { WalletRecordModel as Model } from './wallet-record';
+
+async function prepareNonce<
+  T extends { nonce?: number | null; from?: string | null }
+>(transaction: T, network: NetworkConfig) {
+  if (transaction.nonce == null) {
+    invariant(transaction.from, '"from" field is missing from transaction');
+    const txCount = await backgroundGetBestKnownTransactionCount({
+      network,
+      address: transaction.from,
+      defaultBlock: 'pending',
+    });
+    return { ...transaction, nonce: txCount.value };
+  } else {
+    return transaction;
+  }
+}
+
+export const INTERNAL_SYMBOL_CONTEXT = { origin: INTERNAL_ORIGIN_SYMBOL };
+
+type PublicMethodParams<T = undefined> = T extends undefined
+  ? {
+      id: string | number;
+      context?: Partial<ChannelContext>;
+    }
+  : {
+      id: string | number;
+      params: T;
+      context?: Partial<ChannelContext>;
+    };
+
+type WalletMethodParams<T = undefined> = T extends undefined
+  ? {
+      context?: Partial<ChannelContext | PrivateChannelContext>;
+    }
+  : {
+      params: T;
+      context?: Partial<ChannelContext | PrivateChannelContext>;
+    };
+
+interface WalletEvents {
+  recordUpdated: () => void;
+  currentAddressChange: (addresses: string[]) => void;
+  chainChanged: (chain: Chain, origin: string) => void;
+  switchChainError: (chainId: ChainId, origin: string) => void;
+  permissionsUpdated: () => void;
+}
+
+export class Wallet {
+  public id: string;
+  // eslint-disable-next-line no-use-before-define
+  public publicEthereumController: PublicController;
+  private userCredentials: Credentials | null;
+  private seedPhraseExpiryTimerId: NodeJS.Timeout | number = 0;
+  private pendingWallet: PendingWallet | null = null;
+  private record: WalletRecord | null;
+
+  private disposer = new Disposable();
+
+  walletStore: WalletStore;
+  notificationWindow: NotificationWindow;
+
+  emitter: Emitter<WalletEvents>;
+
+  constructor(
+    id: string,
+    userCredentials: Credentials | null,
+    notificationWindow: NotificationWindow
+  ) {
+    this.emitter = createNanoEvents();
+
+    this.id = id;
+    this.walletStore = new WalletStore({}, 'wallet');
+    this.disposer.add(
+      globalPreferences.on('change', (state, prevState) => {
+        emitter.emit('globalPreferencesChange', state, prevState);
+      })
+    );
+    this.disposer.add(
+      this.walletStore.on('change', this.notifyExternalStores.bind(this))
+    );
+    this.disposer.add(
+      emitter.on('transactionSent', (result, { chain, clientScope }) => {
+        if (result.evm && clientScope === 'Swap') {
+          this.setLastSwapChainByAddress({
+            address: result.evm.from,
+            chain,
+          });
+        }
+      })
+    );
+
+    this.notificationWindow = notificationWindow;
+    this.userCredentials = userCredentials;
+    this.record = null;
+
+    this.syncWithWalletStore();
+    this.publicEthereumController = new PublicController(this, {
+      notificationWindow,
+    });
+  }
+
+  destroy() {
+    this.disposer.clearAll();
+  }
+
+  /** Pulls data (decrypts) into {this.record} <-- from {walletStore} */
+  private async syncWithWalletStore() {
+    await this.walletStore.ready();
+    if (!this.userCredentials) {
+      return;
+    }
+    this.record = await this.walletStore.read(this.id, this.userCredentials);
+    this.notifyExternalStores();
+    if (this.record) {
+      this.emitter.emit('recordUpdated');
+    }
+  }
+
+  /** Pushes data (encrypts) from {this.record} --> into {walletStore} */
+  private async updateWalletStore(record: WalletRecord) {
+    if (!this.userCredentials) {
+      throw new Error('Cannot save pending wallet: encryptionKey is null');
+    }
+    this.walletStore.save(this.id, this.userCredentials.encryptionKey, record);
+  }
+
+  async ready() {
+    return this.walletStore.ready();
+  }
+
+  async getId() {
+    return this.id;
+  }
+
+  async userHeartbeat({ context }: WalletMethodParams) {
+    this.verifyInternalOrigin(context);
+    emitter.emit('userActivity');
+  }
+
+  /** throws if encryptionKey is wrong */
+  async verifyCredentials({
+    params: { id, encryptionKey },
+  }: PublicMethodParams<{ id: string; encryptionKey: string }>) {
+    await this.walletStore.ready();
+    await this.walletStore.check(id, encryptionKey);
+  }
+
+  hasSeedPhraseEncryptionKey() {
+    return Boolean(this.userCredentials?.seedPhraseEncryptionKey);
+  }
+
+  removeSeedPhraseEncryptionKey() {
+    if (this.userCredentials) {
+      this.userCredentials.seedPhraseEncryptionKey = null;
+      this.userCredentials.seedPhraseEncryptionKey_deprecated = null;
+    }
+  }
+
+  private setExpirationForSeedPhraseEncryptionKey(timeout: number) {
+    clearTimeout(this.seedPhraseExpiryTimerId);
+    this.seedPhraseExpiryTimerId = setTimeout(() => {
+      if (this) {
+        this.removeSeedPhraseEncryptionKey();
+      }
+    }, timeout);
+  }
+
+  async updateCredentials({
+    params: { credentials, isNewUser },
+  }: PublicMethodParams<{ credentials: Credentials; isNewUser: boolean }>) {
+    this.id = credentials.id;
+    this.userCredentials = credentials;
+    this.setExpirationForSeedPhraseEncryptionKey(
+      isNewUser ? 1000 * 1800 : 1000 * 120
+    );
+    await this.syncWithWalletStore();
+  }
+
+  async resetCredentials() {
+    this.userCredentials = null;
+  }
+
+  async testMethod({ params: value }: WalletMethodParams<number>) {
+    return new Promise<string>((r) =>
+      setTimeout(
+        () => r(`Hello, curious developer. Your value is ${value}`),
+        1500
+      )
+    );
+  }
+
+  async checkBackupData({ context }: WalletMethodParams) {
+    this.verifyInternalOrigin(context);
+    const backupData = await BrowserStorage.get(WalletStore.backupKey);
+    return Boolean(backupData);
+  }
+
+  async restoreBackupData({ context }: WalletMethodParams) {
+    this.verifyInternalOrigin(context);
+    const backup = await BrowserStorage.get(WalletStore.backupKey);
+    invariant(backup, 'No backup data found');
+    await BrowserStorage.set(WalletStore.key, backup);
+    await BrowserStorage.remove(WalletStore.backupKey);
+  }
+
+  async reencodeWalletWithNewPassword({
+    encryptionKey,
+  }: {
+    encryptionKey: string;
+  }): Promise<string> {
+    this.ensureActiveSession(this.userCredentials);
+    this.ensureRecord(this.record);
+    const encryptedRecord = await Model.encryptRecord(
+      encryptionKey,
+      this.record
+    );
+    return encryptedRecord;
+  }
+
+  async reloadWalletStore() {
+    this.walletStore = new WalletStore({}, 'wallet');
+    await this.walletStore.ready();
+  }
+
+  // TODO: For now, I prefix methods with "ui" which return wallet data and are supposed to be called
+  // from the UI (extension popup) thread. It's maybe better to refactor them
+  // into a separate isolated class
+  async uiGenerateMnemonic({
+    params: { ecosystems },
+  }: WalletMethodParams<{ ecosystems: BlockchainType[] }>) {
+    this.ensureActiveSession(this.userCredentials);
+    const walletContainer = await MnemonicWalletContainer.create({
+      credentials: this.userCredentials,
+      ecosystems: ecosystems,
+    });
+    this.pendingWallet = {
+      origin: WalletOrigin.extension,
+      groupId: null,
+      walletContainer,
+    };
+    return walletContainer.wallets.map((wallet) => maskWallet(wallet));
+  }
+
+  async uiImportPrivateKey({
+    params: privateKey,
+  }: WalletMethodParams<LocallyEncoded>) {
+    const walletContainer = new PrivateKeyWalletContainer([
+      { privateKey: decodeMasked(privateKey) },
+    ]);
+    this.pendingWallet = {
+      origin: WalletOrigin.imported,
+      groupId: null,
+      walletContainer,
+    };
+    return maskWallet(walletContainer.getFirstWallet());
+  }
+
+  async uiImportSeedPhrase({
+    params: mnemonics,
+  }: WalletMethodParams<NonNullable<MaskedBareWallet['mnemonic']>[]>) {
+    this.ensureActiveSession(this.userCredentials);
+    const walletContainer = await MnemonicWalletContainer.create({
+      wallets: mnemonics.map((mnemonic) => ({
+        mnemonic: { ...mnemonic, phrase: decodeMasked(mnemonic.phrase) },
+      })),
+      credentials: this.userCredentials,
+    });
+    const existingGroup = this.record
+      ? Model.getMatchingExistingWalletGroup(this.record, walletContainer)
+      : null;
+    this.pendingWallet = {
+      origin: existingGroup?.origin ?? WalletOrigin.imported,
+      groupId: null,
+      walletContainer,
+    };
+    return maskWallet(walletContainer.getFirstWallet());
+  }
+
+  async uiImportHardwareWallet({
+    params: { accounts, device, provider },
+  }: WalletMethodParams<{
+    accounts: DeviceAccount[];
+    device: Device;
+    provider: 'ledger';
+  }>) {
+    invariant(accounts.length > 0, 'Must import at least 1 account');
+    const walletContainer = new DeviceAccountContainer({
+      device,
+      wallets: accounts,
+      provider,
+    });
+    this.pendingWallet = {
+      origin: WalletOrigin.imported,
+      groupId: null,
+      walletContainer,
+    };
+    return walletContainer.getFirstWallet();
+  }
+
+  async uiImportReadonlyAddress({
+    params: { address, name },
+  }: WalletMethodParams<{ address: string; name: string | null }>) {
+    const walletContainer = new ReadonlyAccountContainer([{ address, name }]);
+    this.pendingWallet = {
+      origin: WalletOrigin.imported,
+      walletContainer,
+      groupId: null,
+    };
+    return walletContainer.getFirstWallet();
+  }
+
+  // async uiApplyReferralCodeToAllWallets({
+  //   params: { referralCode },
+  //   context,
+  // }: WalletMethodParams<{ referralCode: string }>) {
+  //   this.verifyInternalOrigin(context);
+  //   return referralProgramService.applyReferralCodeToAllWallets({
+  //     referralCode,
+  //   });
+  // }
+
+  async getPendingRecoveryPhrase({ context }: WalletMethodParams) {
+    this.verifyInternalOrigin(context);
+    this.ensureActiveSession(this.userCredentials);
+    if (!this.pendingWallet) {
+      return null;
+    }
+    return Model.getPendingRecoveryPhrase(
+      this.pendingWallet,
+      this.userCredentials
+    );
+  }
+
+  async getPendingWallet({ context }: WalletMethodParams) {
+    this.verifyInternalOrigin(context);
+    const wallet = this.pendingWallet?.walletContainer.getFirstWallet();
+    return wallet ? maskWallet(wallet) : null;
+  }
+
+  async getRecoveryPhrase({
+    params: { groupId },
+    context,
+  }: WalletMethodParams<{ groupId: string }>) {
+    this.verifyInternalOrigin(context);
+    this.ensureRecord(this.record);
+    this.ensureActiveSession(this.userCredentials);
+    return await Model.getRecoveryPhrase(this.record, {
+      groupId,
+      credentials: this.userCredentials,
+    });
+  }
+
+  async verifyRecoveryPhrase({
+    params: { groupId, value },
+    context,
+  }: WalletMethodParams<{ groupId: string; value: LocallyEncoded }>) {
+    this.verifyInternalOrigin(context);
+    this.ensureRecord(this.record);
+    this.ensureActiveSession(this.userCredentials);
+    const mnemonic = await Model.getRecoveryPhrase(this.record, {
+      groupId,
+      credentials: this.userCredentials,
+    });
+    return mnemonic.phrase === value;
+  }
+
+  async getPrivateKey({
+    params: { address },
+    context,
+  }: WalletMethodParams<{ address: string }>) {
+    this.verifyInternalOrigin(context);
+    this.ensureRecord(this.record);
+    this.ensureActiveSession(this.userCredentials); // require anyway
+    return await Model.getPrivateKey(this.record, { address });
+  }
+
+  async verifyPrivateKey({
+    params: { address, value },
+    context,
+  }: WalletMethodParams<{ address: string; value: LocallyEncoded }>) {
+    this.verifyInternalOrigin(context);
+    this.ensureRecord(this.record);
+    this.ensureActiveSession(this.userCredentials); // require anyway
+    const privateKey = await Model.getPrivateKey(this.record, { address });
+    return privateKey === value;
+  }
+
+  getCurrentWalletSync({ context }: WalletMethodParams) {
+    this.verifyInternalOrigin(context);
+    if (!this.id) {
+      return null;
+    }
+    const currentAddress = this.readCurrentAddress();
+    if (this.record && currentAddress) {
+      const wallet =
+        Model.getWalletByAddress(this.record, {
+          address: currentAddress,
+          groupId: null,
+        }) || Model.getFirstWallet(this.record);
+      return wallet ? maskWallet(wallet) : null;
+    }
+    return null;
+  }
+
+  async uiGetCurrentWallet({ context }: WalletMethodParams) {
+    this.verifyInternalOrigin(context);
+    return this.getCurrentWalletSync({ context });
+  }
+
+  async uiGetWalletByAddress({
+    context,
+    params: { address, groupId },
+  }: WalletMethodParams<{ address: string; groupId: string | null }>) {
+    this.verifyInternalOrigin(context);
+    if (!this.record) {
+      throw new RecordNotFound();
+    }
+    if (!address) {
+      throw new Error('Illegal argument: address is required for this method');
+    }
+    const wallet = Model.getWalletByAddress(this.record, { address, groupId });
+    return wallet ? maskWallet(wallet) : null;
+  }
+
+  async savePendingWallet() {
+    if (!this.pendingWallet) {
+      throw new Error('Cannot save pending wallet: pendingWallet is null');
+    }
+    if (!this.userCredentials) {
+      throw new Error('Cannot save pending wallet: userCredentials are null');
+    }
+    this.record = Model.createOrUpdateRecord(this.record, this.pendingWallet);
+    const pendingWallet = this.pendingWallet;
+    this.pendingWallet = null;
+    this.removeSeedPhraseEncryptionKey();
+    this.updateWalletStore(this.record);
+    emitter.emit('walletCreated', pendingWallet);
+  }
+
+  async acceptOrigin({
+    params: { origin, address },
+    context,
+  }: WalletMethodParams<{ origin: string; address: string }>) {
+    this.verifyInternalOrigin(context);
+    this.ensureRecord(this.record);
+    this.record = Model.addPermission(this.record, { address, origin });
+    this.updateWalletStore(this.record);
+    this.emitter.emit('permissionsUpdated');
+  }
+
+  async removeAllOriginPermissions({ context }: PublicMethodParams) {
+    this.verifyInternalOrigin(context);
+    this.ensureRecord(this.record);
+    this.record = Model.removeAllOriginPermissions(this.record);
+    this.updateWalletStore(this.record);
+    this.emitter.emit('permissionsUpdated');
+  }
+
+  async removeSolanaPermissions({
+    context,
+    params: { origin },
+  }: WalletMethodParams<{ origin: string; address?: string }>) {
+    this.verifyInternalOrigin(context);
+    this.ensureRecord(this.record);
+    this.record = Model.removeSolanaPermissions(this.record, { origin });
+    this.updateWalletStore(this.record);
+    this.emitter.emit('permissionsUpdated');
+  }
+
+  async removePermission({
+    context,
+    params: { origin, address },
+  }: WalletMethodParams<{ origin: string; address?: string }>) {
+    this.verifyInternalOrigin(context);
+    this.ensureRecord(this.record);
+    this.record = Model.removePermission(this.record, { origin, address });
+    this.updateWalletStore(this.record);
+    this.emitter.emit('permissionsUpdated');
+  }
+
+  async emitConnectionEvent({
+    context,
+    params: { origin },
+  }: WalletMethodParams<{ origin: string }>) {
+    this.verifyInternalOrigin(context);
+    emitter.emit('connectToSiteEvent', { origin });
+  }
+
+  allowedOrigin(
+    context: Partial<ChannelContext> | undefined,
+    address: string
+  ): context is PartiallyRequired<ChannelContext, 'origin'> {
+    if (!context || !context.origin) {
+      throw new Error('This method requires context');
+    }
+    if (context.origin === INTERNAL_ORIGIN) {
+      return true;
+    }
+    if (!this.record) {
+      return false;
+    }
+    return Model.isAccountAvailable(this.record, {
+      address,
+      origin: context.origin,
+    });
+  }
+
+  async isAccountAvailableToOrigin({
+    params: { address, origin },
+    context,
+  }: WalletMethodParams<{ address: string; origin: string }>) {
+    this.verifyInternalOrigin(context);
+    return !this.record
+      ? false
+      : Model.isAccountAvailable(this.record, { address, origin });
+  }
+
+  async getOriginPermissions({ context }: PublicMethodParams) {
+    this.verifyInternalOrigin(context);
+    this.ensureRecord(this.record);
+    return this.record.permissions;
+  }
+
+  async setCurrentAddress({
+    params: { address },
+    context,
+  }: WalletMethodParams<{ address: string }>) {
+    this.verifyInternalOrigin(context);
+    this.ensureRecord(this.record);
+    this.record = Model.setCurrentAddress(this.record, { address });
+    this.updateWalletStore(this.record);
+
+    const { currentAddress } = this.record.walletManager;
+    this.emitter.emit(
+      'currentAddressChange',
+      [currentAddress].filter(isTruthy)
+    );
+  }
+
+  readCurrentAddress() {
+    return this.record?.walletManager.currentAddress || null;
+  }
+
+  ensureCurrentAddress(): string {
+    const currentAddress = this.readCurrentAddress();
+    if (!currentAddress) {
+      throw new Error('Wallet is not initialized');
+    }
+    return currentAddress;
+  }
+
+  private ensureRecord(
+    record: WalletRecord | null
+  ): asserts record is WalletRecord {
+    if (!record) {
+      throw new RecordNotFound();
+    }
+  }
+
+  private ensureActiveSession(
+    credentials: Credentials | null
+  ): asserts credentials is SessionCredentials {
+    if (!credentials || !isSessionCredentials(credentials)) {
+      throw new SessionExpired();
+    }
+  }
+
+  private verifyInternalOrigin(
+    context: Partial<ChannelContext | PrivateChannelContext> | undefined
+  ): asserts context is PartiallyRequired<
+    ChannelContext | PrivateChannelContext,
+    'origin'
+  > {
+    if (
+      context?.origin !== INTERNAL_ORIGIN &&
+      context?.origin !== INTERNAL_ORIGIN_SYMBOL
+    ) {
+      throw new OriginNotAllowed();
+    }
+  }
+
+  // TODO: when is this helper needed?
+  private ensureStringOrigin(
+    context: Partial<ChannelContext | PrivateChannelContext> | undefined
+  ): asserts context is PartiallyRequired<ChannelContext, 'origin'> {
+    this.verifyInternalOrigin(context);
+    if (typeof context.origin !== 'string') {
+      throw new Error('Origin must be a string');
+    }
+  }
+
+  async getCurrentAddress({ context }: WalletMethodParams) {
+    this.verifyInternalOrigin(context);
+    return this.readCurrentAddress();
+  }
+
+  async uiGetWalletGroups({ context }: WalletMethodParams) {
+    this.verifyInternalOrigin(context);
+    const groups = this.record?.walletManager.groups;
+    return groups ? maskWalletGroups(groups) : null;
+  }
+
+  async getLastSwapChainByAddress({
+    params: { address },
+    context,
+  }: WalletMethodParams<{ address: string }>) {
+    this.verifyInternalOrigin(context);
+    this.ensureRecord(this.record);
+    return Model.getLastSwapChain(this.record, { address });
+  }
+
+  private setLastSwapChainByAddress({
+    address,
+    chain,
+  }: {
+    address: string;
+    chain: string;
+  }) {
+    this.ensureRecord(this.record);
+    this.record = Model.setLastSwapChain(this.record, { address, chain });
+    this.updateWalletStore(this.record);
+  }
+
+  async uiGetWalletGroup({
+    params: { groupId },
+    context,
+  }: WalletMethodParams<{ groupId: string }>) {
+    this.verifyInternalOrigin(context);
+    const group = this.record?.walletManager.groups.find(
+      (group) => group.id === groupId
+    );
+    return group ? maskWalletGroup(group) : null;
+  }
+
+  getWalletGroupByAddressSync({
+    params: { address },
+    context,
+  }: WalletMethodParams<{ address: string }>) {
+    this.verifyInternalOrigin(context);
+    if (!this.id) {
+      return null;
+    }
+    if (this.record) {
+      const group = Model.getWalletGroupByAddress(this.record, address);
+      return group ? maskWalletGroup(group) : null;
+    }
+    return null;
+  }
+
+  async getWalletGroupByAddress({
+    params,
+    context,
+  }: WalletMethodParams<{ address: string }>) {
+    this.verifyInternalOrigin(context);
+    return this.getWalletGroupByAddressSync({ params, context });
+  }
+
+  async removeWalletGroup({
+    params: { groupId },
+    context,
+  }: WalletMethodParams<{ groupId: string }>) {
+    this.verifyInternalOrigin(context);
+    if (!this.record) {
+      throw new RecordNotFound();
+    }
+    this.record = Model.removeWalletGroup(this.record, { groupId });
+    this.updateWalletStore(this.record);
+  }
+
+  async renameWalletGroup({
+    params: { groupId, name },
+    context,
+  }: WalletMethodParams<{ groupId: string; name: string }>) {
+    this.verifyInternalOrigin(context);
+    if (!this.record) {
+      throw new RecordNotFound();
+    }
+    this.record = Model.renameWalletGroup(this.record, { groupId, name });
+    this.updateWalletStore(this.record);
+  }
+
+  async renameAddress({
+    params: { address, name },
+    context,
+  }: WalletMethodParams<{ address: string; name: string }>) {
+    this.verifyInternalOrigin(context);
+    if (!this.record) {
+      throw new RecordNotFound();
+    }
+    this.record = Model.renameAddress(this.record, { address, name });
+    this.updateWalletStore(this.record);
+  }
+
+  async removeAddress({
+    params: { address, groupId },
+    context,
+  }: WalletMethodParams<{ address: string; groupId: string | null }>) {
+    this.verifyInternalOrigin(context);
+    this.ensureRecord(this.record);
+    this.record = Model.removeAddress(this.record, { address, groupId });
+    this.updateWalletStore(this.record);
+  }
+
+  async updateLastBackedUp({
+    params: { groupId },
+    context,
+  }: WalletMethodParams<{ groupId: string }>) {
+    this.verifyInternalOrigin(context);
+    this.ensureRecord(this.record);
+
+    if (!groupId) {
+      throw new Error('Must provide groupId');
+    }
+    this.record = Model.updateLastBackedUp(this.record, {
+      groupId,
+      timestamp: Date.now(),
+    });
+    this.updateWalletStore(this.record);
+  }
+
+  async getNoBackupCount({ context }: WalletMethodParams) {
+    this.verifyInternalOrigin(context);
+    this.ensureRecord(this.record);
+    return this.record.walletManager.groups
+      .filter((group) => isMnemonicContainer(group.walletContainer))
+      .filter((group) => group.origin === WalletOrigin.extension)
+      .filter((group) => group.lastBackedUp == null).length;
+  }
+
+  async setPreferences({
+    context,
+    params: { preferences },
+  }: WalletMethodParams<{
+    preferences: Partial<WalletRecord['publicPreferences']>;
+  }>) {
+    this.verifyInternalOrigin(context);
+    this.ensureRecord(this.record);
+    this.record = Model.setPreferences(this.record, { preferences });
+    this.updateWalletStore(this.record);
+  }
+
+  async getPreferences({
+    context,
+  }: WalletMethodParams): Promise<ReturnType<typeof Model.getPreferences>> {
+    this.verifyInternalOrigin(context);
+    return Model.getPreferences(this.record);
+  }
+
+  async getSearchHistory({ context }: WalletMethodParams): Promise<string[]> {
+    this.verifyInternalOrigin(context);
+    await searchStore.ready();
+    return searchStore.getSearchHistory();
+  }
+
+  async addRecentSearch({
+    context,
+    params: { fungibleId },
+  }: WalletMethodParams<{ fungibleId: string }>) {
+    this.verifyInternalOrigin(context);
+    searchStore.addRecentSearch(fungibleId);
+  }
+
+  async clearSearchHistory({ context }: WalletMethodParams) {
+    this.verifyInternalOrigin(context);
+    searchStore.clearSearchHistory();
+  }
+
+  async removeRecentSearch({
+    context,
+    params: { fungibleId },
+  }: WalletMethodParams<{ fungibleId: string }>) {
+    this.verifyInternalOrigin(context);
+    searchStore.removeRecentSearch(fungibleId);
+  }
+
+  /** bound to instance */
+  // private async notifyChainConfigStore() {
+  //   const preferences = await this.getPreferences({
+  //     context: INTERNAL_SYMBOL_CONTEXT,
+  //   });
+  //   const on = Boolean(preferences.testnetMode?.on);
+  //   const client = getDefiSdkClient({ on });
+  //   chainConfigStore.setDefiSdkClient(client);
+  // }
+
+  private notifyLastUsedAddressStore() {
+    const currentAddress = this.readCurrentAddress();
+    if (this.id && currentAddress) {
+      lastUsedAddressStore.setState({
+        address: currentAddress,
+        walletModelId: this.id,
+      });
+    }
+  }
+
+  private async notifyExternalStores() {
+    // TODO: should we inline the contents of these methods here?
+    // this.notifyChainConfigStore();
+    this.notifyLastUsedAddressStore();
+  }
+
+  async getLastUsedAddress({
+    context,
+    params: { userId },
+  }: WalletMethodParams<{ userId: string }>) {
+    this.verifyInternalOrigin(context);
+    const state = lastUsedAddressStore.getState();
+    if (state && state?.walletModelId === userId) {
+      return state.address;
+    } else {
+      return null;
+    }
+  }
+
+  async getGlobalPreferences({ context }: WalletMethodParams) {
+    this.verifyInternalOrigin(context);
+    await globalPreferences.ready();
+    return globalPreferences.getPreferences();
+  }
+
+  async setGlobalPreferences({
+    context,
+    params: { preferences },
+  }: WalletMethodParams<{ preferences: Partial<GlobalPreferencesState> }>) {
+    this.verifyInternalOrigin(context);
+    await globalPreferences.ready();
+    return globalPreferences.setPreferences(preferences);
+  }
+
+  async getRemoteConfigValue({
+    context,
+    params: { key },
+  }: WalletMethodParams<{ key: keyof RemoteConfig }>) {
+    this.verifyInternalOrigin(context);
+    return getRemoteConfigValue(key);
+  }
+
+  async createApprovalTransaction({
+    context,
+    params: { chain, contractAddress, allowanceQuantityBase, spender },
+  }: WalletMethodParams<{
+    chain: string;
+    contractAddress: string;
+    allowanceQuantityBase: string;
+    spender: string;
+  }>): Promise<{
+    from?: string;
+    chainId: string;
+    data: string;
+    to: string;
+  }> {
+    this.verifyInternalOrigin(context);
+    const networksStore = getNetworksStore(Model.getPreferences(this.record));
+    const networks = await networksStore.load({ chains: [chain] });
+    const chainId = networks.getChainId(createChain(chain));
+    invariant(chainId, 'Chain id should exist for approve transaction');
+    const tx = await createApprovalTransaction({
+      contractAddress,
+      spenderAddress: spender,
+      amountBase: allowanceQuantityBase,
+    });
+    return { ...tx, chainId };
+  }
+
+  async fetchAllowance({
+    context,
+    params: { chain, contractAddress, owner, spender },
+  }: WalletMethodParams<{
+    chain: string;
+    contractAddress: string;
+    spender: string;
+    owner: string;
+  }>) {
+    this.verifyInternalOrigin(context);
+    const networksStore = getNetworksStore(Model.getPreferences(this.record));
+    const networks = await networksStore.load({ chains: [chain] });
+    const chainId = networks.getChainId(createChain(chain));
+    invariant(chainId, 'Chain id should exist for fetch allowance');
+    const provider = await this.getProvider(chainId);
+    const contract = new ethers.Contract(
+      contractAddress,
+      ERC20_ALLOWANCE_ABI,
+      provider
+    );
+    const resultUntyped = await contract.allowance(owner, spender);
+    const result = resultUntyped as bigint | string;
+    return BigInt(result).toString();
+  }
+
+  async switchChainForOrigin({
+    params: { evmChain, solanaChain, origin },
+    context,
+  }: WalletMethodParams<
+    AtLeastOneOf<{ evmChain: string; solanaChain: string }> & { origin: string }
+  >) {
+    this.verifyInternalOrigin(context);
+    this.setChainForOrigin({
+      evmChain: evmChain ? createChain(evmChain) : undefined,
+      solanaChain: solanaChain ? createChain(solanaChain) : undefined,
+      origin,
+    } as Parameters<Wallet['setChainForOrigin']>[0]);
+  }
+
+  async uiChainSelected({
+    params: { chain },
+    context,
+  }: WalletMethodParams<{ chain: string }>) {
+    this.verifyInternalOrigin(context);
+    emitter.emit('ui:chainSelected', createChain(chain));
+  }
+
+  /** @deprecated */
+  async requestChainId({ context: _context }: PublicMethodParams) {
+    throw new Error('requestChainId is deprecated');
+  }
+
+  private async getNetworkForOrigin({
+    origin,
+    standard,
+  }: {
+    origin: string;
+    standard: BlockchainType;
+  }) {
+    if (!this.record) {
+      return null;
+    }
+    const chain = Model.getChainForOrigin(this.record, { origin, standard });
+    if (!chain) {
+      return null;
+    }
+    const preferences = Model.getPreferences(this.record);
+    const network = await fetchNetworkById({
+      networkId: chain,
+      preferences,
+      apiEnv: 'testnet-first',
+    });
+    return network;
+  }
+
+  async getChainIdForOrigin({ origin }: { origin: string }) {
+    const network = await this.getNetworkForOrigin({ origin, standard: 'evm' });
+    if (network) {
+      return Networks.getChainId(network);
+    } else {
+      const currentAddress = this.readCurrentAddress();
+      const fallbackChainId = '0x1' as ChainId;
+      if (currentAddress && isSolanaAddress(currentAddress)) {
+        // TODO: What's the correct return value in this case? Can we avoid this?
+        // eslint-disable-next-line no-console
+        console.warn(
+          `Solana does not support chainId (requested by ${origin})`
+        );
+      }
+      return fallbackChainId;
+    }
+  }
+
+  async requestChainForOrigin({
+    params: { origin, standard },
+    context,
+  }: WalletMethodParams<{ origin: string; standard: BlockchainType }>) {
+    this.verifyInternalOrigin(context);
+    this.ensureRecord(this.record);
+    const network = await this.getNetworkForOrigin({ origin, standard });
+    if (network) {
+      return network.id;
+    } else {
+      return standard === 'solana' ? NetworkId.Solana : NetworkId.Ethereum;
+    }
+  }
+
+  /** @deprecated */
+  setChainId(_chainId: string) {
+    throw new Error('setChainId is deprecated. Use setChainForOrigin instead');
+  }
+
+  setChainForOrigin(
+    params: Parameters<(typeof Model)['setChainForOrigin']>[1]
+  ) {
+    this.ensureRecord(this.record);
+    this.record = Model.setChainForOrigin(this.record, params);
+    this.updateWalletStore(this.record);
+    if (params.evmChain) {
+      // TODO: Is it a good idea to split into explicit 'evm:chainChanged' and 'solana:chainChanged' events?
+      this.emitter.emit('chainChanged', params.evmChain, params.origin);
+    }
+    if (params.solanaChain) {
+      this.emitter.emit('chainChanged', params.solanaChain, params.origin);
+    }
+  }
+
+  /** A helper for interpretation in UI */
+  async uiGetEip712Transaction({
+    params: { transaction },
+    context,
+  }: WalletMethodParams<{ transaction: IncomingTransactionWithChainId }>) {
+    this.verifyInternalOrigin(context);
+
+    const prepared = prepareTransaction(transaction);
+    const typedData = createTypedData(prepared);
+    return typedData;
+  }
+
+  private async getNodeUrlByChainId(chainId: ChainId) {
+    const networksStore = getNetworksStore(Model.getPreferences(this.record));
+    const networks = await networksStore.loadNetworksByChainId(chainId);
+    return networks.getRpcUrlInternal(networks.getChainById(chainId));
+  }
+
+  private async getZkSyncProvider(chainId: ChainId) {
+    const nodeUrl = await this.getNodeUrlByChainId(chainId);
+    return new ZksProvider(nodeUrl); // return new ethers.providers.JsonRpcProvider(nodeUrl);
+  }
+
+  private async getProvider(chainId: ChainId) {
+    const nodeUrl = await this.getNodeUrlByChainId(chainId);
+    return new ethers.JsonRpcProvider(nodeUrl);
+  }
+
+  private getKeypairByAddress(address: string): Keypair {
+    this.ensureRecord(this.record);
+    invariant(isSolanaAddress(address), 'Keypairs are for solana addresseses');
+    const signerWallet = Model.getSignerWalletByAddress(this.record, address);
+    invariant(signerWallet, `Signer wallet not found for ${address}`);
+
+    return fromSecretKeyToEd25519(signerWallet.privateKey);
+  }
+
+  private getOfflineSignerByAddress(address: string) {
+    this.ensureRecord(this.record);
+    const wallet = Model.getSignerWalletByAddress(this.record, address);
+    if (!wallet) {
+      throw new Error('Signer wallet for this address is not found');
+    }
+
+    return toEthersWallet(wallet);
+  }
+
+  private getOfflineSigner() {
+    this.ensureRecord(this.record);
+    const currentAddress = this.ensureCurrentAddress();
+    const currentWallet = currentAddress
+      ? Model.getSignerWalletByAddress(this.record, currentAddress)
+      : null;
+    if (!currentWallet) {
+      throw new Error('Signer wallet for this address is not found');
+    }
+
+    return toEthersWallet(currentWallet);
+  }
+
+  private async getSigner(chainId: ChainId) {
+    const jsonRpcProvider = await this.getProvider(chainId);
+    const wallet = this.getOfflineSigner();
+    return wallet.connect(jsonRpcProvider);
+  }
+
+  /** NOTE: mutates {transaction} param. TODO? */
+  private async resolveChainIdForTx({
+    initiator,
+    transaction,
+  }: {
+    transaction: IncomingTransactionAA;
+    initiator: string;
+  }): Promise<ChainId> {
+    const dappChainId = await this.getChainIdForOrigin({
+      origin: new URL(initiator).origin,
+    });
+    const txChainId = normalizeTransactionChainId(transaction);
+    if (initiator === INTERNAL_ORIGIN) {
+      // Transaction is initiated from our own UI
+      invariant(txChainId, 'Internal transaction must have a chainId');
+      return txChainId;
+    } else if (txChainId) {
+      if (dappChainId !== txChainId) {
+        throw new Error("Transaction chainId doesn't match dapp chainId");
+      }
+      return txChainId;
+    } else {
+      // eslint-disable-next-line no-console
+      console.warn('chainId field is missing from transaction object');
+      transaction.chainId = dappChainId;
+    }
+    const chainId = normalizeTransactionChainId(transaction);
+    invariant(chainId, 'Could not resolve chainId for transaction');
+    return chainId;
+  }
+
+  private async sendTransaction({
+    transaction: incomingTransaction,
+    txContext,
+    context,
+  }: {
+    transaction: IncomingTransactionAA;
+    txContext: TransactionContextParams;
+    context: Partial<ChannelContext> | undefined;
+  }): Promise<SerializableTransactionResponse> {
+    this.verifyInternalOrigin(context);
+    if (!incomingTransaction.from) {
+      throw new Error(
+        '"from" field is missing from the transaction object. Send from current address?'
+      );
+    }
+    const currentAddress = this.ensureCurrentAddress();
+    const { initiator } = txContext;
+    if (
+      normalizeAddress(incomingTransaction.from) !==
+      normalizeAddress(currentAddress)
+    ) {
+      throw new Error(
+        // TODO?...
+        'transaction "from" field is different from currently selected address'
+      );
+    }
+
+    const chainId = await this.resolveChainIdForTx({
+      transaction: incomingTransaction,
+      initiator,
+    });
+
+    const { mode } = await this.assertNetworkMode({ chainId });
+
+    const networksStore = getNetworksStore(Model.getPreferences(this.record));
+    const networks = await networksStore.loadNetworksByChainId(chainId);
+    const network = networks.getNetworkById(chainId);
+    const prepared = prepareTransaction(incomingTransaction);
+    const txWithFee = await prepareGasAndNetworkFee(prepared, networks, {
+      source: mode === 'testnet' ? 'testnet' : 'mainnet',
+      apiClient: YounoAPI,
+    });
+    const transaction = await prepareNonce(txWithFee, network);
+
+    const paymasterEligible = Boolean(transaction.customData?.paymasterParams);
+
+    if (paymasterEligible) {
+      try {
+        const eip712Tx = omit(transaction, ['authorizationList']); // authorizationList can't be part of EIP712 transaction
+        const { chainId } = eip712Tx;
+        invariant(chainId, 'ChainId missing from TransactionRequest');
+        const typedData = createTypedData(eip712Tx);
+        const signature = await this.signTypedData_v4({
+          context,
+          params: { typedData, typedDataContext: txContext },
+        });
+        const rawTransaction = serializePaymasterTx({
+          transaction: eip712Tx,
+          signature,
+        });
+
+        return await this.sendSignedTransaction({
+          context,
+          params: { serialized: rawTransaction, txContext },
+        });
+      } catch (error) {
+        throw getEthersError(error);
+      }
+    } else {
+      try {
+        const signer = await this.getSigner(chainId);
+        const transactionResponse = await signer.sendTransaction({
+          ...transaction,
+          type: transaction.type ?? undefined, // to exclude null
+        });
+        const safeTx = removeSignature(transactionResponse);
+
+        const safeTxPlain = toPlainTransactionResponse(safeTx);
+        emitter.emit(
+          'transactionSent',
+          { evm: safeTxPlain },
+          { mode, ...txContext }
+        );
+        return safeTxPlain;
+      } catch (error) {
+        const ethersError = getEthersError(error);
+        const parsedError = parseError(ethersError);
+        const errorMessage = parsedError.display || parsedError.message;
+        emitter.emit('transactionFailed', errorMessage, { mode, ...txContext });
+        throw ethersError;
+      }
+    }
+  }
+
+  async signAndSendTransaction({
+    params,
+    context,
+  }: WalletMethodParams<[IncomingTransactionAA, TransactionContextParams]>) {
+    this.verifyInternalOrigin(context);
+    this.ensureStringOrigin(context);
+    const [transaction, transactionContextParams] = params;
+    if (!transaction) {
+      throw new InvalidParams();
+    }
+    return this.sendTransaction({
+      transaction,
+      context,
+      txContext: transactionContextParams,
+    });
+  }
+
+  async solana_signTransaction({
+    params,
+    context,
+  }: WalletMethodParams<{
+    transaction: StringBase64;
+    params: TransactionContextParams;
+    /** Whether to emit 'transactionSent' event */
+    silent?: boolean;
+  }>): Promise<SolSignTransactionResult> {
+    this.verifyInternalOrigin(context);
+    this.ensureStringOrigin(context);
+    this.ensureRecord(this.record);
+    const currentAddress = this.ensureCurrentAddress();
+    // TODO: infer signer address from transaction instead
+    invariant(isSolanaAddress(currentAddress), 'Active address is not solana');
+    const {
+      transaction: txBase64,
+      params: transactionContextParams,
+      silent = false,
+    } = params;
+    invariant(txBase64, () => new InvalidParams());
+    const transaction = solFromBase64(txBase64);
+
+    const keypair = this.getKeypairByAddress(currentAddress);
+    const result = SolanaSigning.signTransaction(transaction, keypair);
+    const { mode } = await this.assertNetworkMode({
+      id: createChain('solana'),
+    }); // MUST assert even if result is not used
+    if (!silent) {
+      emitter.emit(
+        'transactionSent',
+        { solana: result },
+        { mode, ...transactionContextParams }
+      );
+      // TODO: process Solana Txs errors and emit 'transactionFailed' event
+    }
+    return result;
+  }
+
+  async solana_signAllTransactions({
+    params,
+    context,
+  }: WalletMethodParams<{
+    transactions: StringBase64[];
+    params: TransactionContextParams;
+  }>): Promise<SolSignTransactionResult[]> {
+    this.verifyInternalOrigin(context);
+    this.ensureStringOrigin(context);
+    this.ensureRecord(this.record);
+    const currentAddress = this.ensureCurrentAddress();
+    const { transactions: txsBase64, params: transactionContextParams } =
+      params;
+    invariant(txsBase64 && Array.isArray(txsBase64), () => new InvalidParams());
+    invariant(txsBase64.length > 0, 'No transactions provided');
+    const { mode } = await this.assertNetworkMode({
+      id: createChain('solana'),
+    }); // MUST assert even if result is not used
+    const transactions = txsBase64.map((tx) => solFromBase64(tx));
+    // TODO: infer signer address from transaction instead
+    const keypair = this.getKeypairByAddress(currentAddress);
+    const results = SolanaSigning.signAllTransactions(transactions, keypair);
+
+    results.forEach((result, index) => {
+      const contextParamsCopy = { ...transactionContextParams };
+      if (index > 0) {
+        /** TODO: Temporarily assume that addressAction describes only first tx */
+        contextParamsCopy.addressAction = null;
+      }
+      emitter.emit(
+        'transactionSent',
+        { solana: result },
+        { mode, ...contextParamsCopy }
+      );
+      // TODO: process Solana Txs errors and emit 'transactionFailed' event
+    });
+
+    return results;
+  }
+
+  async solana_signAndSendTransaction({
+    params,
+    context,
+  }: WalletMethodParams<{
+    transaction: StringBase64;
+    params: TransactionContextParams;
+  }>): Promise<SolSignTransactionResult> {
+    this.verifyInternalOrigin(context);
+    this.ensureStringOrigin(context);
+    this.ensureRecord(this.record);
+
+    const { tx: signed, publicKey } = await this.solana_signTransaction({
+      params: { ...params, silent: true },
+      context,
+    });
+    const { mode } = await this.assertNetworkMode({
+      id: createChain('solana'),
+    }); // MUST assert even if result is not used
+    const networksStore = getNetworksStore(Model.getPreferences(this.record));
+    const network = await networksStore.fetchNetworkById('solana');
+    const rpcUrl = Networks.getNetworkRpcUrlInternal(network);
+    const connection = new Connection(rpcUrl, 'confirmed');
+
+    const transaction = solFromBase64(signed);
+
+    const signature = await connection.sendRawTransaction(
+      transaction.serialize()
+    );
+    const result = { signature, publicKey, tx: solToBase64(transaction) };
+    emitter.emit(
+      'transactionSent',
+      { solana: result },
+      { mode, ...params.params }
+    );
+    // TODO: process Solana Txs errors and emit 'transactionFailed' event
+    return result;
+  }
+
+  async solana_sendTransaction({
+    params,
+    context,
+  }: WalletMethodParams<{
+    signed: StringBase64;
+    publicKey: string;
+    params: TransactionContextParams;
+  }>): Promise<SolSignTransactionResult> {
+    this.verifyInternalOrigin(context);
+    this.ensureStringOrigin(context);
+    this.ensureRecord(this.record);
+    const { signed, publicKey } = params;
+    const { mode } = await this.assertNetworkMode({
+      id: createChain('solana'),
+    }); // MUST assert even if result is not used
+    const networksStore = getNetworksStore(Model.getPreferences(this.record));
+    const network = await networksStore.fetchNetworkById('solana');
+    const rpcUrl = Networks.getNetworkRpcUrlInternal(network);
+    const connection = new Connection(rpcUrl, 'confirmed');
+
+    const transaction = solFromBase64(signed);
+
+    const signature = await connection.sendRawTransaction(
+      transaction.serialize()
+    );
+    const result = { signature, publicKey, tx: solToBase64(transaction) };
+    emitter.emit(
+      'transactionSent',
+      { solana: result },
+      { mode, ...params.params }
+    );
+    // TODO: process Solana Txs errors and emit 'transactionFailed' event
+    return result;
+  }
+
+  async solana_signMessageWithAddress({
+    params: { signerAddress, messageHex, ...messageContextParams },
+    context,
+  }: WalletMethodParams<
+    { signerAddress: string; messageHex: string } & MessageContextParams
+  >) {
+    this.verifyInternalOrigin(context);
+    const messageUint8 = ethers.getBytes(messageHex);
+    const keypair = this.getKeypairByAddress(signerAddress);
+    const result = SolanaSigning.signMessage(messageUint8, keypair);
+    this.registerPersonalSign({
+      params: {
+        address: signerAddress,
+        message: messageUint8,
+        ...messageContextParams,
+      },
+    });
+    return {
+      signatureSerialized: uint8ArrayToBase64(result.signature),
+    };
+  }
+
+  async solana_signMessage({
+    params,
+    context,
+  }: WalletMethodParams<
+    { messageHex: string } & MessageContextParams
+  >): Promise<{ signatureSerialized: string }> {
+    this.verifyInternalOrigin(context);
+    this.ensureRecord(this.record);
+    const address = this.ensureCurrentAddress();
+    return this.solana_signMessageWithAddress({
+      params: { signerAddress: address, ...params },
+      context,
+    });
+  }
+
+  async sendSignedTransaction({
+    params,
+    context,
+  }: WalletMethodParams<{
+    serialized: string;
+    txContext: TransactionContextParams;
+  }>): Promise<SerializableTransactionResponse> {
+    this.verifyInternalOrigin(context);
+    this.ensureStringOrigin(context);
+    const { serialized, txContext } = params;
+    const { chain } = txContext;
+    const networksStore = getNetworksStore(Model.getPreferences(this.record));
+    const networks = await networksStore.load({ chains: [chain] });
+    const chainId = networks.getChainId(createChain(chain));
+    invariant(chainId, 'Chain id should exist for send signed transaction');
+    const { mode } = await this.assertNetworkMode({ chainId }); // MUST assert even if result is not used
+    try {
+      const isEip712Tx = checkEip712Tx(serialized);
+      let transactionResponse: ethers.TransactionResponse;
+      if (isEip712Tx) {
+        const provider = await this.getZkSyncProvider(chainId);
+        transactionResponse = await broadcastTransactionPatched(
+          provider,
+          serialized
+        );
+      } else {
+        const provider = await this.getProvider(chainId);
+        transactionResponse = await provider.broadcastTransaction(serialized);
+      }
+      const safeTx = removeSignature(transactionResponse);
+      const safeTxPlain = toPlainTransactionResponse(safeTx);
+      emitter.emit(
+        'transactionSent',
+        { evm: safeTxPlain },
+        { mode, ...txContext }
+      );
+      return safeTxPlain;
+    } catch (error) {
+      const ethersError = getEthersError(error);
+      const parsedError = parseError(ethersError);
+      const errorMessage = parsedError.display || parsedError.message;
+      emitter.emit('transactionFailed', errorMessage, { mode, ...txContext });
+      throw ethersError;
+    }
+  }
+
+  async registerTypedDataSign({
+    params: { address, typedData: rawTypedData, ...messageContextParams },
+  }: WalletMethodParams<
+    {
+      address: string;
+      typedData: TypedData | string;
+    } & MessageContextParams
+  >) {
+    const typedData = prepareTypedData(rawTypedData);
+    emitter.emit('typedDataSigned', {
+      typedData,
+      address,
+      ...messageContextParams,
+    });
+  }
+
+  async signTypedData_v4({
+    params: { typedData: rawTypedData, typedDataContext: messageContextParams },
+    context,
+  }: WalletMethodParams<{
+    typedData: TypedData | string;
+    typedDataContext: MessageContextParams;
+  }>) {
+    this.verifyInternalOrigin(context);
+    if (!rawTypedData) {
+      throw new InvalidParams();
+    }
+    const signer = this.getOfflineSigner();
+    const signature = signTypedData(rawTypedData, signer);
+
+    this.registerTypedDataSign({
+      params: {
+        address: signer.address,
+        typedData: rawTypedData,
+        ...messageContextParams,
+      },
+    });
+    return signature;
+  }
+
+  async registerPersonalSign({
+    params: { message, ...messageContextParams },
+  }: WalletMethodParams<
+    {
+      address: string;
+      message: string | ethers.BytesLike;
+    } & MessageContextParams
+  >) {
+    const messageAsUtf8String = toUtf8String(message);
+    emitter.emit('messageSigned', {
+      message: messageAsUtf8String,
+      ...messageContextParams,
+    });
+  }
+
+  async signMessage({
+    params: { signerAddress, message, messageContextParams },
+    context,
+  }: WalletMethodParams<{
+    signerAddress: string;
+    message: string;
+    messageContextParams: MessageContextParams;
+  }>) {
+    this.verifyInternalOrigin(context);
+    const messageAsUtf8String = toUtf8String(message);
+
+    // Some dapps provide a hex message that doesn't parse as a utf string,
+    // but wallets sign it anyway
+    const messageToSign = ethers.isHexString(messageAsUtf8String)
+      ? ethers.getBytes(messageAsUtf8String)
+      : messageAsUtf8String;
+
+    const signer = this.getOfflineSignerByAddress(signerAddress);
+    const signature = await signer.signMessage(messageToSign);
+    this.registerPersonalSign({
+      params: { address: signer.address, message, ...messageContextParams },
+    });
+    return signature;
+  }
+
+  async personalSign({
+    params: {
+      params: [message],
+      ...messageContextParams
+    },
+    context,
+  }: WalletMethodParams<
+    {
+      params: [string, string?, string?];
+    } & MessageContextParams
+  >) {
+    this.verifyInternalOrigin(context);
+    if (message == null) {
+      throw new InvalidParams();
+    }
+    const currentAddress = this.ensureCurrentAddress();
+    return this.signMessage({
+      params: {
+        signerAddress: currentAddress,
+        message,
+        messageContextParams,
+      },
+      context,
+    });
+  }
+
+  async removeEthereumChain({
+    context,
+    params: { chain: chainStr },
+  }: WalletMethodParams<{ chain: string }>) {
+    this.ensureRecord(this.record);
+    const affectedPermissions = Model.getPermissionsByChain(this.record, {
+      chain: createChain(chainStr),
+    });
+    affectedPermissions.forEach(({ origin }) => {
+      // TODO: remove chain for origin in case new chain is not set
+      this.setChainForOrigin({
+        evmChain: createChain(NetworkId.Ethereum),
+        origin,
+      });
+    });
+    this.resetEthereumChain({ context, params: { chain: chainStr } });
+  }
+
+  async addEthereumChain({
+    context,
+    params: { values, origin, chain: chainStr, prevChain: prevChainStr },
+  }: WalletMethodParams<{
+    values: [AddEthereumChainParameter];
+    origin: string;
+    chain: string | null;
+    prevChain: string | null;
+  }>) {
+    this.verifyInternalOrigin(context);
+    const chain = chainStr || toCustomNetworkId(values[0].chainId);
+    // NOTE: This is where we might want to call something like
+    // {await networksStore.loadNetworkConfigByChainId(values[0].chainId)}
+    // IF we wanted to refactor networkStore to not hold searched values
+    const result = chainConfigStore.addEthereumChain(values[0], {
+      id: chain,
+      prevId: prevChainStr,
+      origin,
+    });
+
+    this.emitter.emit('chainChanged', createChain(chain), origin);
+    emitter.emit('addEthereumChain', {
+      values: [result.value],
+      origin: result.origin,
+    });
+    return result;
+  }
+
+  async resetEthereumChain({
+    context,
+    params: { chain: chainStr },
+  }: WalletMethodParams<{ chain: string }>) {
+    this.verifyInternalOrigin(context);
+    chainConfigStore.removeEthereumChain(createChain(chainStr));
+  }
+
+  addVisitedEthereumChainInternal(chain: Chain) {
+    chainConfigStore.addVisitedChain(chain);
+  }
+
+  async addVisitedEthereumChain({
+    context,
+    params: { chain: chainStr },
+  }: WalletMethodParams<{ chain: string }>) {
+    this.verifyInternalOrigin(context);
+    this.addVisitedEthereumChainInternal(createChain(chainStr));
+  }
+
+  async removeVisitedEthereumChain({
+    context,
+    params: { chain: chainStr },
+  }: WalletMethodParams<{ chain: string }>) {
+    this.verifyInternalOrigin(context);
+    chainConfigStore.removeVisitedChain(createChain(chainStr));
+  }
+
+  async getOtherNetworkData({ context }: PublicMethodParams) {
+    this.verifyInternalOrigin(context);
+    await chainConfigStore.ready();
+    const { ethereumChainConfigs, visitedChains = null } =
+      chainConfigStore.getState();
+    return { ethereumChainConfigs, visitedChains };
+  }
+
+  async getPendingTransactions({ context }: PublicMethodParams) {
+    this.verifyInternalOrigin(context);
+    return this.record?.transactions || [];
+  }
+
+  // async buttonClicked({
+  //   context,
+  //   params,
+  // }: WalletMethodParams<ButtonClickedParams>) {
+  //   this.verifyInternalOrigin(context);
+  //   emitter.emit('buttonClicked', params);
+  // }
+
+  // async bannerClicked({
+  //   context,
+  //   params,
+  // }: WalletMethodParams<BannerClickedParams>) {
+  //   this.verifyInternalOrigin(context);
+  //   emitter.emit('bannerClicked', params);
+  // }
+
+  async assetClicked({
+    context,
+    params,
+  }: WalletMethodParams<AssetClickedParams>) {
+    this.verifyInternalOrigin(context);
+    emitter.emit('assetClicked', params);
+  }
+
+  async cloudflareChallengeIssued({ context }: WalletMethodParams) {
+    this.verifyInternalOrigin(context);
+    emitter.emit('cloudflareChallengeIssued');
+  }
+
+  async passkeyLoginEnabled({ context }: WalletMethodParams) {
+    this.verifyInternalOrigin(context);
+    emitter.emit('passkeyLoginEnabled');
+  }
+
+  async passkeyLoginDisabled({ context }: WalletMethodParams) {
+    this.verifyInternalOrigin(context);
+    emitter.emit('passkeyLoginDisabled');
+  }
+
+  async passwordChangeSuccess({ context }: WalletMethodParams) {
+    this.verifyInternalOrigin(context);
+    emitter.emit('passwordChangeSuccess');
+  }
+
+  async passwordChangeError({ context }: WalletMethodParams) {
+    this.verifyInternalOrigin(context);
+    emitter.emit('passwordChangeError');
+  }
+
+  async reportLedgerError({
+    context,
+    params,
+  }: WalletMethodParams<{ errorMessage: string }>) {
+    this.verifyInternalOrigin(context);
+    emitter.emit('reportLedgerError', params.errorMessage);
+  }
+
+  async screenView({ context, params }: WalletMethodParams<ScreenViewParams>) {
+    // NOTE: maybe consider adding a more generic method, e.g.:
+    // walletPort.request('sendEvent', { event_name, params }).
+    this.verifyInternalOrigin(context);
+    emitter.emit('screenView', params);
+  }
+
+  async quoteError({ context, params }: WalletMethodParams<QuoteErrorContext>) {
+    this.verifyInternalOrigin(context);
+    invariant(params.inputChain, 'inputChain is required to report quoteError');
+    const { mode } = await this.assertNetworkMode({
+      id: createChain(params.inputChain),
+    });
+    emitter.emit(
+      'quoteError',
+      params,
+      mode === 'default' ? 'mainnet' : 'testnet'
+    );
+  }
+
+  async transactionFormed({
+    context,
+    params,
+  }: WalletMethodParams<TransactionFormedContext>) {
+    this.verifyInternalOrigin(context);
+    emitter.emit('transactionFormed', params);
+  }
+
+  async unlockedAppOpened({ context }: WalletMethodParams) {
+    this.verifyInternalOrigin(context);
+    emitter.emit('unlockedAppOpened');
+  }
+
+  async daylightAction({
+    context,
+    params,
+  }: WalletMethodParams<DaylightEventParams>) {
+    this.verifyInternalOrigin(context);
+    emitter.emit('daylightAction', params);
+  }
+
+  async blockOriginWithWarning({
+    params: { origin },
+  }: WalletMethodParams<{ origin: string }>) {
+    return phishingDefenceService.blockOriginWithWarning(origin);
+  }
+
+  async getDappSecurityStatus({
+    params: { url },
+  }: WalletMethodParams<{ url?: string | null }>): Promise<{
+    status: DappSecurityStatus;
+    isWhitelisted: boolean;
+  }> {
+    return phishingDefenceService.getDappSecurityStatus(url);
+  }
+
+  async ignoreDappSecurityWarning({
+    params: { url },
+  }: WalletMethodParams<{ url: string }>) {
+    return phishingDefenceService.ignoreDappSecurityWarning(url);
+  }
+
+  async openSendTransaction({
+    params: { params, context, id },
+    context: walletContext,
+  }: WalletMethodParams<
+    Parameters<(typeof this.publicEthereumController)['eth_sendTransaction']>[0]
+  >) {
+    this.verifyInternalOrigin(walletContext);
+    return this.publicEthereumController.eth_sendTransaction({
+      params,
+      context,
+      id,
+    });
+  }
+
+  async openPersonalSign({
+    params: { params, context, id },
+    context: walletContext,
+  }: WalletMethodParams<
+    Parameters<(typeof this.publicEthereumController)['personal_sign']>[0]
+  >) {
+    this.verifyInternalOrigin(walletContext);
+    return this.publicEthereumController.personal_sign({
+      params,
+      context,
+      id,
+    }) as Promise<string>;
+  }
+
+  private async checkTestnetMode(
+    options:
+      | { chainId: ChainId; id?: undefined }
+      | { id: Chain; chainId?: undefined }
+  ): Promise<
+    | { violation: true; network: NetworkConfig; mode: 'testnet' | 'default' }
+    | { violation: false; network: null; mode: 'testnet' | 'default' }
+  > {
+    const preferences = await this.getPreferences({
+      context: INTERNAL_SYMBOL_CONTEXT,
+    });
+    let network: NetworkConfig | null;
+    if (options.chainId) {
+      network = await fetchNetworkByChainId({
+        preferences,
+        chainId: options.chainId,
+        apiEnv: 'testnet-first',
+      });
+    } else if (options.id) {
+      network = await fetchNetworkById({
+        preferences,
+        networkId: options.id,
+        apiEnv: 'testnet-first',
+      });
+    } else {
+      throw new Error('Invalid options object');
+    }
+    const mode = preferences.testnetMode?.on ? 'testnet' : 'default';
+    if (!network) {
+      return { violation: false, network: null, mode };
+    }
+    if (Boolean(network.is_testnet) === Boolean(preferences.testnetMode?.on)) {
+      return { violation: false, network: null, mode };
+    } else {
+      return { violation: true, network, mode };
+    }
+  }
+
+  /** Signing mainnet transactions must not be allowed in testnet mode */
+  private async assertNetworkMode(
+    options: Parameters<typeof this.checkTestnetMode>[0]
+  ) {
+    const result = await this.checkTestnetMode(options);
+    const { violation } = result;
+    if (violation) {
+      throw new Error(
+        `Testnet Mode violation: ${result.network.name} is a mainnet. Turn off Testnet Mode before continuing`
+      );
+    }
+    return result;
+  }
+
+  async ensureTestnetModeForChainId(chainId: ChainId, tabId: number | null) {
+    const { violation, network, mode } = await this.checkTestnetMode({
+      chainId,
+    });
+    if (violation && mode === 'testnet') {
+      // Warn user that we're switching to mainnet from testmode
+      return new Promise<void>((resolve, reject) => {
+        this.notificationWindow.open({
+          route: '/testnetModeGuard',
+          search: `?targetNetwork=${JSON.stringify(network)}`,
+          requestId: `${INTERNAL_ORIGIN}:${nanoid()}`,
+          tabId,
+          onResolve: async () => {
+            await this.setPreferences({
+              context: INTERNAL_SYMBOL_CONTEXT,
+              params: { preferences: { testnetMode: { on: false } } },
+            });
+            resolve();
+          },
+          onDismiss: () => {
+            reject(new UserRejected('User Rejected the Request'));
+          },
+        });
+      });
+    } else if (violation && mode === 'default') {
+      // Enable testmode automatically without user confirmation
+      await this.setPreferences({
+        context: INTERNAL_SYMBOL_CONTEXT,
+        params: { preferences: { testnetMode: { on: true } } },
+      });
+    }
+  }
+
+  async ensureTestnetModeForTx({
+    transaction,
+    initiator,
+    tabId,
+  }: {
+    transaction: IncomingTransaction;
+    initiator: string;
+    tabId: number | null;
+  }) {
+    const chainId = await this.resolveChainIdForTx({
+      transaction,
+      initiator,
+    });
+    await this.ensureTestnetModeForChainId(chainId, tabId);
+  }
+
+  async getRpcUrlSolana() {
+    const networksStore = getNetworksStore(Model.getPreferences(this.record));
+    const network = await networksStore.fetchNetworkById('solana');
+    const rpcUrl = Networks.getNetworkRpcUrlInternal(network);
+    return rpcUrl;
+  }
+
+  async getRpcUrlByChainId({
+    chainId,
+    type,
+  }: {
+    chainId: ChainId;
+    type: 'public' | 'internal';
+  }) {
+    const network = await fetchNetworkByChainId({
+      preferences: Model.getPreferences(this.record),
+      chainId,
+      apiEnv: 'testnet-first',
+    });
+    if (network) {
+      if (type === 'internal') {
+        return Networks.getNetworkRpcUrlInternal(network);
+      } else if (type === 'public') {
+        return Networks.getRpcUrlPublic(network);
+      } else {
+        throw new Error(`Invalid Argument: ${type}`);
+      }
+    }
+    return null;
+  }
+
+  async clearPendingTransactions({ context }: WalletMethodParams) {
+    this.verifyInternalOrigin(context);
+    transactionService.clearPendingTransactions();
+  }
+}

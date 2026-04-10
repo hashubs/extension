@@ -1,0 +1,72 @@
+import { baseToCommon, commonToBase } from '@/shared/units/convert';
+import type BigNumber from 'bignumber.js';
+import type { Chain } from '../networks/chain';
+
+export interface Asset {
+  decimals?: number;
+  implementations?: Record<
+    string,
+    { address: string | null; decimals: number } | undefined
+  >;
+}
+
+export function getAssetImplementationInChain({
+  asset,
+  chain,
+}: {
+  asset?: Pick<Asset, 'implementations'>;
+  chain: Chain;
+}) {
+  return asset?.implementations?.[String(chain)];
+}
+
+export function getDecimals({
+  asset,
+  chain,
+}: {
+  asset: Pick<Asset, 'implementations'> & { decimals?: number };
+  chain: Chain;
+}) {
+  return (
+    getAssetImplementationInChain({ asset, chain })?.decimals ||
+    asset.decimals ||
+    18
+  );
+}
+
+export function getAddress({
+  asset,
+  chain,
+}: {
+  asset?: Asset;
+  chain: Chain;
+}): string | null | undefined {
+  const chainImplementation = getAssetImplementationInChain({ asset, chain });
+  return chainImplementation ? chainImplementation.address : undefined;
+}
+
+export function getCommonQuantity({
+  asset,
+  chain,
+  baseQuantity,
+}: {
+  asset: Asset;
+  chain: Chain;
+  baseQuantity: BigNumber.Value;
+}) {
+  const decimals = getDecimals({ asset, chain });
+  return baseToCommon(baseQuantity, decimals);
+}
+
+export function getBaseQuantity({
+  asset,
+  chain,
+  commonQuantity,
+}: {
+  asset: Asset;
+  chain: Chain;
+  commonQuantity: BigNumber.Value;
+}) {
+  const decimals = getDecimals({ asset, chain });
+  return commonToBase(commonQuantity, decimals);
+}
