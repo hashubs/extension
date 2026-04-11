@@ -1,0 +1,40 @@
+notification-window-message-handler.ts:26 [NotificationWindowMessageHandler] msg received {
+    "name": "window",
+    "senderTab": 1819669221,
+    "msg": {
+        "id": 2753907711,
+        "jsonrpc": "2.0",
+        "method": "reject",
+        "params": [
+            {
+                "windowId": "8OtE4NOjm9zuWJb0i8Tqe",
+                "error": {
+                    "code": 4001
+                }
+            }
+        ]
+    }
+}
+notification-window-message-handler.ts:49 [NotificationWindowMessageHandler] reject {
+    "windowId": "8OtE4NOjm9zuWJb0i8Tqe",
+    "error": {
+        "code": 4001
+    }
+}
+notification-window.ts:240 [NotificationWindow] on:reject 8OtE4NOjm9zuWJb0i8Tqe
+notification-window.ts:175 [NotificationWindow] closeWindowById called with id: 8OtE4NOjm9zuWJb0i8Tqe
+notification-window.ts:176 [NotificationWindow] current state keys: ['https://superbridge.app:3538541256']
+notification-window.ts:184 [NotificationWindow] closeWindowById {
+    "id": "8OtE4NOjm9zuWJb0i8Tqe",
+    "windowId": 1819669221,
+    "tabId": 1819669221,
+    "isSidepanel": false
+}
+notification-window.ts:186 [NotificationWindow] attempting to remove tab 1819669221
+map-rpc-to-controller.ts:57 Controller error
+map-rpc-to-controller.ts:58 (index)Valuemessagenamecodestack(index)Valuemessagenamecodestackid3538541256jsonrpc'2.0'error'User Rejected the Request''Error'4001'Error: User Rejected the Request\n    at onDismiss …nhllfhhcbcoegamb/background.c39d5601.js:130114:29'Object
+notification-window.ts:190 [NotificationWindow] tab.remove error Error: Unknown error.
+    at browser-polyfill.js:772:26
+notification-window.ts:193 [NotificationWindow] fallback to remove window 1819669221
+notification-window.ts:195 [NotificationWindow] fallback window.remove error Error: No window with id: 1819669221.
+    at browser-polyfill.js:772:26

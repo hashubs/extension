@@ -1,9 +1,10 @@
+import { ProgrammaticNavigationHelper } from '@/shared/programmatic';
 import { queryClient } from '@/shared/query-client/queryClient';
 import { ScreenViewTracker } from '@/shared/ScreenViewTracker';
 import { DesignTheme } from '@/ui/components/DesignTheme/DesignTheme';
 import { InactivityDetector } from '@/ui/components/Session/InactivityDetector';
 import { ViewSuspense } from '@/ui/components/ViewSuspense/ViewSuspense';
-import { ProgrammaticNavigationHelper } from '@/ui/shared/routing/helpers';
+import { initialize as initializeApperance } from '@/ui/features/appearance';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { AreaProvider } from 'react-area';
 import { HashRouter as Router } from 'react-router-dom';
@@ -13,6 +14,9 @@ export interface BaseAppProps {
   inspect?: { message: string };
   children: React.ReactNode;
 }
+
+// Initialize appearance for all entries
+initializeApperance();
 
 /**
  * Shared root application component that provides all global providers

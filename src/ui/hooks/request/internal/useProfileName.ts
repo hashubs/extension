@@ -1,6 +1,6 @@
 import { lookupAddressName } from '@/shared/domain-name-service';
 import { persistentQuery } from '@/shared/query-client/queryClientPersistence';
-import { getWalletDisplayName } from '@/ui/components/WalletDisplayName/getWalletDisplayName';
+import { getWalletDisplayName } from '@/ui/components/wallet';
 import { useQuery } from '@tanstack/react-query';
 import { normalizeAddress } from 'src/shared/normalize-address';
 import type { BareWallet } from 'src/shared/types/bare-wallet';
@@ -23,16 +23,16 @@ export enum WalletNameType {
 export const lookupAddressNameKey = 'name-service/lookupAddressName';
 
 export function useProfileName(
-  wallet: Pick<BareWallet, 'address' | 'name'>,
+  wallet: Pick<BareWallet, 'address' | 'name'> | null | undefined,
   {
     padding = 5,
     maxCharacters,
   }: { padding?: number; maxCharacters?: number } = {}
-): { type: WalletNameType; value: string } {
+): { type: WalletNameType; value: string; isLoading: boolean } {
   const { isLoading: isDomainLoading, data: domain } = useQuery({
-    queryKey: persistentQuery([lookupAddressNameKey, wallet.address]),
-    queryFn: async () => lookupAddressName(wallet.address),
-    enabled: !wallet.name,
+    queryKey: persistentQuery([lookupAddressNameKey, wallet?.address]),
+    queryFn: async () => lookupAddressName(wallet!.address),
+    enabled: !!wallet?.address && !wallet?.name,
     suspense: false,
     refetchOnWindowFocus: false,
     refetchOnMount: false,
@@ -42,19 +42,33 @@ export function useProfileName(
     useErrorBoundary: false,
   });
 
-  const domainName = isDomainLoading ? null : domain;
+  if (!wallet) {
+    return {
+      type: WalletNameType.address,
+      value: '0x0000000000000000000000000000000000000000',
+      isLoading: true,
+    };
+  }
+
+  const isQueryLoading = isDomainLoading && !wallet.name;
+  const domainName = isQueryLoading ? null : domain;
 
   if (wallet.name) {
     return {
       type: WalletNameType.customName,
       value: getWalletDisplayName(wallet, { padding, maxCharacters }),
+      isLoading: false,
     };
   }
+
   const value =
     domainName ?? getWalletDisplayName(wallet, { padding, maxCharacters });
   const type = domainName ? WalletNameType.domain : WalletNameType.address;
+
+  let finalValue = value;
   if (normalizeAddress(wallet.address) === testAddress) {
-    return { type, value: `${value} ${testWalletSuffix}` };
+    finalValue = `${value} ${testWalletSuffix}`;
   }
-  return { type, value };
+
+  return { type, value: finalValue, isLoading: isQueryLoading };
 }

@@ -11,7 +11,7 @@ import browser from 'webextension-polyfill';
 // import { initDnaApi } from '../../modules/dna-service/dna.client';
 import type { SessionCacheService } from '@/background/resource/session-cache-service';
 import { emitter } from '@/shared/events';
-import { navigateProgrammatically } from '@/ui/shared/routing/helpers';
+import { navigateProgrammatically } from '@/shared/programmatic';
 import type { RPCPort } from './channels.types';
 
 export const walletPort = new PortMessageChannel({
@@ -53,7 +53,7 @@ class WindowPort extends PortMessageChannel {
     }
   }
 
-  confirm<T>(
+  async confirm<T>(
     windowId: string,
     // result MUST NOT be undefined, otherwise the payload will not be interpreter
     // as JsonRpcResult or RpcResult, because `undefined` properties get removed
@@ -61,17 +61,23 @@ class WindowPort extends PortMessageChannel {
     result: T
   ) {
     try {
-      return this.request('resolve', [{ windowId, result }]);
+      return await this.request('resolve', [{ windowId, result }]);
+    } catch (error: any) {
+      console.error('Error in window confirm:', error);
     } finally {
       WindowPort.maybeRestoreRouteForSidepanel();
+      window.close();
     }
   }
 
-  reject(windowId: string) {
+  async reject(windowId: string) {
     try {
-      return this.request('reject', [{ windowId, error: new UserRejected() }]);
+      return await this.request('reject', [
+        { windowId, error: new UserRejected() },
+      ]);
     } finally {
       WindowPort.maybeRestoreRouteForSidepanel();
+      window.close();
     }
   }
 }

@@ -10,7 +10,7 @@ export function WalletDisplayName({
   render,
   className,
 }: {
-  wallet: ExternallyOwnedAccount;
+  wallet?: ExternallyOwnedAccount | null;
   padding?: number;
   maxCharacters?: number;
   render?: (data: ReturnType<typeof useProfileName>) => React.ReactNode;
@@ -20,8 +20,10 @@ export function WalletDisplayName({
     padding,
     maxCharacters,
   });
+
   if (render) {
     return render(data);
   }
-  return <span className={cn('break-all', className)}>{data.value}</span>;
+
+  return <span className={cn(className)}>{data.value}</span>;
 }

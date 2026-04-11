@@ -1,15 +1,15 @@
 import { ExternallyOwnedAccount } from '@/background/wallet/model/account-container';
-import { isTruthy } from 'is-truthy-ts';
-import type { BareWallet } from 'src/shared/types/bare-wallet';
-import type { DeviceAccount } from 'src/shared/types/device';
-import { isReadonlyAccount } from 'src/shared/types/validators';
+import type { BareWallet } from '@/shared/types/bare-wallet';
+import type { DeviceAccount } from '@/shared/types/device';
+import { isReadonlyAccount } from '@/shared/types/validators';
 import {
   DEFAULT_WALLET_LIST_GROUP_ID,
   DEFAULT_WALLET_LIST_GROUPS,
   getWalletId,
   WATCHLIST_WALLET_LIST_GROUP_ID,
   type WalletListGroup,
-} from 'src/shared/wallet/wallet-list';
+} from '@/shared/wallet/wallet-list';
+import { isTruthy } from 'is-truthy-ts';
 
 export type AnyWallet = ExternallyOwnedAccount | BareWallet | DeviceAccount;
 

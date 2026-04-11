@@ -14,3 +14,4 @@ export { Card, CardItem } from './card';
 export { AnimatedCheckmark } from './checkmark';
 export { Image } from './image';
 export { NeutralDecimals } from './neutral-decimals';
+export { Skeleton } from './skeleton';

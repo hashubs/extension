@@ -1,12 +1,9 @@
-import { initialize as initializeApperance } from '@/ui/features/appearance';
 import { Onboarding } from '@/ui/views/onboarding/onboarding';
 import { PhishingWarningPage } from '@/ui/views/phishing-warning';
 import { useMemo } from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
 import { BaseApp } from '../base/App';
 import * as styles from './style.module.css';
-
-initializeApperance();
 
 export interface AppProps {
   inspect?: { message: string };

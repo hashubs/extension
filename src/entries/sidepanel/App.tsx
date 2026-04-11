@@ -1,11 +1,8 @@
-import { initialize as initializeApperance } from '@/ui/features/appearance';
 import { useMemo } from 'react';
 import { Route, Routes } from 'react-router-dom';
 import { BaseApp } from '../base/App';
 import { Views } from '../base/views';
 import * as styles from './style.module.css';
-
-initializeApperance();
 
 export interface AppProps {
   initialView?: 'handshakeFailure';

@@ -18,7 +18,7 @@ const DEFAULT_WINDOW_SIZE = {
   width: 400 + (IS_WINDOWS ? 14 : 0), // windows cuts the width
   height: 600,
 };
-const DEFAULT_TAB_VIEW_WIDTH = 500;
+const DEFAULT_TAB_VIEW_WIDTH = 400;
 
 export interface WindowProps {
   route: string;

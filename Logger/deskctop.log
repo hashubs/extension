@@ -1,0 +1,43 @@
+notification-window-message-handler.ts:26 [NotificationWindowMessageHandler] msg received {
+    "name": "window",
+    "senderTab": 1694163790,
+    "msg": {
+        "id": 1536418838,
+        "jsonrpc": "2.0",
+        "method": "reject",
+        "params": [
+            {
+                "windowId": "bZfhhJE7JKuPI4PQT3ufJ",
+                "error": {
+                    "code": 4001
+                }
+            }
+        ]
+    }
+}
+notification-window-message-handler.ts:49 [NotificationWindowMessageHandler] reject {
+    "windowId": "bZfhhJE7JKuPI4PQT3ufJ",
+    "error": {
+        "code": 4001
+    }
+}
+notification-window.ts:240 [NotificationWindow] on:reject bZfhhJE7JKuPI4PQT3ufJ
+notification-window.ts:175 [NotificationWindow] closeWindowById called with id: bZfhhJE7JKuPI4PQT3ufJ
+notification-window.ts:176 [NotificationWindow] current state keys: ['https://superbridge.app:2983320626']
+notification-window.ts:184 [NotificationWindow] closeWindowById {
+    "id": "bZfhhJE7JKuPI4PQT3ufJ",
+    "windowId": 1694163789,
+    "tabId": 1694163790,
+    "isSidepanel": false
+}
+notification-window.ts:186 [NotificationWindow] attempting to remove tab 1694163790
+map-rpc-to-controller.ts:57 Controller error
+map-rpc-to-controller.ts:58 (index)Valuemessagenamecodestack(index)Valuemessagenamecodestackid2983320626jsonrpc'2.0'error'User Rejected the Request''Error'4001'Error: User Rejected the Request\n    at onDismiss …nfhinniildikhlhj/background.c39d5601.js:130114:29'Object
+port-registry.ts:56 [PortRegistry] Port disconnected: handshake
+port-registry.ts:56 [PortRegistry] Port disconnected: lofkdokjjjpikbamnfhinniildikhlhj/wallet
+port-registry.ts:56 [PortRegistry] Port disconnected: lofkdokjjjpikbamnfhinniildikhlhj/http-connection-ui
+port-registry.ts:56 [PortRegistry] Port disconnected: accountPublicRPC
+port-registry.ts:56 [PortRegistry] Port disconnected: memoryCacheRPC
+port-registry.ts:56 [PortRegistry] Port disconnected: window
+port-registry.ts:56 [PortRegistry] Port disconnected: sessionCacheService
+notification-window.ts:188 [NotificationWindow] tab.remove success 1694163790

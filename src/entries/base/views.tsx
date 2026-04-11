@@ -5,6 +5,7 @@ import { Navigate, Route, Routes } from 'react-router-dom';
 import { RequireAuth } from './auth';
 import { SomeKindOfResolver } from './resolver';
 
+import { WalletSelect } from '@/ui/components/wallet';
 import { HandshakeFailure } from '@/ui/views/handshake-failure';
 import { Login } from '@/ui/views/login';
 import { Overview } from '@/ui/views/overview/overview';
@@ -39,6 +40,14 @@ export function Views({ initialRoute }: { initialRoute?: string }) {
           element={
             <RequireAuth>
               <Overview />
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="/select-wallet"
+          element={
+            <RequireAuth>
+              <WalletSelect />
             </RequireAuth>
           }
         />

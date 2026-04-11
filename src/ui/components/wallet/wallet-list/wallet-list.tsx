@@ -1,14 +1,15 @@
+import { normalizeAddress } from '@/shared/normalize-address';
 import { middot } from '@/shared/typography';
 import { formatCurrencyToParts } from '@/shared/units/formatCurrencyValue';
 import { getAddressType } from '@/shared/wallet/classifiers';
+import { getWalletId } from '@/shared/wallet/wallet-list';
+import { BlockieImg } from '@/ui/components/BlockieImg';
+import { WalletDisplayName } from '@/ui/components/wallet';
 import { useAddressActivity } from '@/ui/hooks/request/external/useAddressActivity';
 import { WalletNameType } from '@/ui/hooks/request/internal/useProfileName';
 import { NeutralDecimals } from '@/ui/ui-kit';
 import { useMemo } from 'react';
-import { normalizeAddress } from 'src/shared/normalize-address';
-import { getWalletId } from 'src/shared/wallet/wallet-list';
-import { WalletDisplayName } from 'src/ui/components/WalletDisplayName';
-import { BlockieImg } from '../BlockieImg';
+import { FaCheck } from 'react-icons/fa';
 import { AnyWallet, getFullWalletList, WalletGroupInfo } from './shared';
 
 type AnyWalletWithValue = AnyWallet & {
@@ -35,34 +36,33 @@ function WalletListItem({
     <div
       role="button"
       onClick={onClick}
-      className={`group relative flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-all ${
-        isSelected
-          ? 'border-teal-500/50 bg-teal-500/10 shadow-sm'
-          : 'bg-item border border-border/20 hover:bg-black/5 dark:hover:bg-white/5'
-      }`}
+      className="group relative flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-all bg-item border border-border/20 hover:bg-black/5 dark:hover:bg-white/5"
     >
       <div className="shrink-0 flex items-center justify-center">
         <BlockieImg address={wallet.address} size={30} borderRadius={4} />
       </div>
-      <div className="flex flex-col gap-[2px]">
-        <span className="text-xs leading-none">
-          <WalletDisplayName
-            wallet={wallet}
-            render={(data) => (
-              <>
-                {data.type !== WalletNameType.domain
-                  ? `${ecosystemPrefix} ${middot} `
-                  : ''}
-                {data.value}
-              </>
-            )}
-          />
-        </span>
-        <span className="inline-flex text-base font-medium leading-none">
-          <NeutralDecimals
-            parts={formatCurrencyToParts(wallet.valueUsd, 'en', 'USD')}
-          />
-        </span>
+      <div className="flex items-center justify-between">
+        <div className="flex flex-col gap-[2px]">
+          <span className="text-xs leading-none">
+            <WalletDisplayName
+              wallet={wallet}
+              render={(data) => (
+                <>
+                  {data.type !== WalletNameType.domain
+                    ? `${ecosystemPrefix} ${middot} `
+                    : ''}
+                  {data.value}
+                </>
+              )}
+            />
+          </span>
+          <span className="inline-flex text-base font-medium leading-none">
+            <NeutralDecimals
+              parts={formatCurrencyToParts(wallet.valueUsd, 'en', 'USD')}
+            />
+          </span>
+        </div>
+        {isSelected && <FaCheck className="w-4 h-4 text-muted-foreground/80" />}
       </div>
     </div>
   );
@@ -144,14 +144,6 @@ export function WalletList({
     }
     return map;
   }, [walletMap, activityData]);
-
-  if (groups.length === 0) {
-    return (
-      <div className="text-sm font-medium text-center py-10 rounded-2xl border-2 border-dashed border-muted-foreground/10">
-        No wallets found
-      </div>
-    );
-  }
 
   return (
     <div className="flex flex-col gap-5">

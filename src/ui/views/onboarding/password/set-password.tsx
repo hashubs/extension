@@ -140,7 +140,6 @@ export function SetPassword({
             size="md"
             isValid={password.length > 0 && isMatching}
             type="password"
-            placeholder="••••••••••••"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             status="default"

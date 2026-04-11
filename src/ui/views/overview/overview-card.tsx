@@ -29,7 +29,6 @@ interface Props {
 }
 
 export function OverviewCard({
-  accountName = 'Account 1',
   balance = '$0.12',
   balanceChange = '+$35',
   onAction,
@@ -42,7 +41,7 @@ export function OverviewCard({
     <div className="p-1.5">
       <div className="p-1.5 rounded-[24px] bg-[#f6f6f8] dark:bg-[#1f1f1f]">
         <div className="bg-white dark:bg-[#171717] p-[14px] rounded-[20px]">
-          <OverviewHeader accountName={accountName} onMenuOpen={onMenuOpen} />
+          <OverviewHeader onMenuOpen={onMenuOpen} />
 
           {/* Balance */}
           <div className="mb-3">

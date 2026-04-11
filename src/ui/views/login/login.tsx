@@ -1,12 +1,11 @@
-import { accountPublicRPCPort, walletPort } from '@/shared/channel';
-import { invariant } from '@/shared/invariant';
+import { accountPublicRPCPort } from '@/shared/channel';
 import { queryClient } from '@/shared/query-client/queryClient';
 import { PublicUser } from '@/shared/types/User';
 import { zeroizeAfterSubmission } from '@/shared/zeroize-submission';
 import { Button, Input } from '@/ui/ui-kit';
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { useCallback, useState } from 'react';
-import { Navigate, useNavigate, useSearchParams } from 'react-router-dom';
+import { useState } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { ForgotPassword } from './forgot-password';
 
 export function Login() {
@@ -15,33 +14,14 @@ export function Login() {
   const [password, setPassword] = useState('');
   const [forgotPasswordOpen, setForgotPasswordOpen] = useState(false);
 
-  const {
-    data: user,
-    isLoading,
-    isError,
-    error,
-  } = useQuery({
+  const { data: user, isLoading } = useQuery({
     queryKey: ['account/getExistingUser'],
     queryFn: () => {
       return accountPublicRPCPort.request('getExistingUser');
     },
+    suspense: false,
+    useErrorBoundary: true,
   });
-
-  const userId = user?.id;
-
-  const { data: lastUsedAddress } = useQuery({
-    enabled: Boolean(userId),
-    queryKey: ['wallet/getLastUsedAddress', userId],
-    queryFn: async () => {
-      invariant(userId, "user['id'] is required");
-      return walletPort.request('getLastUsedAddress', { userId });
-    },
-  });
-
-  const handleSuccess = useCallback(() => {
-    queryClient.invalidateQueries(['authState']);
-    navigate(params.get('next') || '/', { replace: true });
-  }, [navigate, params]);
 
   const loginMutation = useMutation({
     mutationFn: async ({
@@ -56,7 +36,8 @@ export function Login() {
     onSuccess: async () => {
       zeroizeAfterSubmission();
       await new Promise((r) => setTimeout(r, 100));
-      handleSuccess();
+      queryClient.invalidateQueries(['authState']);
+      navigate(params.get('next') || '/', { replace: true });
     },
   });
 
@@ -64,14 +45,6 @@ export function Login() {
     if (!password || !user) return;
     loginMutation.mutate({ user, password });
   };
-
-  const subtitle = lastUsedAddress
-    ? `Unlocking ${lastUsedAddress.slice(0, 6)}...${lastUsedAddress.slice(-4)}`
-    : 'Enter your password to unlock';
-
-  if (isLoading) return null;
-  if (isError) throw error;
-  if (!user) return <Navigate to="/" replace={true} />;
 
   return (
     <>
@@ -83,19 +56,20 @@ export function Login() {
           <h2 className="text-xl font-semibold mb-1">Welcome Back</h2>
         </div>
 
-        <div className="relative z-10 rounded-t-3xl bg-background px-8 py-10 shadow-2xl">
+        <div className="relative z-10 rounded-t-3xl bg-background px-8 py-10 shadow-2xl animate-slide-up">
           <div className="flex flex-col space-y-4">
             <div className="w-full">
-              <p className="text-sm text-primary mb-1.5">{subtitle}</p>
+              <p className="text-sm text-primary mb-1.5">
+                Enter your password to unlock
+              </p>
               <Input
                 type="password"
-                placeholder="••••••••"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleUnlock()}
-                autoFocus
                 isError={!!loginMutation.error}
                 size="md"
+                autoFocus={!isLoading}
               />
               {!!loginMutation.error && (
                 <p className="text-destructive-foreground text-xs mt-1.5">
@@ -108,9 +82,8 @@ export function Login() {
             <div className="flex flex-col space-y-2">
               <Button
                 onClick={handleUnlock}
-                disabled={loginMutation.isLoading || !password}
                 loading={loginMutation.isLoading}
-                size="sm"
+                size="md"
                 variant="solid"
                 className="py-1.75"
                 shimmer
@@ -119,7 +92,7 @@ export function Login() {
               </Button>
               <Button
                 variant="outline"
-                size="sm"
+                size="md"
                 className="py-1.75"
                 onClick={() => setForgotPasswordOpen(true)}
               >

@@ -1,5 +1,7 @@
 import type { NotificationWindow } from '@/background/notification-window/notification-window';
 import { isRpcRequest } from '@/shared/custom-rpc';
+import { formatJsonRpcResultForPort } from '@/shared/custom-rpc/format-json-rpc-result-for-port';
+import { formatJsonRpcWalletError } from '@/shared/custom-rpc/format-json-rpc-wallet-error';
 import { invariant } from '@/shared/invariant';
 import { isObj } from '@/shared/is-obj';
 import type { ErrorResponse } from '@walletconnect/jsonrpc-utils';
@@ -28,25 +30,29 @@ export function createNotificationWindowMessageHandler(
     }
 
     if (isRpcRequest(msg)) {
-      const { params, method } = msg;
-      if (method === 'resolve') {
-        assertType(params, (v): v is [unknown] => Array.isArray(v));
-        assertType(params[0], isWindowResolve);
-        notificationWindow.emit('resolve', {
-          id: params[0].windowId,
-          result: params[0].result,
-        });
-        port.postMessage({ id: msg.id, result: null });
-      } else if (msg.method === 'reject') {
-        assertType(params, (v): v is [unknown] => Array.isArray(v));
-        assertType(params[0], isWindowReject);
-        notificationWindow.emit('reject', {
-          id: params[0].windowId,
-          error: params[0].error as ErrorResponse,
-        });
-        port.postMessage({ id: msg.id, result: null });
-      } else if (msg.method === 'closeCurrentWindow') {
-        notificationWindow.closeCurrentWindow();
+      try {
+        const { params, method } = msg;
+        if (method === 'resolve') {
+          assertType(params, (v): v is [unknown] => Array.isArray(v));
+          assertType(params[0], isWindowResolve);
+          notificationWindow.emit('resolve', {
+            id: params[0].windowId,
+            result: params[0].result,
+          });
+          port.postMessage(formatJsonRpcResultForPort(Number(msg.id), null));
+        } else if (msg.method === 'reject') {
+          assertType(params, (v): v is [unknown] => Array.isArray(v));
+          assertType(params[0], isWindowReject);
+          notificationWindow.emit('reject', {
+            id: params[0].windowId,
+            error: params[0].error as ErrorResponse,
+          });
+          port.postMessage(formatJsonRpcResultForPort(Number(msg.id), null));
+        } else if (msg.method === 'closeCurrentWindow') {
+          notificationWindow.closeCurrentWindow();
+        }
+      } catch (error: any) {
+        port.postMessage(formatJsonRpcWalletError(Number(msg.id), error));
       }
     } else {
       return false;

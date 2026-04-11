@@ -14,6 +14,7 @@ export const useAuthState = () => {
       return { isAuthenticated, existingUser, wallet };
     },
     useErrorBoundary: true,
+    suspense: false,
     retry: false,
     refetchOnWindowFocus: false,
   });

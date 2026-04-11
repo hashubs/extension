@@ -98,7 +98,12 @@ export function DappSecurityCheck({
     <>
       {status === 'ok' || status === 'error' ? (
         <Drawer open={open} onOpenChange={setOpen}>
-          <DrawerContent variant="inset" className="overflow-hidden">
+          <DrawerContent
+            variant="inset"
+            className="overflow-hidden"
+            title="Security Check"
+            description="Security Check"
+          >
             <SecurityCheckDialogContent
               status={status}
               onClose={() => setOpen(false)}

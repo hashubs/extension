@@ -5,7 +5,7 @@ import type { IconType } from 'react-icons';
 import { AiOutlineLoading3Quarters } from 'react-icons/ai';
 
 const buttonVariants = cva(
-  'group relative w-full overflow-hidden rounded-xl disabled:opacity-50 disabled:cursor-not-allowed',
+  'group relative w-full overflow-hidden rounded-xl disabled:opacity-50 disabled:cursor-not-allowed outline-none',
   {
     variants: {
       variant: {
@@ -26,7 +26,7 @@ const buttonVariants = cva(
         blank: '',
       },
       size: {
-        sm: 'h-8 px-4 text-xs',
+        sm: 'h-8 px-4 text-sm',
         md: 'h-9 md:h-10 px-6 text-sm',
         lg: 'h-10 md:h-12 px-8 text-sm md:text-base',
         xl: 'h-12 md:h-14 px-10 text-base md:text-lg',

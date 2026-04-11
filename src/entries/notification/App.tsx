@@ -1,5 +1,7 @@
+import { WalletSelect } from '@/ui/components/wallet';
 import { initialize as initializeApperance } from '@/ui/features/appearance';
 import { HandshakeFailure } from '@/ui/views/handshake-failure';
+import { Login } from '@/ui/views/login';
 import {
   ChooseGlobalProviderGuard,
   RequestAccounts,
@@ -18,28 +20,32 @@ export interface AppProps {
 export function App({ initialView, inspect }: AppProps) {
   return (
     <BaseApp bodyClassList={[]} inspect={inspect}>
-      <>
-        <Routes>
-          {initialView ? (
-            <Route path="/" element={<Navigate to={initialView} />} />
-          ) : null}
-          <Route
-            path="/requestAccounts"
-            element={
+      <Routes>
+        {initialView ? (
+          <Route path="/" element={<Navigate to={initialView} />} />
+        ) : null}
+        <Route path="/login" element={<Login />} />
+        <Route
+          path="/requestAccounts"
+          element={
+            <RequireAuth>
               <ChooseGlobalProviderGuard>
-                <RequireAuth>
-                  <RequestAccounts />
-                </RequireAuth>
+                <RequestAccounts />
               </ChooseGlobalProviderGuard>
-            }
-          />
-          <Route path="/handshake-failure" element={<HandshakeFailure />} />
-          <Route
-            path="*"
-            element={<Navigate to="/requestAccounts" replace />}
-          />
-        </Routes>
-      </>
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="/requestAccounts/select-wallet"
+          element={
+            <RequireAuth>
+              <WalletSelect />
+            </RequireAuth>
+          }
+        />
+        <Route path="/handshake-failure" element={<HandshakeFailure />} />
+        <Route path="*" element={<Navigate to="/login" replace />} />
+      </Routes>
     </BaseApp>
   );
 }
