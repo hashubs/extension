@@ -11,7 +11,6 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 import { RiLockPasswordLine } from 'react-icons/ri';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { AnimatedBackground } from './components/AnimatedBackground';
 import { ForgotPassword } from './forgot-password';
 
 export function Login() {
@@ -32,11 +31,10 @@ export function Login() {
     enabled: Boolean(user?.id),
     queryKey: ['wallet/getLastUsedAddress', user?.id],
     queryFn: async () => {
-      await wait(500);
+      await wait(100);
       invariant(user?.id, "user['id'] is required");
       return walletPort.request('getLastUsedAddress', { userId: user.id });
     },
-    suspense: false,
   });
 
   const loginMutation = useMutation({
@@ -52,7 +50,7 @@ export function Login() {
     onSuccess: async () => {
       zeroizeAfterSubmission();
       setUnlocked(true);
-      await wait(100);
+      await new Promise((r) => setTimeout(r, 100));
       queryClient.invalidateQueries(['authState']);
       navigate(params.get('next') || '/', { replace: true });
     },
@@ -67,7 +65,37 @@ export function Login() {
     <>
       <div className="flex flex-col h-full bg-[#f8f8f8] dark:bg-[#202020] overflow-hidden relative">
         <div className="flex-1 relative flex items-center justify-center min-h-[280px] overflow-hidden bg-[#f8f8f8] dark:bg-[#202020]">
-          <AnimatedBackground show={!!lastUsedAddress} />
+          <div className="absolute opacity-0 animate-fly-in-tl w-[130px] h-[130px] rounded-full bg-[#1B3A6B] -top-10 -left-10" />
+
+          <div
+            className="absolute opacity-0 animate-fly-in-tr -top-5 right-[18px]"
+            style={{
+              width: 0,
+              height: 0,
+              borderLeft: '58px solid transparent',
+              borderRight: '58px solid transparent',
+              borderBottom: '100px solid #D4577A',
+            }}
+          />
+
+          <div className="absolute opacity-0 animate-fly-in-r w-20 h-20 bg-[#3AAECC] rounded-[10px] top-[90px] -right-5" />
+
+          <div
+            className="absolute opacity-0 animate-fly-in-bl bottom-[18px] left-3"
+            style={{
+              width: 0,
+              height: 0,
+              borderLeft: '50px solid transparent',
+              borderRight: '50px solid transparent',
+              borderBottom: '86px solid #2BBFA4',
+            }}
+          />
+
+          <div className="absolute opacity-0 animate-fly-in-br w-[70px] h-[70px] rounded-full bg-[#4A4A5A] -bottom-[18px] right-[50px]" />
+
+          <div className="absolute opacity-0 animate-pop-in-1 w-8 h-8 rounded-full bg-[#3AAECC] top-[115px] left-[55px]" />
+
+          <div className="absolute opacity-0 animate-pop-in-2 w-[22px] h-[22px] bg-[#D4577A] rounded-[4px] rotate-30Z bottom-[50px] right-[110px]" />
 
           <div className="relative z-10 flex flex-col items-center gap-4">
             {lastUsedAddress ? (
@@ -94,7 +122,7 @@ export function Login() {
           </div>
         </div>
 
-        <div className="relative px-8 pt-10 pb-4 z-10 rounded-t-3xl bg-background border-t border-muted-foreground/10 shadow-2xl">
+        <div className="relative z-10 rounded-t-3xl bg-background px-8 py-10 shadow-2xl">
           <Input
             type="password"
             value={password}
@@ -112,24 +140,24 @@ export function Login() {
             </p>
           )}
 
-          <div className="flex flex-col space-y-2 mt-3">
+          <div className="flex flex-col space-y-2 mt-2.5">
             <Button
               onClick={handleUnlock}
               loading={loginMutation.isLoading}
               size="md"
-              variant="primary"
+              variant="danger"
               className="py-1.75"
               shimmer
             >
               Unlock
             </Button>
             <Button
-              variant="blank"
+              variant="outline"
               size="md"
               className="py-1.75"
               onClick={() => setForgotPasswordOpen(true)}
             >
-              Need Help?
+              Forgot your password?
             </Button>
           </div>
         </div>

@@ -34,8 +34,8 @@
   --muted-foreground: oklch(0.556 0 0);
   --accent: oklch(0.97 0 0);
   --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(70.4% 0.191 22.216);
-  --destructive-foreground: oklch(70.4% 0.191 22.216);
+  --destructive: oklab(62.62799999999999% 0.15943 0.01535);
+  --destructive-foreground: oklab(62.62799999999999% 0.15943 0.01535);
   --border: oklch(0.922 0 0);
   --input: oklch(0.922 0 0);
   --ring: oklch(0.708 0 0);
@@ -84,8 +84,8 @@
   --muted-foreground: oklch(0.708 0 0);
   --accent: oklch(0.269 0 0);
   --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.396 0.141 25.723);
-  --destructive-foreground: oklch(0.637 0.237 25.331);
+  --destructive: oklab(62.62799999999999% 0.15943 0.01535);
+  --destructive-foreground: oklab(62.62799999999999% 0.15943 0.01535);
   --border: oklch(0.269 0 0);
   --input: oklch(0.269 0 0);
   --ring: oklch(0.439 0 0);
@@ -156,6 +156,8 @@
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
 
+  --color-red: var(--red);
+
   --color-surface: var(--surface);
   --color-surface-bright: var(--surface-bright);
   --color-surface-container-lowest: var(--surface-container-lowest);
@@ -173,7 +175,7 @@
 
 @layer base {
   * {
-    @apply border-muted-foreground/80 outline-ring/50 box-border animate-fade-in;
+    @apply border-muted-foreground/80 outline-ring/50 box-border;
   }
 
   ::-webkit-scrollbar {
@@ -193,6 +195,10 @@
     min-height: var(--body-height);
     margin-inline: auto;
     overflow: hidden;
+  }
+
+  root {
+    display: contents;
   }
 
   button:not(:disabled),
@@ -223,6 +229,22 @@
   --animate-token-row-in: tokenRowIn 0.3s ease-out;
   --animate-slide-up: slideUp 0.3s ease-out;
   --animate-slide-down: slideDown 0.3s ease-out;
+
+  --animate-fly-in-tl: flyInTL 0.7s cubic-bezier(0.34, 1.4, 0.64, 1) 0.1s
+    forwards;
+  --animate-fly-in-tr: flyInTR 0.7s cubic-bezier(0.34, 1.4, 0.64, 1) 0.22s
+    forwards;
+  --animate-fly-in-r: flyInR 0.65s cubic-bezier(0.34, 1.4, 0.64, 1) 0.35s
+    forwards;
+  --animate-fly-in-bl: flyInBL 0.65s cubic-bezier(0.34, 1.4, 0.64, 1) 0.45s
+    forwards;
+  --animate-fly-in-br: flyInBR 0.6s cubic-bezier(0.34, 1.4, 0.64, 1) 0.55s
+    forwards;
+  --animate-pop-in-1: popIn 0.5s cubic-bezier(0.34, 1.8, 0.64, 1) 0.65s forwards;
+  --animate-pop-in-2: popIn 0.5s cubic-bezier(0.34, 1.8, 0.64, 1) 0.72s forwards;
+  --animate-fade-up: fadeUp 0.6s ease 0.8s forwards;
+  --animate-slide-up: slideUp 0.55s cubic-bezier(0.34, 1.2, 0.64, 1) 0.9s
+    forwards;
 
   @keyframes collapsible-down {
     from {
@@ -320,6 +342,87 @@
       transform: translateY(-20px);
     }
     to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes flyInTL {
+    0% {
+      opacity: 0;
+      transform: translate(-60px, -60px) scale(0.6);
+    }
+    100% {
+      opacity: 1;
+      transform: translate(0, 0) scale(1);
+    }
+  }
+  @keyframes flyInTR {
+    0% {
+      opacity: 0;
+      transform: translate(60px, -60px) scale(0.6);
+    }
+    100% {
+      opacity: 1;
+      transform: translate(0, 0) scale(1);
+    }
+  }
+  @keyframes flyInR {
+    0% {
+      opacity: 0;
+      transform: translate(60px, 0) rotate(20deg) scale(0.5);
+    }
+    100% {
+      opacity: 1;
+      transform: translate(0, 0) rotate(20deg) scale(1);
+    }
+  }
+  @keyframes flyInBL {
+    0% {
+      opacity: 0;
+      transform: translate(-60px, 60px) scale(0.5);
+    }
+    100% {
+      opacity: 1;
+      transform: translate(0, 0) scale(1);
+    }
+  }
+  @keyframes flyInBR {
+    0% {
+      opacity: 0;
+      transform: translate(50px, 50px) scale(0.5);
+    }
+    100% {
+      opacity: 1;
+      transform: translate(0, 0) scale(1);
+    }
+  }
+  @keyframes popIn {
+    0% {
+      opacity: 0;
+      transform: scale(0);
+    }
+    100% {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+  @keyframes fadeUp {
+    0% {
+      opacity: 0;
+      transform: translateY(12px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  @keyframes slideUp {
+    0% {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    100% {
       opacity: 1;
       transform: translateY(0);
     }

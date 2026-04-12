@@ -31,17 +31,17 @@ export const alertVariants = cva(
         variant: 'danger',
         theme: 'system',
         className:
-          'from-red-500/10 to-red-700/10 border-red-500/30 dark:border-red-500/20',
+          'from-destructive/10 to-red-700/10 border-destructive/30 dark:border-destructive/20',
       },
       {
         variant: 'danger',
         theme: 'light',
-        className: 'from-red-500/10 to-red-700/10 border-red-500/30',
+        className: 'from-destructive/10 to-red-700/10 border-destructive/30',
       },
       {
         variant: 'danger',
         theme: 'dark',
-        className: 'from-red-500/10 to-red-700/10 border-red-500/20',
+        className: 'from-destructive/10 to-red-700/10 border-destructive/20',
       },
 
       {
@@ -140,10 +140,10 @@ export const iconBgVariants = cva(
       {
         variant: 'danger',
         theme: 'system',
-        className: 'bg-red-500/20 dark:bg-red-500/20',
+        className: 'bg-destructive/20 dark:bg-destructive/20',
       },
-      { variant: 'danger', theme: 'light', className: 'bg-red-500/20' },
-      { variant: 'danger', theme: 'dark', className: 'bg-red-500/20' },
+      { variant: 'danger', theme: 'light', className: 'bg-destructive/20' },
+      { variant: 'danger', theme: 'dark', className: 'bg-destructive/20' },
       {
         variant: 'warning',
         theme: 'system',

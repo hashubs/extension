@@ -1,10 +1,5 @@
-import {
-  Button,
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@/ui/ui-kit';
+import { Header } from '@/ui/components/header';
+import { Button, Sheet, SheetContent } from '@/ui/ui-kit';
 import { LuLoader } from 'react-icons/lu';
 
 interface ForgotPasswordComponentProps {
@@ -21,16 +16,9 @@ export function ForgotPassword({
   onConfirm,
 }: ForgotPasswordComponentProps) {
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent
-        showCloseButton={false}
-        className="w-[calc(100%-2rem)] max-w-sm rounded-2xl border border-border bg-background p-4"
-      >
-        <DialogHeader>
-          <DialogTitle className="text-base font-semibold text-foreground">
-            Forgot password?
-          </DialogTitle>
-        </DialogHeader>
+    <Sheet open={open} onOpenChange={onOpenChange}>
+      <SheetContent className="border-none">
+        <Header title="Forgot password?" onBack={() => onOpenChange(false)} />
 
         <div className="space-y-2">
           <p className="text-muted-foreground">
@@ -66,7 +54,7 @@ export function ForgotPassword({
             )}
           </Button>
         </div>
-      </DialogContent>
-    </Dialog>
+      </SheetContent>
+    </Sheet>
   );
 }
