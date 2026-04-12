@@ -1,3 +1,4 @@
+import { ViewTransition } from '@/ui/components/ViewTransition/ViewTransition';
 import { WalletSelect } from '@/ui/components/wallet';
 import { initialize as initializeApperance } from '@/ui/features/appearance';
 import { HandshakeFailure } from '@/ui/views/handshake-failure';
@@ -17,35 +18,41 @@ export interface AppProps {
   inspect?: { message: string };
 }
 
+const animatedRoutes = ['/requestAccounts'];
+
 export function App({ initialView, inspect }: AppProps) {
   return (
-    <BaseApp bodyClassList={[]} inspect={inspect}>
-      <Routes>
-        {initialView ? (
-          <Route path="/" element={<Navigate to={initialView} />} />
-        ) : null}
-        <Route path="/login" element={<Login />} />
-        <Route
-          path="/requestAccounts"
-          element={
-            <RequireAuth>
-              <ChooseGlobalProviderGuard>
-                <RequestAccounts />
-              </ChooseGlobalProviderGuard>
-            </RequireAuth>
-          }
-        />
-        <Route
-          path="/requestAccounts/select-wallet"
-          element={
-            <RequireAuth>
-              <WalletSelect />
-            </RequireAuth>
-          }
-        />
-        <Route path="/handshake-failure" element={<HandshakeFailure />} />
-        <Route path="*" element={<Navigate to="/login" replace />} />
-      </Routes>
+    <BaseApp bodyClassList={['overflow-hidden']} inspect={inspect}>
+      <ViewTransition animatedRoutes={animatedRoutes}>
+        {(location) => (
+          <Routes location={location}>
+            {initialView ? (
+              <Route path="/" element={<Navigate to={initialView} />} />
+            ) : null}
+            <Route path="/login" element={<Login />} />
+            <Route
+              path="/requestAccounts"
+              element={
+                <RequireAuth>
+                  <ChooseGlobalProviderGuard>
+                    <RequestAccounts />
+                  </ChooseGlobalProviderGuard>
+                </RequireAuth>
+              }
+            />
+            <Route
+              path="/requestAccounts/select-wallet"
+              element={
+                <RequireAuth>
+                  <WalletSelect />
+                </RequireAuth>
+              }
+            />
+            <Route path="/handshake-failure" element={<HandshakeFailure />} />
+            <Route path="*" element={<Navigate to="/login" replace />} />
+          </Routes>
+        )}
+      </ViewTransition>
     </BaseApp>
   );
 }

@@ -2,14 +2,14 @@ import type {
   DeviceAccount,
   ExternallyOwnedAccount,
 } from '@/background/wallet/model/account-container';
-import { walletPort } from '@/shared/channel';
 import { setCurrentAddress } from '@/shared/request/internal/setCurrentAddress';
 import type { BareWallet } from '@/shared/types/bare-wallet';
 import type { BlockchainType } from '@/shared/wallet/classifiers';
 import { Header } from '@/ui/components/header';
 import { WalletList } from '@/ui/components/wallet/wallet-list/wallet-list';
+import { useWalletGroups } from '@/ui/hooks/useWalletGroups';
 import { Input } from '@/ui/ui-kit';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useCallback, useMemo, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { isMatchForEcosystem } from 'src/shared/wallet/shared';
@@ -22,12 +22,7 @@ export function WalletSelect() {
 
   const ecosystem = searchParams.get('ecosystem') as BlockchainType;
 
-  const { data: walletGroups } = useQuery({
-    queryKey: ['wallet/uiGetWalletGroups'],
-    queryFn: () => walletPort.request('uiGetWalletGroups'),
-    suspense: false,
-    useErrorBoundary: true,
-  });
+  const { data: walletGroups } = useWalletGroups();
 
   const [searchQuery, setSearchQuery] = useState('');
   const queryClient = useQueryClient();
@@ -48,13 +43,14 @@ export function WalletSelect() {
     async (wallet: ExternallyOwnedAccount | BareWallet | DeviceAccount) => {
       const next = searchParams.get('next');
       if (next) {
-        // Used in RequestAccounts context, return value via query params
         const newParams = new URLSearchParams(searchParams);
         newParams.set('selectedAddress', wallet.address);
         newParams.delete('next');
-        navigate(`${next}?${newParams.toString()}`, { replace: true });
+        navigate(`${next}?${newParams.toString()}`, {
+          replace: true,
+          state: { direction: 'back' },
+        });
       } else {
-        // Used in normal app context, update global current address
         await updateCurrentAddress(wallet.address);
         navigate(-1);
       }
@@ -83,10 +79,6 @@ export function WalletSelect() {
   );
 
   const showSearch = totalWalletCount >= MIN_WALLETS_FOR_SEARCH;
-
-  if (!walletGroups?.length) {
-    return null;
-  }
 
   return (
     <div className="flex flex-col h-full overflow-hidden bg-background">

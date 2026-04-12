@@ -2,7 +2,7 @@ import { walletPort } from '@/shared/channel';
 import { BlockieImg } from '@/ui/components/BlockieImg';
 import { WalletDisplayName } from '@/ui/components/wallet';
 import { useAddressParams } from '@/ui/hooks/request/internal/useAddressParams';
-import { useQuery } from '@tanstack/react-query';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import { HiOutlineViewGrid } from 'react-icons/hi';
 import { useNavigate } from 'react-router-dom';
 
@@ -13,12 +13,13 @@ interface Props {
 export function OverviewHeader({ onMenuOpen }: Props) {
   const navigate = useNavigate();
 
-  const { singleAddress, ready } = useAddressParams();
+  const { singleAddress } = useAddressParams();
   const { data: wallet } = useQuery({
     queryKey: ['wallet/uiGetCurrentWallet'],
     queryFn: () => walletPort.request('uiGetCurrentWallet'),
     suspense: false,
     useErrorBoundary: true,
+    placeholderData: keepPreviousData,
   });
 
   const address = wallet?.address || singleAddress;
@@ -26,10 +27,6 @@ export function OverviewHeader({ onMenuOpen }: Props) {
   const handleSelectWallet = () => {
     navigate('/select-wallet');
   };
-
-  if (!ready || !wallet) {
-    return null;
-  }
 
   return (
     <div className="flex items-center justify-between border-b border-muted pb-2 mb-4">

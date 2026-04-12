@@ -41,7 +41,7 @@ function WalletListItem({
       <div className="shrink-0 flex items-center justify-center">
         <BlockieImg address={wallet.address} size={30} borderRadius={4} />
       </div>
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between w-full">
         <div className="flex flex-col gap-[2px]">
           <span className="text-xs leading-none">
             <WalletDisplayName

@@ -8,6 +8,7 @@ import { BlockieImg } from '@/ui/components/BlockieImg';
 import { DappSecurityCheck } from '@/ui/components/DappSecurityCheck/DappSecurityCheck';
 import { SiteFaviconImg } from '@/ui/components/SiteFaviconImg';
 import { WalletDisplayName } from '@/ui/components/wallet';
+import { usePrefetchWalletGroups } from '@/ui/hooks/useWalletGroups';
 import { usePhishingDefenceStatus } from '@/ui/hooks/request/external/usePhishingDefenceStatus';
 import { useEvent } from '@/ui/hooks/useEvent';
 import { Button, Drawer, DrawerContent, DrawerTrigger } from '@/ui/ui-kit';
@@ -327,6 +328,8 @@ export function RequestAccounts() {
   const origin = params.get('origin');
   const windowId = params.get('windowId');
   const ecosystem = (params.get('ecosystem') || 'evm') as BlockchainType;
+
+  usePrefetchWalletGroups();
 
   assertKnownEcosystems([ecosystem]);
   invariant(origin, 'origin get-parameter is required');

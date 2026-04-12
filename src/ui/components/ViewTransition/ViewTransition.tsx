@@ -1,0 +1,144 @@
+import { animated, useTransition } from '@react-spring/web';
+import React, { useRef } from 'react';
+import {
+  type Location,
+  useLocation,
+  useNavigationType,
+} from 'react-router-dom';
+
+interface ViewTransitionProps {
+  children: (location: Location) => React.ReactNode;
+  animatedRoutes?: string[];
+  excludedTransitions?: Array<{ from: string; to: string }>;
+}
+
+export function ViewTransition({
+  children,
+  animatedRoutes = [],
+  excludedTransitions = [],
+}: ViewTransitionProps) {
+  const location = useLocation();
+  const navigationType = useNavigationType();
+
+  const prevPathRef = useRef(location.pathname);
+  const isBackRef = useRef(false);
+  const shouldAnimateRef = useRef(false);
+  const isMountedRef = useRef(false);
+  const isTransitioningRef = useRef(false);
+
+  const getDepth = (path: string) => path.split('/').filter(Boolean).length;
+
+  const normalizePath = (path: string) => (path === '/' ? path : path.replace(/\/$/, ''));
+
+  const matchesRoute = (path: string) => {
+    const normalized = normalizePath(path);
+    return animatedRoutes.some((route) => {
+      const normalizedRoute = normalizePath(route);
+      return (
+        normalized === normalizedRoute ||
+        normalized.startsWith(normalizedRoute + '/')
+      );
+    });
+  };
+
+  const isExcludedTransition = (from: string, to: string) => {
+    const nFrom = normalizePath(from);
+    const nTo = normalizePath(to);
+    return excludedTransitions.some((t) => {
+      const exFrom = normalizePath(t.from);
+      const exTo = normalizePath(t.to);
+
+      const matchesFrom =
+        nFrom === exFrom ||
+        (exFrom !== '/' && nFrom.startsWith(exFrom + '/'));
+      const matchesTo =
+        nTo === exTo || (exTo !== '/' && nTo.startsWith(exTo + '/'));
+
+      return matchesFrom && matchesTo;
+    });
+  };
+
+  const prevPath = prevPathRef.current;
+
+  const computeDirection = (): 'back' | 'forward' => {
+    const state = location.state as { direction?: 'back' | 'forward' } | null;
+    if (state?.direction === 'back') return 'back';
+    if (state?.direction === 'forward') return 'forward';
+    if (navigationType === 'POP') return 'back';
+    const currentDepth = getDepth(location.pathname);
+    const prevDepth = getDepth(prevPath);
+    return currentDepth >= prevDepth ? 'forward' : 'back';
+  };
+
+  const isBack = computeDirection() === 'back';
+
+  const shouldAnimate =
+    isMountedRef.current &&
+    prevPath !== location.pathname &&
+    !isExcludedTransition(prevPath, location.pathname) &&
+    (animatedRoutes.length === 0 ||
+      matchesRoute(location.pathname) ||
+      matchesRoute(prevPath));
+
+  shouldAnimateRef.current = shouldAnimate;
+  isBackRef.current = isBack;
+
+  React.useLayoutEffect(() => {
+    isMountedRef.current = true;
+    prevPathRef.current = location.pathname;
+  }, [location.pathname]);
+
+  const transitions = useTransition(location, {
+    key: location.pathname,
+    from: () => ({
+      transform: shouldAnimateRef.current
+        ? isBackRef.current
+          ? 'translateX(-30%)'
+          : 'translateX(100%)'
+        : 'translateX(0%)',
+      zIndex: isBackRef.current ? 1 : 2,
+    }),
+    enter: () => ({
+      transform: 'translateX(0%)',
+      zIndex: isBackRef.current ? 1 : 2,
+    }),
+    leave: () => ({
+      transform: shouldAnimateRef.current
+        ? isBackRef.current
+          ? 'translateX(100%)'
+          : 'translateX(-30%)'
+        : 'translateX(0%)',
+      zIndex: isBackRef.current ? 2 : 1,
+    }),
+    config: isTransitioningRef.current
+      ? { tension: 600, friction: 40 }
+      : { tension: 280, friction: 26 },
+    immediate: (key) => key === 'zIndex' || !shouldAnimateRef.current,
+    exitBeforeEnter: false,
+    onStart: () => {
+      isTransitioningRef.current = true;
+    },
+    onRest: () => {
+      isTransitioningRef.current = false;
+    },
+  });
+
+  return (
+    <div className="relative h-full w-full overflow-hidden bg-background">
+      {transitions((style, item) => (
+        <animated.div
+          key={item.key}
+          style={{
+            ...style,
+            position: 'absolute',
+            inset: 0,
+            backgroundColor: 'inherit',
+            willChange: 'transform',
+          }}
+        >
+          {children(item)}
+        </animated.div>
+      ))}
+    </div>
+  );
+}
