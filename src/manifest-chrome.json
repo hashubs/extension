@@ -55,7 +55,11 @@
       "resources": [
         "content-script/in-page.ts",
         "index.html",
-        "notification.html"
+        "notification.html",
+        "*.js",
+        "*.css",
+        "*.woff2",
+        "images/*"
       ],
       "matches": ["<all_urls>"]
     }

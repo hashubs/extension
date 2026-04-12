@@ -193,7 +193,6 @@ export function SetPassword({
             isError={confirm.length > 0 && !isMatching}
             isValid={confirm.length > 0 && isMatching}
             type="password"
-            placeholder="••••••••••••"
             value={confirm}
             onChange={(e) => setConfirm(e.target.value)}
             disabled={password.length === 0}

@@ -6,13 +6,13 @@ import { walletPort } from '@/shared/channel';
 import { setCurrentAddress } from '@/shared/request/internal/setCurrentAddress';
 import type { BareWallet } from '@/shared/types/bare-wallet';
 import type { BlockchainType } from '@/shared/wallet/classifiers';
+import { Header } from '@/ui/components/header';
 import { WalletList } from '@/ui/components/wallet/wallet-list/wallet-list';
 import { Input } from '@/ui/ui-kit';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useCallback, useMemo, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { isMatchForEcosystem } from 'src/shared/wallet/shared';
-import { Header } from '../header';
 
 const MIN_WALLETS_FOR_SEARCH = 5;
 

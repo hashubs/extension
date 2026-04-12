@@ -1,4 +1,4 @@
-export { WalletSelect } from './select-wallet';
+export { WalletSelect } from '../../views/select-wallet';
 export { getWalletDisplayName } from './WalletDisplayName/getWalletDisplayName';
 export { WalletDisplayName } from './WalletDisplayName/WalletDisplayName';
 

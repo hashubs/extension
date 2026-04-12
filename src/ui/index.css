@@ -197,8 +197,13 @@
     overflow: hidden;
   }
 
-  root {
-    display: contents;
+  @media (hover: none) and (pointer: coarse) {
+    html,
+    body,
+    #root {
+      width: 100% !important;
+      height: 100% !important;
+    }
   }
 
   button:not(:disabled),
