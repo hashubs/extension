@@ -42,12 +42,12 @@
   animation: fadeOut 0.2s forwards;
 }
 
-.younoLogo {
+.logo {
   position: relative;
   width: 40px;
   height: 40px;
   border-radius: 8px;
-  background-image: url('data-url:./zerion-logo.svg');
+  background-image: url('data-url:./logo.svg');
   background-repeat: no-repeat;
   background-position: center;
   background-size: 40px 40px;
@@ -92,7 +92,7 @@
   width: 256px;
 }
 
-.switchChainError .younoLogo {
+.switchChainError .logo {
   width: 32px;
   height: 32px;
 }

@@ -1,16 +1,16 @@
 import type { NetworkConfig } from '@/modules/networks/network-config';
 import { invariant } from '@/shared/invariant';
-import { Asset } from '@/shared/types/defi/asset';
-import { NFT } from '@/shared/types/defi/nft';
-import type { MultichainTransaction } from '@/shared/types/multichain-transaction';
-import type { Quote2 } from '@/shared/types/quote';
-import type { Fungible } from '@/shared/youno-api/types/fungible';
+import type { Fungible } from '@/shared/request/types/fungible';
 import type {
   ActionChain,
   AddressAction,
   Amount,
   NFTPreview,
-} from '@/shared/youno-api/types/wallet-get-actions';
+} from '@/shared/request/types/wallet-get-actions';
+import { Asset } from '@/shared/types/defi/asset';
+import { NFT } from '@/shared/types/defi/nft';
+import type { MultichainTransaction } from '@/shared/types/multichain-transaction';
+import type { Quote2 } from '@/shared/types/quote';
 import type { BigNumberish } from 'ethers';
 import { nanoid } from 'nanoid';
 import type {

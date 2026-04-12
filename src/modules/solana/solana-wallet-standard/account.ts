@@ -1,4 +1,7 @@
-import { WalletAccount, WalletIcon } from '@wallet-standard/base';
+import {
+  WalletAccount as WalletAccountInterface,
+  WalletIcon,
+} from '@wallet-standard/base';
 import { SOLANA_CHAINS } from './solana';
 
 const SOLANA_FEATURES = [
@@ -7,7 +10,7 @@ const SOLANA_FEATURES = [
   'solana:signMessage',
 ] as const;
 
-export class YounoWalletAccount implements WalletAccount {
+export class WalletAccount implements WalletAccountInterface {
   readonly #address: string;
   readonly #publicKey: Uint8Array;
   readonly #label?: string;
@@ -18,8 +21,8 @@ export class YounoWalletAccount implements WalletAccount {
     publicKey,
     label,
     icon,
-  }: Omit<WalletAccount, 'chains' | 'features'>) {
-    if (new.target === YounoWalletAccount) {
+  }: Omit<WalletAccountInterface, 'chains' | 'features'>) {
+    if (new.target === WalletAccount) {
       Object.freeze(this);
     }
     this.#address = address;

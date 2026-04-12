@@ -76,7 +76,6 @@ export class SwitchChainError extends Error {
 }
 
 export class SessionExpired extends Error {
-  // 211210N is youno in l33t
   code = 2312103;
 
   constructor(message = 'Session expired') {

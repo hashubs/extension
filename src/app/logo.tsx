@@ -4,7 +4,7 @@ interface Props extends SVGProps<SVGSVGElement> {
   size?: number;
 }
 
-export const SelvoLogo = ({ size = 163.84, ...props }: Props) => (
+export const BrandLogo = ({ size = 163.84, ...props }: Props) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
     xmlSpace="preserve"

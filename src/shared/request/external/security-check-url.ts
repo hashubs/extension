@@ -1,6 +1,6 @@
+import type { ApiContext } from '../api-bare';
 import type { ClientOptions } from '../shared';
-import { YounoHttpClient } from '../shared';
-import type { YounoApiContext } from '../youno-api-bare';
+import { HttpClient } from '../shared';
 
 interface Params {
   url: string;
@@ -16,12 +16,12 @@ interface Response {
 }
 
 export function securityCheckUrl(
-  this: YounoApiContext,
+  this: ApiContext,
   payload: Params,
   options?: ClientOptions
 ) {
   const params = new URLSearchParams({ url: payload.url });
   const kyOptions = this.getKyOptions();
   const endpoint = `security/check?${params}`;
-  return YounoHttpClient.get<Response>({ endpoint, ...options }, kyOptions);
+  return HttpClient.get<Response>({ endpoint, ...options }, kyOptions);
 }

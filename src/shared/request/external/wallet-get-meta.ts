@@ -1,8 +1,8 @@
 import { invariant } from '@/shared/invariant';
-import { Payload } from '@/shared/youno-api/types/payload';
+import { Payload } from '@/shared/request/types/payload';
+import type { ApiContext } from '../api-bare';
 import type { ClientOptions } from '../shared';
-import { CLIENT_DEFAULTS, YounoHttpClient } from '../shared';
-import type { YounoApiContext } from '../youno-api-bare';
+import { CLIENT_DEFAULTS, HttpClient } from '../shared';
 
 export interface Identity {
   provider: 'ens' | 'lens' | 'ud' | 'unspecified';
@@ -20,14 +20,14 @@ interface Response {
 }
 
 export async function getWalletsMeta(
-  this: YounoApiContext,
+  this: ApiContext,
   params: Payload,
   options: ClientOptions = CLIENT_DEFAULTS
 ) {
   invariant(params.addresses.length > 0, 'Addresses param is empty');
   const kyOptions = this.getKyOptions();
   const endpoint = '/wallet/meta/identifiers';
-  return await YounoHttpClient.post<Response>(
+  return await HttpClient.post<Response>(
     {
       endpoint,
       body: JSON.stringify(params),

@@ -1,4 +1,6 @@
+import { EXTENSION } from '@/app/constants';
 import { naiveFormDataToObject } from '@/shared/form-data';
+import { getActiveTabOrigin } from '@/shared/request/internal/getActiveTabOrigin';
 import { Dialog } from '@base-ui/react';
 import { useQuery } from '@tanstack/react-query';
 import CloseIcon from 'jsx:src/ui/assets/close.svg';
@@ -7,7 +9,6 @@ import ConnectionIconOn from 'jsx:src/ui/assets/pause-feature-on.svg';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { invariant } from 'src/shared/invariant';
 import { reloadActiveTab } from 'src/shared/reloadActiveTab';
-import { getActiveTabOrigin } from 'src/shared/youno-api/internal/getActiveTabOrigin';
 import { useGlobalPreferences } from 'src/ui/features/preferences/usePreferences';
 import type { SubmitData } from './actions';
 import {
@@ -80,7 +81,7 @@ function PauseInjectionDialog({
   return (
     <div className="relative flex flex-col gap-6 min-h-full">
       <h2 className="text-2xl font-bold text-center">
-        Disable Zerion for
+        Disable {EXTENSION.name} for
         <br />
         <span className="text-gray-500 wrap-break-word">
           {activeTabUrl?.hostname}

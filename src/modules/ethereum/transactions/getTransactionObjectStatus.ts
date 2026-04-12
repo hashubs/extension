@@ -1,5 +1,5 @@
 import { invariant } from '@/shared/invariant';
-import { ActionStatus } from '@/shared/youno-api/types/wallet-get-actions';
+import { ActionStatus } from '@/shared/request/types/wallet-get-actions';
 import type { TransactionObject } from './types';
 
 function transactionReceiptToActionStatus(

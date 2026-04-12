@@ -1,7 +1,7 @@
 import { accountPublicRPCPort, walletPort } from '@/shared/channel';
 import { isSessionExpiredError } from '@/shared/isSessionExpiredError';
+import { setCurrentAddress } from '@/shared/request/internal/setCurrentAddress';
 import { decodeMasked } from '@/shared/wallet/encode-locally';
-import { setCurrentAddress } from '@/shared/youno-api/internal/setCurrentAddress';
 import { MnemonicComponent } from '@/ui/components/Mnemonic';
 import { useCopyToClipboard } from '@/ui/hooks/useCopyToClipboard';
 import { usePendingRecoveryPhrase } from '@/ui/hooks/useRecoveryPhrase';

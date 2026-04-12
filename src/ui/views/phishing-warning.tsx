@@ -1,3 +1,4 @@
+import { EXTENSION } from '@/app/constants';
 import { walletPort } from '@/shared/channel';
 import { prepareForHref } from '@/shared/prepare-for-href';
 import { useMemo } from 'react';
@@ -153,7 +154,7 @@ export function PhishingWarningPage() {
           className="text-center text-xs pb-1"
           style={{ color: 'rgba(255,255,255,0.2)' }}
         >
-          Protected by Youno × Blockaid
+          Protected by {EXTENSION.name} × Blockaid
         </p>
       </div>
     </div>

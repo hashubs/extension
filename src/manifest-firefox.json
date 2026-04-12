@@ -11,7 +11,7 @@
     "48": "images/logo-icon-48.png",
     "128": "images/logo-icon-128.png"
   },
-  "author": "Youno",
+  "author": "Selvo",
   "action": {
     "default_icon": {
       "16": "images/logo-icon-16.png",
@@ -19,7 +19,7 @@
       "48": "images/logo-icon-48.png",
       "128": "images/logo-icon-128.png"
     },
-    "default_title": "Youno",
+    "default_title": "Selvo",
     "default_popup": "popup.html"
   },
   "commands": {
@@ -66,7 +66,7 @@
   "host_permissions": ["http://*/*", "https://*/*"],
   "browser_specific_settings": {
     "gecko": {
-      "id": "wallet@youno.id",
+      "id": "wallet@selvo.id",
       "strict_min_version": "120.0"
     }
   }

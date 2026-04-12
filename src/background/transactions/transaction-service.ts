@@ -321,8 +321,6 @@ export class TransactionService {
       this.schedulePurgeCheck();
     });
 
-    // registerTransaction to Zerion backend removed — not needed in Youno
-
     this.transactionsPoller.emitter.on('evm:mined', (receipt) => {
       const item = this.transactionsStore.getByHash(receipt.hash);
       if (item) {

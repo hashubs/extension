@@ -1,9 +1,9 @@
 import { accountPublicRPCPort, walletPort } from '@/shared/channel';
 import { isSessionExpiredError } from '@/shared/isSessionExpiredError';
 import { prepareUserInputSeedOrPrivateKey } from '@/shared/prepareUserInputSeedOrPrivateKey';
+import { setCurrentAddress } from '@/shared/request/internal/setCurrentAddress';
 import { wait } from '@/shared/wait';
 import { encodeForMasking } from '@/shared/wallet/encode-locally';
-import { setCurrentAddress } from '@/shared/youno-api/internal/setCurrentAddress';
 import { zeroizeAfterSubmission } from '@/shared/zeroize-submission';
 import { prepareWalletsToImport } from '@/ui/components/ImportWallet/Mnemonic/helpers';
 import { Processing as ProcessingComponent } from '@/ui/components/processing';
@@ -11,8 +11,8 @@ import { useMutation } from '@tanstack/react-query';
 import { isTruthy } from 'is-truthy-ts';
 import { useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useImportWallet } from './import-context';
 import { ONBOARDING_ROUTES } from '../routes';
+import { useImportWallet } from './import-context';
 
 export function Processing() {
   const navigate = useNavigate();

@@ -1,5 +1,5 @@
 import type { IncomingTransaction } from '@/modules/ethereum/types/IncomingTransaction';
-import type { Fungible } from '@/shared/youno-api/types/fungible';
+import type { Fungible } from '@/shared/request/types/fungible';
 import type { PartiallyRequired } from '../type-utils/partially-required';
 import type { MultichainTransaction } from './multichain-transaction';
 import type { StringBase64 } from './string-base64';
@@ -139,12 +139,12 @@ export type ContractMetadata2 = {
   id: string;
   /**
    * @description Human-readable name of liquidity source
-   * @example Zerion
+   * @example Name
    */
   name: string;
   /**
    * @description URL with icon of liquidity source, might be empty
-   * @example https://protocol-icons.s3.amazonaws.com/zerion%20defi%20sdk.png
+   * @example https://protocol-icons.s3.amazonaws.com/name.png
    */
   iconUrl: string;
   /** @description Explorer details */

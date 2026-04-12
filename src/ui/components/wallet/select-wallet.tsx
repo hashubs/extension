@@ -3,9 +3,9 @@ import type {
   ExternallyOwnedAccount,
 } from '@/background/wallet/model/account-container';
 import { walletPort } from '@/shared/channel';
+import { setCurrentAddress } from '@/shared/request/internal/setCurrentAddress';
 import type { BareWallet } from '@/shared/types/bare-wallet';
 import type { BlockchainType } from '@/shared/wallet/classifiers';
-import { setCurrentAddress } from '@/shared/youno-api/internal/setCurrentAddress';
 import { WalletList } from '@/ui/components/wallet/wallet-list/wallet-list';
 import { Input } from '@/ui/ui-kit';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';

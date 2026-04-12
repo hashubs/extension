@@ -1,3 +1,4 @@
+import { EXTENSION } from '@/app/constants';
 import { utf8ToUint8Array } from './convert';
 
 /**
@@ -81,6 +82,6 @@ export async function deriveEncryptionKeyFromPRF(
     ikm: prfOutput,
     salt,
     length: 32,
-    info: 'youno-passkey-v1',
+    info: `${EXTENSION.slug}-passkey-v1`,
   });
 }

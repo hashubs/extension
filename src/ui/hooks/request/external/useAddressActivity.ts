@@ -1,8 +1,8 @@
-import { YounoAPI } from '@/shared/youno-api/youno-api.client';
+import { ApiClient } from '@/shared/request/api.client';
 import { useQuery, UseQueryOptions } from '@tanstack/react-query';
 
 type AddressActivityData = Awaited<
-  ReturnType<typeof YounoAPI.walletGetAddressActivity>
+  ReturnType<typeof ApiClient.walletGetAddressActivity>
 >['data'];
 
 interface UseAddressActivityParams {
@@ -22,7 +22,7 @@ export function useAddressActivity({
     queryKey: ['addressActivity', trimmedAddresses] as const,
     queryFn: async () => {
       const payload = { addresses: trimmedAddresses, currency: 'usd' };
-      const response = await YounoAPI.walletGetAddressActivity(payload);
+      const response = await ApiClient.walletGetAddressActivity(payload);
       return response.data;
     },
     staleTime: 5000,

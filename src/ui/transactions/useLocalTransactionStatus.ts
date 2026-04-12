@@ -1,5 +1,5 @@
 import { getTransactionObjectStatus } from '@/modules/ethereum/transactions/getTransactionObjectStatus';
-import type { ActionStatus } from '@/shared/youno-api/types/wallet-get-actions';
+import type { ActionStatus } from '@/shared/request/types/wallet-get-actions';
 import { useStore } from '@store-unit/react';
 import { useMemo } from 'react';
 import { localTransactionsStore } from './transactions-store';

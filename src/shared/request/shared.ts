@@ -1,3 +1,4 @@
+import { EXTENSION } from '@/app/constants';
 import { API_URL, TESTNET_API_URL } from '@/env/config';
 import { platform } from '@/shared/analytics/platform';
 import { createUrl } from '@/shared/create-url';
@@ -29,8 +30,8 @@ export const CLIENT_DEFAULTS: ClientOptions = { source: 'mainnet' };
 export function createHeaders(options: Options) {
   return {
     'X-Request-Id': crypto.randomUUID(),
-    'Youno-Client-Type': platform,
-    'Youno-Client-Version': version,
+    [`${EXTENSION.slug}-client-type`]: platform,
+    [`${EXTENSION.slug}-client-version`]: version,
     'Content-Type': 'application/json',
     ...options.headers,
   };
@@ -52,7 +53,7 @@ const resolveUrl = (input: UrlInput): string | URL => {
   }
 };
 
-export class YounoHttpClient {
+export class HttpClient {
   static get<T>(options: GetOptions & Options, kyOptions: KyOptions) {
     const url = resolveUrl(options);
     return ky

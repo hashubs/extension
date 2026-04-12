@@ -1,3 +1,4 @@
+import { EXTENSION } from '@/app/constants';
 import type { Brand } from '@/shared/type-utils/brand';
 import { isAccountContainer } from '@/shared/types/validators';
 import type { WalletGroup } from '@/shared/types/wallet-group';
@@ -6,7 +7,7 @@ import { capitalize } from 'capitalize-ts';
 type AccountProviderName = Brand<string, 'AccountProviderName'>;
 
 enum AccountProvider {
-  younoExtension = 'younoExtension',
+  selvoExtension = 'selvoExtension',
   viewerNotAdded = 'viewerNotAdded',
   readOnly = 'readOnly',
 }
@@ -18,7 +19,7 @@ export function getProviderNameFromGroup(
     ? isAccountContainer(group.walletContainer)
       ? (group.walletContainer.provider as AccountProviderName) ??
         AccountProvider.readOnly
-      : AccountProvider.younoExtension
+      : AccountProvider.selvoExtension
     : AccountProvider.viewerNotAdded;
 }
 
@@ -29,8 +30,8 @@ export function getProviderForApiV4(
     case AccountProvider.viewerNotAdded: {
       return 'viewer_not_added';
     }
-    case AccountProvider.younoExtension: {
-      return 'youno-extension';
+    case AccountProvider.selvoExtension: {
+      return `${EXTENSION.name}-extension`;
     }
     case AccountProvider.readOnly: {
       return 'Read Only';
@@ -48,8 +49,8 @@ export function getProviderForMetabase(
     case AccountProvider.viewerNotAdded: {
       return 'viewer_not_added';
     }
-    case AccountProvider.younoExtension: {
-      return 'Youno Wallet';
+    case AccountProvider.selvoExtension: {
+      return `${EXTENSION.name} Wallet'`;
     }
     case AccountProvider.readOnly: {
       return 'Read only'; // matching with ios event

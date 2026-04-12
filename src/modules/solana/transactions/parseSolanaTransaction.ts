@@ -1,6 +1,6 @@
+import type { Fungible } from '@/shared/request/types/fungible';
+import type { AddressAction } from '@/shared/request/types/wallet-get-actions';
 import { baseToCommon } from '@/shared/units/convert';
-import type { Fungible } from '@/shared/youno-api/types/fungible';
-import type { AddressAction } from '@/shared/youno-api/types/wallet-get-actions';
 import type {
   MessageV0,
   Transaction,

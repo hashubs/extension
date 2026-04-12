@@ -1,12 +1,7 @@
 import { invariant } from '@/shared/invariant';
-import {
-  CLIENT_DEFAULTS,
-  YounoHttpClient,
-  type ClientOptions,
-} from '../shared';
-
-import { Payload } from '@/shared/youno-api/types/payload';
-import { YounoApiContext } from '../youno-api-bare';
+import { Payload } from '@/shared/request/types/payload';
+import { ApiContext } from '../api-bare';
+import { CLIENT_DEFAULTS, HttpClient, type ClientOptions } from '../shared';
 
 export type ActivityData = Record<
   string,
@@ -18,14 +13,14 @@ export interface Response {
 }
 
 export async function walletGetAddressActivity(
-  this: YounoApiContext,
+  this: ApiContext,
   params: Payload,
   options: ClientOptions = CLIENT_DEFAULTS
 ) {
   invariant(params.addresses.length > 0, 'Addresses param is empty');
   const kyOptions = this.getKyOptions();
   const endpoint = '/wallet/address/activity';
-  return await YounoHttpClient.post<Response>(
+  return await HttpClient.post<Response>(
     {
       endpoint,
       body: JSON.stringify(params),

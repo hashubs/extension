@@ -1,7 +1,7 @@
-import { YounoWallet } from './wallet';
+import { SolanaWalletStandard } from './wallet';
 
 export function initialize(implementation: any) {
-  const wallet = new YounoWallet(implementation);
+  const wallet = new SolanaWalletStandard(implementation);
   const register = ({ register }: { register: (wallet: any) => void }) =>
     register(wallet);
 
@@ -23,9 +23,8 @@ export function initialize(implementation: any) {
   }
 
   try {
-    window.addEventListener(
-      'wallet-standard:app-ready',
-      ({ detail }: any) => register(detail as { register: (wallet: any) => void })
+    window.addEventListener('wallet-standard:app-ready', ({ detail }: any) =>
+      register(detail as { register: (wallet: any) => void })
     );
   } catch (error) {
     // eslint-disable-next-line no-console

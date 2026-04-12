@@ -1,3 +1,4 @@
+import { EXTENSION } from '@/app/constants';
 import type { EthereumProvider } from '@/modules/ethereum/provider';
 
 let didHandleWindowAccess = false;
@@ -7,7 +8,7 @@ type ForeignProvider = EthereumProvider & { isRabby?: boolean };
 
 const state = {
   dappDetected: false,
-  dappIsYounoAware: false,
+  dappIsSelvoAware: false,
 };
 
 const listeners: Array<(value: typeof state) => void> = [];
@@ -20,10 +21,10 @@ export function onChange(listener: (value: typeof state) => void) {
   }
 }
 
-function trackYounoFlagAccess(ourProvider: EthereumProvider) {
-  Object.defineProperty(ourProvider, 'isYouno', {
+function trackSelvoFlagAccess(ourProvider: EthereumProvider) {
+  Object.defineProperty(ourProvider, EXTENSION.flag, {
     get() {
-      state.dappIsYounoAware = true;
+      state.dappIsSelvoAware = true;
       notify();
       return ourProvider.isMetaMask ? undefined : true;
     },
@@ -31,7 +32,7 @@ function trackYounoFlagAccess(ourProvider: EthereumProvider) {
 }
 
 export async function initialize(ourProvider: EthereumProvider) {
-  trackYounoFlagAccess(ourProvider);
+  trackSelvoFlagAccess(ourProvider);
   const isDapp = await ourProvider.request({ method: 'wallet_isKnownDapp' });
   if (isDapp) {
     state.dappDetected = true;

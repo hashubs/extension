@@ -1,3 +1,4 @@
+import { EXTENSION } from '@/app/constants';
 import {
   SolanaSignAndSendTransactionFeature,
   SolanaSignAndSendTransactionMethod,
@@ -8,6 +9,7 @@ import {
   SolanaSignTransactionFeature,
   SolanaSignTransactionMethod,
 } from '@solana/wallet-standard-features';
+import { VersionedTransaction } from '@solana/web3.js';
 import { Wallet, WalletIcon } from '@wallet-standard/base';
 import {
   StandardConnectFeature,
@@ -17,32 +19,26 @@ import {
   StandardEventsFeature,
   StandardEventsOnMethod,
 } from '@wallet-standard/features';
-import { VersionedTransaction } from '@solana/web3.js';
-import { YounoWalletAccount } from './account';
-import {
-  base58Sign,
-  isSolanaChain,
-  SOLANA_CHAINS,
-} from './solana';
+import type { SolanaProvider } from '../solana-provider';
+import { WalletAccount } from './account';
+import { base58Sign, isSolanaChain, SOLANA_CHAINS } from './solana';
 
-import type { YounoSolana } from '../youno-solana';
+export type SolanaImplementation = SolanaProvider;
 
-export type YounoSolanaImplementation = YounoSolana;
-
-export class YounoWallet implements Wallet {
+export class SolanaWalletStandard implements Wallet {
   readonly #listeners: { [E in string]?: any[] } = {};
   readonly #version = '1.0.0' as const;
   readonly #name: string;
   readonly #icon: WalletIcon;
-  #account: YounoWalletAccount | null = null;
-  readonly #implementation: YounoSolanaImplementation;
+  #account: WalletAccount | null = null;
+  readonly #implementation: SolanaImplementation;
 
-  constructor(implementation: YounoSolanaImplementation) {
-    this.#name = implementation.name || 'Youno';
+  constructor(implementation: SolanaImplementation) {
+    this.#name = implementation.name || EXTENSION.name;
     this.#icon = implementation.icon as WalletIcon;
     this.#implementation = implementation;
 
-    if (new.target === YounoWallet) {
+    if (new.target === SolanaWalletStandard) {
       Object.freeze(this);
     }
 
@@ -135,7 +131,7 @@ export class YounoWallet implements Wallet {
         this.#account.address !== address ||
         !this.#compareUint8Arrays(this.#account.publicKey, bytes)
       ) {
-        this.#account = new YounoWalletAccount({
+        this.#account = new WalletAccount({
           address,
           publicKey: bytes,
         });
@@ -169,7 +165,7 @@ export class YounoWallet implements Wallet {
   };
 
   #connect: StandardConnectMethod = async () => {
-    // YounoSolana's connect doesn't support onlyIfTrusted yet.
+    // SolanaProvider's connect doesn't support onlyIfTrusted yet.
     if (!this.#account) {
       await this.#implementation.connect();
     }

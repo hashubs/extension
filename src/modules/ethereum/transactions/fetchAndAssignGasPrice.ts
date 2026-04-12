@@ -1,8 +1,8 @@
 import type { NetworkConfig } from '@/modules/networks/network-config';
 import { Networks } from '@/modules/networks/networks';
 import { sendRpcRequest } from '@/shared/custom-rpc/rpc-request';
-import type { NetworksSource } from '@/shared/youno-api/shared';
-import type { YounoApiClient } from '@/shared/youno-api/youno-api-bare';
+import type { ApiClientType } from '@/shared/request/api.client';
+import type { NetworksSource } from '@/shared/request/shared';
 import { produce } from 'immer';
 import omit from 'lodash/omit';
 import type { IncomingTransaction } from '../types/IncomingTransaction';
@@ -74,7 +74,7 @@ export async function estimateGas(
 async function fetchGasPriceForTransaction(
   transaction: IncomingTransaction,
   networks: Networks,
-  { source, apiClient }: { source: NetworksSource; apiClient: YounoApiClient }
+  { source, apiClient }: { source: NetworksSource; apiClient: ApiClientType }
 ): Promise<ChainGasPrice> {
   const chainId = resolveChainId(transaction);
   const network = wrappedGetNetworkById(networks, chainId);
@@ -94,7 +94,7 @@ export function hasGasEstimation(transaction: IncomingTransaction) {
 export async function prepareGasAndNetworkFee<T extends IncomingTransaction>(
   transaction: T,
   networks: Networks,
-  { source, apiClient }: { source: NetworksSource; apiClient: YounoApiClient }
+  { source, apiClient }: { source: NetworksSource; apiClient: ApiClientType }
 ) {
   const [gas, networkFeeInfo] = await Promise.all([
     hasGasEstimation(transaction)

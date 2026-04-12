@@ -3,13 +3,7 @@ import type { BridgeFormState } from '@/ui/pages/bridge-form/types';
 import type { SwapFormState } from '@/ui/pages/swap-form/types';
 import type { Quote2 } from './quote';
 
-type ClientScope =
-  | string
-  | 'Swap'
-  | 'Bridge'
-  | 'Send'
-  | 'Zerion DNA'
-  | 'External Dapp';
+type ClientScope = string | 'Swap' | 'Bridge' | 'Send' | 'External Dapp';
 
 export type TransactionContextParams = {
   chain: string; // Cannot use type {Chain} because it's not serializable and this object is being sent between Ports

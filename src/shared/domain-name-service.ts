@@ -1,5 +1,5 @@
-import { Identity } from './youno-api/requests/wallet-get-meta';
-import { YounoAPI } from './youno-api/youno-api.client';
+import { ApiClient } from './request/api.client';
+import { Identity } from './request/external/wallet-get-meta';
 
 const DOMAIN_PRIORITY: Record<Identity['provider'], number> = {
   ens: 0,
@@ -13,12 +13,12 @@ function identityComparator(a: Identity, b: Identity) {
 }
 
 /** TODO:
- * parameterize apiClient: ZerionApiClient as a dependency
+ * parameterize apiClient: SelvoApiClient as a dependency
  * so that this method can be used in background scripts, too
  */
 export async function lookupAddressNames(address: string): Promise<string[]> {
   try {
-    const response = await YounoAPI.getWalletsMeta({ addresses: [address] });
+    const response = await ApiClient.getWalletsMeta({ addresses: [address] });
     return (
       response.data?.[0]?.identities
         .sort(identityComparator)
@@ -30,7 +30,7 @@ export async function lookupAddressNames(address: string): Promise<string[]> {
 }
 
 /** TODO:
- * parameterize apiClient: ZerionApiClient as a dependency
+ * parameterize apiClient: SelvoApiClient as a dependency
  * so that this method can be used in background scripts, too
  */
 export async function lookupAddressName(
@@ -41,12 +41,12 @@ export async function lookupAddressName(
 }
 
 /** TODO:
- * parameterize apiClient: ZerionApiClient as a dependency
+ * parameterize apiClient: SelvoApiClient as a dependency
  * so that this method can be used in background scripts, too
  */
 export async function resolveDomain(domain: string): Promise<string | null> {
   try {
-    const response = await YounoAPI.getWalletsMeta({ addresses: [domain] });
+    const response = await ApiClient.getWalletsMeta({ addresses: [domain] });
     return response?.data?.[0]?.address || null;
   } catch {
     return null;

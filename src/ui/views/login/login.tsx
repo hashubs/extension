@@ -1,3 +1,4 @@
+import { BrandLogo } from '@/app/logo';
 import { accountPublicRPCPort, walletPort } from '@/shared/channel';
 import { invariant } from '@/shared/invariant';
 import { queryClient } from '@/shared/query-client/queryClient';
@@ -5,7 +6,6 @@ import { PublicUser } from '@/shared/types/User';
 import { wait } from '@/shared/wait';
 import { zeroizeAfterSubmission } from '@/shared/zeroize-submission';
 import { BlockieImg } from '@/ui/components/BlockieImg';
-import { SelvoLogo } from '@/ui/components/branding/logo';
 import { Button, Input } from '@/ui/ui-kit';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
@@ -77,7 +77,7 @@ export function Login() {
                 borderRadius={8}
               />
             ) : (
-              <SelvoLogo
+              <BrandLogo
                 size={100}
                 className="shadow-[0_8px_32px_rgba(0,0,0,0.25)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.5)]"
               />

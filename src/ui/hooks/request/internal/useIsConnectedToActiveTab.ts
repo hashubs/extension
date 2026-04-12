@@ -1,5 +1,5 @@
 import { walletPort } from '@/shared/channel';
-import { getActiveTabOrigin } from '@/shared/youno-api/internal/getActiveTabOrigin';
+import { getActiveTabOrigin } from '@/shared/request/internal/getActiveTabOrigin';
 import { useQuery } from '@tanstack/react-query';
 
 export function useIsConnectedToActiveTab(address: string) {

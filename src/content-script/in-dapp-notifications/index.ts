@@ -33,38 +33,58 @@ const notifications = {
       : null;
 
     // prettier-ignore
-    const el = r('div', { class: `${styles.notification} ${styles.chainChanged}` },
-      r('div', null,
-        r('div', { class: styles.hstack, style: 'grid-gap: 12px;' },
-          r('div', { class: styles.younoLogo }, networkIcon),
-          r('div', { class: styles.vstack, style: 'grid-gap: 0px;' },
+    const el = r(
+      'div',
+      { class: `${styles.notification} ${styles.chainChanged}` },
+      r(
+        'div',
+        null,
+        r(
+          'div',
+          { class: styles.hstack, style: 'grid-gap: 12px;' },
+          r('div', { class: styles.logo }, networkIcon),
+          r(
+            'div',
+            { class: styles.vstack, style: 'grid-gap: 0px;' },
             r('div', { class: styles.title }, 'Network Switched'),
-            r('div', { class: styles.message }, networkName),
-          ),
+            r('div', { class: styles.message }, networkName)
+          )
         ),
-        r('button', { 'aria-label': 'Close', class:styles.closeButton})
+        r('button', { 'aria-label': 'Close', class: styles.closeButton })
       )
-    )
+    );
 
     return el;
   },
 
   switchChainError(chainId: string) {
     // prettier-ignore
-    const el = r('div', { class: `${styles.notification} ${styles.switchChainError}`},
-      r('div', { class: styles.vstack, style: 'grid-gap: 8px;' },
-        r('div', { class: styles.hstack, style: 'grid-gap: 12px' },
-          r('div', { class: styles.younoLogo }),
+    const el = r(
+      'div',
+      { class: `${styles.notification} ${styles.switchChainError}` },
+      r(
+        'div',
+        { class: styles.vstack, style: 'grid-gap: 8px;' },
+        r(
+          'div',
+          { class: styles.hstack, style: 'grid-gap: 12px' },
+          r('div', { class: styles.logo }),
           r('div', { class: styles.title }, 'Unrecognized Network')
         ),
-        r('div', { class: styles.message },
+        r(
+          'div',
+          { class: styles.message },
           'Unable to switch network to the ',
-          r('span', { class: styles.chainId }, `Chain Id: ${chainId.toString()}`),
+          r(
+            'span',
+            { class: styles.chainId },
+            `Chain Id: ${chainId.toString()}`
+          ),
           '.\nPlease check your network settings and try again.'
         )
       ),
       r('button', { 'aria-label': 'Close', class: styles.closeButton })
-    )
+    );
 
     return el;
   },

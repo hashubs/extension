@@ -9,13 +9,13 @@ export interface RemoteConfig {
     imgSrc: string;
     title: string;
     fee: number;
-    isYounoFee: boolean;
+    isSelvoFee: boolean;
   }>;
   loyalty_config: Partial<{
     referrerXpPercent: number;
     rewardIconLevel: number;
   }>;
-  youno_fee_learn_more_link: string;
+  selvo_fee_learn_more_link: string;
   premium_page_feedback_link: string;
   quotes_refetch_interval: number;
   tx_polling_preferences: {

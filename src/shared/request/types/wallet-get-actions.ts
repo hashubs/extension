@@ -64,7 +64,7 @@ export type ActionType =
   | 'batch_execute';
 
 type Wallet = {
-  /** @example test.zerion.eth */
+  /** @example test.name.eth */
   name: string | null;
   /** @example https://lh3.googleusercontent.com/MtCGsfm3h_n9wjzVloLzF4ocL4nhU9iYL81HKpZ4wZxCF6bwB2RFmK6hI7EO_fmPwPKjAx-d-qKsqNrVjn2jbJLibAW0-nBqYQ=s250 */
   iconUrl: string | null;

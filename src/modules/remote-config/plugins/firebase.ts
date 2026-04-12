@@ -11,7 +11,7 @@ const defaultConfig: RemoteConfig = {
   extension_loyalty_enabled: true,
   extension_asset_page_enabled: true,
   loyalty_config: {},
-  youno_fee_learn_more_link: '',
+  selvo_fee_learn_more_link: '',
   fee_comparison_config: [],
   premium_page_feedback_link: '',
   quotes_refetch_interval: 20000,

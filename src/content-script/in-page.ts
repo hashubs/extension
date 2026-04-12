@@ -1,11 +1,11 @@
 import { FEATURE_SOLANA } from '@/env/config';
 import { Connection } from '@/modules/ethereum/connection';
 import { EthereumProvider } from '@/modules/ethereum/provider';
+import { SolanaProvider } from '@/modules/solana/solana-provider';
 import {
   type Ghost,
   initialize as initializeWalletStandard,
 } from '@/modules/solana/solana-wallet-standard';
-import { YounoSolana } from '@/modules/solana/youno-solana';
 import { isMetamaskModeOn } from '@/shared/preferences-helpers';
 import type { GlobalPreferences } from '@/shared/types/global-preferences';
 import * as competingProviders from './competing-providers';
@@ -18,7 +18,7 @@ import { popWalletChannelId } from './wallet-channel-id';
 declare global {
   interface Window {
     ethereum?: EthereumProvider;
-    younoWallet?: EthereumProvider;
+    selvoWallet?: EthereumProvider;
     solana?: Ghost;
   }
 }
@@ -27,12 +27,12 @@ const walletChannelId = popWalletChannelId();
 
 const broadcastChannel = new BroadcastChannel(walletChannelId);
 const connection = new Connection(broadcastChannel);
-const provider = new EthereumProvider(connection);
+const ethereumProvider = new EthereumProvider(connection);
 if (FEATURE_SOLANA === 'on') {
-  const younoSolana = new YounoSolana(connection);
-  initializeWalletStandard(younoSolana);
-  Object.assign(provider, { solana: younoSolana });
-  window.solana = younoSolana;
+  const solanaProvider = new SolanaProvider(connection);
+  initializeWalletStandard(solanaProvider);
+  Object.assign(ethereumProvider, { solana: solanaProvider });
+  window.solana = solanaProvider;
 }
 
 let isPaused = false;
@@ -43,13 +43,13 @@ connection.on('walletEvent', (data) => {
   }
 });
 
-provider.connect();
+ethereumProvider.connect();
 
 competingProviders.onBeforeAssignToWindow({
   foreignProvider: window.ethereum,
-  ourProvider: provider,
+  ourProvider: ethereumProvider,
 });
-dappDetection.initialize(provider);
+dappDetection.initialize(ethereumProvider);
 dappDetection.onBeforeAssignToWindow(window.ethereum);
 
 /**
@@ -59,19 +59,19 @@ dappDetection.onBeforeAssignToWindow(window.ethereum);
  * on https://stargate.finance/ this lead to "max call stack" error.
  * The following monkey-patch approach seems to work everywhere.
  */
-const patchedProvider = Object.create(provider);
-for (const untypedKey in provider) {
-  const key = untypedKey as keyof typeof provider;
-  if (typeof provider[key] === 'function') {
+const patchedProvider = Object.create(ethereumProvider);
+for (const untypedKey in ethereumProvider) {
+  const key = untypedKey as keyof typeof ethereumProvider;
+  if (typeof ethereumProvider[key] === 'function') {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     patchedProvider[key] = (...args: any[]) => {
       if (competingProviders.hasOtherProviders()) {
-        provider.nonEip6963Request = true;
+        ethereumProvider.nonEip6963Request = true;
       }
 
       // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
-      const result = (provider[key] as Function)(...args);
-      provider.nonEip6963Request = false;
+      const result = (ethereumProvider[key] as Function)(...args);
+      ethereumProvider.nonEip6963Request = false;
       return result;
     };
   }
@@ -81,7 +81,7 @@ for (const untypedKey in provider) {
  * Provide a way to automatically invoke the `request` method
  * of a foreign provider if user prefers "other wallet"
  */
-provider.prefersOtherWalletStrategy = ({ request, originalError }) => {
+ethereumProvider.prefersOtherWalletStrategy = ({ request, originalError }) => {
   if (isPaused && competingProviders.hasOtherProviders()) {
     const otherProvider = competingProviders.getFirstOtherProvider();
     return (otherProvider as EthereumProvider).request(request);
@@ -114,11 +114,11 @@ const proxiedProvider = new Proxy(patchedProvider, {
 
 window.ethereum = proxiedProvider;
 
-dappDetection.onChange(({ dappIsYounoAware }) => {
-  if (dappIsYounoAware) {
-    // Some libs (such as rainbow) access "isYouno" flag
+dappDetection.onChange(({ dappIsSelvoAware }) => {
+  if (dappIsSelvoAware) {
+    // Some libs (such as rainbow) access "isSelvo" flag
     // to filter out wallets, and it doesn't mean the dapp is showing
-    // the connect button for Youno specifically. This is why we
+    // the connect button for Selvo specifically. This is why we
     // do not turn off the page observer. But we might change this later.
     // pageObserver.stop();
   }
@@ -138,7 +138,7 @@ try {
       dappDetection.handleForeignProvider(value);
       competingProviders.handleForeignProvider({
         foreignProvider: value,
-        ourProvider: provider,
+        ourProvider: ethereumProvider,
       });
     },
   });
@@ -148,26 +148,26 @@ try {
 }
 
 if (dappsWithoutCorrectEIP1193Support.has(window.location.origin)) {
-  provider.markAsMetamask();
+  ethereumProvider.markAsMetamask();
 }
 
-initializeEIP6963(provider, {
+initializeEIP6963(ethereumProvider, {
   onRequestProvider: () => {
     pageObserver.stop();
-    dappDetection.registerEip6963SupportOnce(provider);
+    dappDetection.registerEip6963SupportOnce(ethereumProvider);
   },
   onAccessProvider: () => {
     pageObserver.stop();
-    dappDetection.registerEip6963SupportOnce(provider);
+    dappDetection.registerEip6963SupportOnce(ethereumProvider);
   },
 });
 
-provider
+ethereumProvider
   .request({ method: 'wallet_getGlobalPreferences' })
   .then((preferences: GlobalPreferences) => {
     if (preferences.recognizableConnectButtons) {
-      dappDetection.onChange(({ dappDetected, dappIsYounoAware }) => {
-        if (dappDetected && !dappIsYounoAware) {
+      dappDetection.onChange(({ dappDetected, dappIsSelvoAware }) => {
+        if (dappDetected && !dappIsSelvoAware) {
           pageObserver.start();
         }
       });
@@ -178,20 +178,20 @@ provider
  * Current strategy:
  * window.ethereum provider should:
  *   Appear as metamask by default
- *   if user explicitly disables this, then appear as Youno
+ *   if user explicitly disables this, then appear as Selvo
  */
-provider.markAsMetamask();
-provider
+ethereumProvider.markAsMetamask();
+ethereumProvider
   .request({
     method: 'wallet_getWalletNameFlags',
     params: { origin: window.location.origin },
   })
   .then((result) => {
     if (isMetamaskModeOn(result)) {
-      provider.markAsMetamask();
+      ethereumProvider.markAsMetamask();
     } else {
-      provider.unmarkAsMetamask();
+      ethereumProvider.unmarkAsMetamask();
     }
   });
 
-window.younoWallet = provider;
+window.selvoWallet = ethereumProvider;

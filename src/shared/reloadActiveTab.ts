@@ -1,5 +1,5 @@
 import browser from 'webextension-polyfill';
-import { getActiveTabOrigin } from './youno-api/internal/getActiveTabOrigin';
+import { getActiveTabOrigin } from './request/internal/getActiveTabOrigin';
 
 export async function reloadActiveTab() {
   const tabData = await getActiveTabOrigin();

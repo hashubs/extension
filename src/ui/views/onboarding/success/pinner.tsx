@@ -1,3 +1,4 @@
+import { EXTENSION } from '@/app/constants';
 import { animated, useSpring } from '@react-spring/web';
 import JigsawIcon from 'jsx:../../../assets/jigsaw.svg';
 import PinIcon from 'jsx:../../../assets/pin.svg';
@@ -14,7 +15,7 @@ export function PinnerExtension() {
   return (
     <animated.div className={styles.pinner} style={pinnerStyle}>
       <div className={styles.pinnerInner}>
-        <h3 className={styles.pinnerTitle}>Pin Youno extension</h3>
+        <h3 className={styles.pinnerTitle}>Pin {EXTENSION.name} extension</h3>
         <div className={styles.pinnerRow}>
           Click
           <JigsawIcon

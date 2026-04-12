@@ -1,7 +1,7 @@
 import { walletPort } from '@/shared/channel';
 import { isSessionExpiredError } from '@/shared/isSessionExpiredError';
+import { getWalletGroupByAddress } from '@/shared/request/internal/getWalletGroupByAddress';
 import { wait } from '@/shared/wait';
-import { getWalletGroupByAddress } from '@/shared/youno-api/internal/getWalletGroupByAddress';
 import { Processing as ProcessingComponent } from '@/ui/components/processing';
 import { Button } from '@/ui/ui-kit';
 import { useMutation } from '@tanstack/react-query';

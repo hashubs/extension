@@ -1,5 +1,6 @@
+import { EXTENSION } from '@/app/constants';
+import { BrandLogo } from '@/app/logo';
 import { windowPort } from '@/shared/channel';
-import ZerionLogo from 'jsx:src/ui/assets/zerion-logo-blue.svg';
 import React from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { invariant } from 'src/shared/invariant';
@@ -47,8 +48,8 @@ export function ChooseGlobalProvider({
                 onClick={() => onConfirm()}
                 className="flex items-center justify-center gap-2 w-full py-3 rounded-xl bg-blue-600 text-white text-sm font-semibold hover:bg-blue-700 transition-colors"
               >
-                <ZerionLogo style={{ width: 20, height: 20 }} />
-                <span>Continue with Zerion</span>
+                <BrandLogo style={{ width: 20, height: 20 }} />
+                <span>Continue with {EXTENSION.name}</span>
               </button>
 
               <button
@@ -71,24 +72,6 @@ export function ChooseGlobalProvider({
             </div>
           </div>
         </div>
-
-        {/*
-        <div style={{ textAlign: 'center' }}>
-          <UIText
-            kind="small/accent"
-            color="var(--neutral-500)"
-            as={UnstyledAnchor}
-            href="https://zerion.io/blog/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="hover:underline"
-            onClick={openInNewWindow}
-          >
-            How to connect if there is no 'Zerion Wallet' option?
-          </UIText>
-          <PageBottom />
-        </div>
-        */}
       </div>
     </div>
   );

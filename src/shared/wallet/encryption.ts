@@ -30,7 +30,6 @@ export async function seedPhraseToHash(phrase: string) {
    * Storing hash of the seed phrase is considered ok, because using a brute-force search
    * to find phrase by hash makes little sense: you could brute-force phrases to get actual
    * private keys or addresses instead.
-   * (https://zeriontech.slack.com/archives/C03EJB0AJ8M/p1682978582012569)
    *
    * * We add a version to the output hash to be able to update hashing algorithm later
    * * We mix in an additional non BIP-32 word to the input, even though hashing an unmodified seed phrase should be safe given the above

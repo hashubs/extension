@@ -1,2 +1,2 @@
+export type { SolanaProvider as Ghost } from '../solana-provider';
 export * from './initialize';
-export type { YounoSolana as Ghost } from '../youno-solana';

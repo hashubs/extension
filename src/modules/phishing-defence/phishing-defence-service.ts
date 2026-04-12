@@ -2,8 +2,10 @@ import { INTERNAL_ORIGIN } from '@/background/constants';
 import { knownDappOrigins } from '@/shared/dapps/known-dapps';
 import { getIndexUrl } from '@/shared/get-browser-url';
 import { prepareForHref } from '@/shared/prepare-for-href';
-import type { YounoApiClient } from '@/shared/youno-api/youno-api-bare';
-import { YounoAPI as YounoAPIBackground } from '@/shared/youno-api/youno-api.background';
+import {
+  ApiBackground,
+  type ApiBackgroundType,
+} from '@/shared/request/api.background';
 import browser from 'webextension-polyfill';
 
 export type DappSecurityStatus =
@@ -16,10 +18,10 @@ export type DappSecurityStatus =
 class PhishingDefence {
   private whitelistedWebsites: Set<string>;
   private websiteStatus: Record<string, DappSecurityStatus> = {};
-  apiClient: YounoApiClient;
+  private apiBackground: ApiBackgroundType;
 
-  constructor(apiClient: YounoApiClient) {
-    this.apiClient = apiClient;
+  constructor(api: ApiBackgroundType) {
+    this.apiBackground = api;
     this.whitelistedWebsites = new Set(knownDappOrigins);
   }
 
@@ -75,7 +77,7 @@ class PhishingDefence {
     this.websiteStatus[origin] = 'loading';
 
     try {
-      const result = await this.apiClient.securityCheckUrl({ url });
+      const result = await this.apiBackground.securityCheckUrl({ url });
       const status = result.data?.flags.isMalicious ? 'phishing' : 'ok';
       this.websiteStatus[origin] = status;
 
@@ -125,4 +127,4 @@ class PhishingDefence {
 }
 
 /** TODO: should this be instantiated in Wallet/Wallet.ts? */
-export const phishingDefenceService = new PhishingDefence(YounoAPIBackground);
+export const phishingDefenceService = new PhishingDefence(ApiBackground);

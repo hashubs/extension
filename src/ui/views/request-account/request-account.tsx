@@ -1,3 +1,4 @@
+import { EXTENSION } from '@/app/constants';
 import type { ExternallyOwnedAccount } from '@/background/wallet/model/account-container';
 import { Permission } from '@/background/wallet/model/types';
 import { walletPort, windowPort } from '@/shared/channel';
@@ -129,7 +130,7 @@ function Permissions({
     <Drawer>
       <DrawerTrigger asChild>
         <span className="flex items-center gap-1 text-muted-foreground">
-          <p className="text-sm">Wants to connect to Youno</p>
+          <p className="text-sm">Wants to connect to {EXTENSION.name}</p>
           <LuInfo className="w-4 h-4" />
         </span>
       </DrawerTrigger>

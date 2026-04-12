@@ -2,7 +2,7 @@ import { createChain } from '@/modules/networks/chain';
 import type { NetworkConfig } from '@/modules/networks/network-config';
 import { Networks } from '@/modules/networks/networks';
 import { sendRpcRequest } from '@/shared/custom-rpc/rpc-request';
-import type { YounoApiClient } from '@/shared/youno-api/youno-api-bare';
+import type { ApiClientType } from '@/shared/request/api.client';
 import type { ChainGasPrice } from './types';
 
 export async function fetchGasPriceFromNode(
@@ -41,7 +41,7 @@ export async function fetchGasPrice({
 }: {
   network: NetworkConfig;
   source: 'testnet' | 'mainnet';
-  apiClient: YounoApiClient;
+  apiClient: ApiClientType;
 }) {
   try {
     const response = await apiClient.getGasPrices(

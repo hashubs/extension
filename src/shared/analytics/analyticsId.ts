@@ -6,7 +6,7 @@ import { deviceIdStore } from './deviceId-store';
 /**
  * Analytics ID is used as userId in analytics events.
  * It it set during onboarding with the help of <AnalyticsUserIdHandler /> and shouldn't be changed later.
- * It is synced with Web App and zerion.io landing page the same way as refferal code.
+ * It is synced with Web App and landing page the same way as refferal code.
  * In case, user ID can't be set from Web App, device ID is used instead as a fallback.
  *
  * All analytics events should use this ID as userId.
@@ -18,7 +18,7 @@ import { deviceIdStore } from './deviceId-store';
  * This ID is random and not connected to any user data.
  */
 
-export const analyticsIdKey = 'z-user-id';
+export const analyticsIdKey = 's-user-id';
 
 export async function getAnalyticsId() {
   return (

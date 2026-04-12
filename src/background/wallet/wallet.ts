@@ -76,9 +76,9 @@ import { getEthersError } from '@/shared/errors/get-ethers-error';
 import { parseError } from '@/shared/errors/parse-error/parse-error';
 import { invariant } from '@/shared/invariant';
 import { normalizeAddress } from '@/shared/normalize-address';
+import { ApiBackground } from '@/shared/request/api.background';
 import type { AtLeastOneOf } from '@/shared/type-utils/OneOf';
 import type { PartiallyRequired } from '@/shared/type-utils/partially-required';
-import { YounoAPI } from '@/shared/youno-api/youno-api.background';
 // import type {
 //   BannerClickedParams,
 //   ButtonClickedParams,
@@ -1260,7 +1260,7 @@ export class Wallet {
     const prepared = prepareTransaction(incomingTransaction);
     const txWithFee = await prepareGasAndNetworkFee(prepared, networks, {
       source: mode === 'testnet' ? 'testnet' : 'mainnet',
-      apiClient: YounoAPI,
+      apiClient: ApiBackground,
     });
     const transaction = await prepareNonce(txWithFee, network);
 

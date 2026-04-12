@@ -1,10 +1,11 @@
+import { EXTENSION } from '@/app/constants';
 import { invariant } from '@/shared/invariant';
-import { Payload } from '@/shared/youno-api/types/payload';
-import { AddressAction } from '@/shared/youno-api/types/wallet-get-actions';
+import { Payload } from '@/shared/request/types/payload';
+import { AddressAction } from '@/shared/request/types/wallet-get-actions';
 import { produce } from 'immer';
+import type { ApiContext } from '../api-bare';
 import type { ClientOptions } from '../shared';
-import { CLIENT_DEFAULTS, YounoHttpClient } from '../shared';
-import type { YounoApiContext } from '../youno-api-bare';
+import { CLIENT_DEFAULTS, HttpClient } from '../shared';
 
 export interface Response {
   data: AddressAction[];
@@ -21,7 +22,7 @@ export interface Response {
 }
 
 export async function walletGetActions(
-  this: YounoApiContext,
+  this: ApiContext,
   params: Payload,
   options: ClientOptions = CLIENT_DEFAULTS
 ) {
@@ -30,11 +31,11 @@ export async function walletGetActions(
   const provider = await this.getAddressProviderHeader(firstAddress);
   const kyOptions = this.getKyOptions();
   const endpoint = 'wallet/get-actions/v1';
-  const result = await YounoHttpClient.post<Response>(
+  const result = await HttpClient.post<Response>(
     {
       endpoint,
       body: JSON.stringify(params),
-      headers: { 'youno-wallet-provider': provider },
+      headers: { [`${EXTENSION.slug}-wallet-provider`]: provider },
       ...options,
     },
     kyOptions

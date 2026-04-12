@@ -1,4 +1,5 @@
-import logo from 'data-url:@/ui/assets/zerion-logo-blue.svg';
+import { EXTENSION } from '@/app/constants';
+import logo from 'data-url:@/app/selvo-logo-teal.svg';
 
 function visitTextNodes(node: Element, cb: (node: Node) => boolean) {
   const walker = document.createTreeWalker(node, NodeFilter.SHOW_TEXT);
@@ -23,7 +24,7 @@ const injectedRegexes: Record<string, RegExp> = {
 const labelsInjectedRe =
   injectedRegexes[window.location.origin] || injectedRegexes.default;
 const labelsMetamaskRe = /\bMeta[mM]ask\b/;
-const younoRe = /youno/i;
+const matcher = EXTENSION.matcher;
 
 function isReplacementMatch(textNode: Node, regex: RegExp) {
   const { textContent } = textNode;
@@ -33,7 +34,7 @@ function isReplacementMatch(textNode: Node, regex: RegExp) {
 function replaceButtonLabel(textNode: Node, regex: RegExp) {
   const { textContent } = textNode;
   if (textContent) {
-    textNode.textContent = textContent.replace(regex, 'Youno');
+    textNode.textContent = textContent.replace(regex, EXTENSION.name);
   }
 }
 
@@ -73,11 +74,11 @@ function replaceButtonImage(node: HTMLElement, context: Context) {
   if (
     !element ||
     !(element instanceof HTMLElement || element instanceof SVGElement) ||
-    element.dataset.younoReplaced === 'true'
+    element.dataset.selvoReplaced === 'true'
   ) {
     return;
   }
-  element.dataset.younoReplaced = 'true';
+  element.dataset.selvoReplaced = 'true';
   if (element.nodeName === 'IMG') {
     (element as HTMLImageElement).src = logo;
   } else {
@@ -120,7 +121,7 @@ function rewriteConnectButtons(
   const injectedCandidates: Item[] = [];
   const metamaskCandidates: Item[] = [];
   let didMutateSomething = false;
-  let foundYounoText = false;
+  let foundSelvoText = false;
 
   function mutateButton(element: HTMLElement, textNode: Node, regex: RegExp) {
     replaceButtonLabel(textNode, regex);
@@ -148,15 +149,15 @@ function rewriteConnectButtons(
       /**
        * - if we find metamask button, save it to list of metamask candidates,
        * - if we find injected button, save it to list of injected candidates,
-       * - if we find "youno" text button, ignore candidates
-       * This is to avoid mutating both Metamask and Injected buttons to Youno
-       * and to avoid mutating Injected buttons when Youno button exitst
+       * - if we find "Selvo" text button, ignore candidates
+       * This is to avoid mutating both Metamask and Injected buttons to Selvo
+       * and to avoid mutating Injected buttons when Selvo button exitst
        */
       visitTextNodes(element, (textNode) => {
-        const matchesYouno = isReplacementMatch(textNode, younoRe);
+        const matches = isReplacementMatch(textNode, matcher);
 
-        if (matchesYouno) {
-          foundYounoText = true;
+        if (matches) {
+          foundSelvoText = true;
           return true;
         }
         const matchesInjected = isReplacementMatch(textNode, labelsInjectedRe);
@@ -175,7 +176,7 @@ function rewriteConnectButtons(
   for (const element of buttonLikeElements) {
     analyzeElement(element);
   }
-  if (foundYounoText) {
+  if (foundSelvoText) {
     return;
   }
   for (const item of injectedCandidates) {
