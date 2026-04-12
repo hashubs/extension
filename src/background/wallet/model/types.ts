@@ -19,6 +19,7 @@ export interface WalletGroup {
 interface WalletManager {
   groups: WalletGroup[];
   currentAddress: string | null;
+  currentNetworkId?: string | null;
   internalMnemonicGroupCounter: number;
   internalHardwareGroupCounter?: number;
 }

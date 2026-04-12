@@ -7,10 +7,12 @@ import type { BareWallet } from '@/shared/types/bare-wallet';
 import type { BlockchainType } from '@/shared/wallet/classifiers';
 import { Header } from '@/ui/components/header';
 import { WalletList } from '@/ui/components/wallet/wallet-list/wallet-list';
-import { useWalletGroups } from '@/ui/hooks/useWalletGroups';
+import { useAddressParams } from '@/ui/hooks/request/internal/useAddressParams';
+import { useWalletGroups } from '@/ui/hooks/request/internal/useWalletGroups';
 import { Input } from '@/ui/ui-kit';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useCallback, useMemo, useState } from 'react';
+import { IoSearchOutline } from 'react-icons/io5';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { isMatchForEcosystem } from 'src/shared/wallet/shared';
 
@@ -23,6 +25,7 @@ export function WalletSelect() {
   const ecosystem = searchParams.get('ecosystem') as BlockchainType;
 
   const { data: walletGroups } = useWalletGroups();
+  const { singleAddress: currentAddress } = useAddressParams();
 
   const [searchQuery, setSearchQuery] = useState('');
   const queryClient = useQueryClient();
@@ -58,7 +61,8 @@ export function WalletSelect() {
     [navigate, searchParams, updateCurrentAddress]
   );
 
-  const value = searchParams.get('selectedAddress') || '';
+  const activeAddress =
+    searchParams.get('selectedAddress') || currentAddress || '';
 
   const allAddresses = useMemo(
     () =>
@@ -84,7 +88,7 @@ export function WalletSelect() {
     <div className="flex flex-col h-full overflow-hidden bg-background">
       <Header title="Select Wallet" onBack={() => navigate(-1)} />
 
-      <div className="px-4 pb-3 border-b border-muted-foreground/10">
+      <div className="px-4 pb-3 pt-0.5 border-b border-muted-foreground/10">
         <Input
           type="search"
           placeholder="Search wallets"
@@ -92,13 +96,14 @@ export function WalletSelect() {
           onChange={(e) => setSearchQuery(e.currentTarget.value)}
           size="md"
           status="default"
+          leftIcon={IoSearchOutline}
           disabled={!showSearch}
         />
       </div>
 
       <div className="flex-1 overflow-y-auto no-scrollbar p-4">
         <WalletList
-          selectedAddress={value || ''}
+          selectedAddress={activeAddress}
           walletGroups={walletGroups as any}
           onSelect={onSelect}
           predicate={isWalletMatchingFilter}

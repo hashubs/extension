@@ -1,7 +1,6 @@
 import { ellipsis, NBSP } from '@/shared/typography';
-import React from 'react';
 import { LuLoader } from 'react-icons/lu';
-import { DelayedRender, useRenderDelay } from '../DelayedRender/DelayedRender';
+import { useRenderDelay } from '../DelayedRender/DelayedRender';
 
 interface Props {
   size?: string;
@@ -31,22 +30,5 @@ export function ViewLoading({ size = '24px', kind = 'default' }: Props) {
         </div>
       )}
     </div>
-  );
-}
-
-export function ViewLoadingSuspense({
-  children,
-  ...props
-}: React.PropsWithChildren<Props>) {
-  return (
-    <React.Suspense
-      fallback={
-        <DelayedRender>
-          <ViewLoading {...props} />
-        </DelayedRender>
-      }
-    >
-      {children}
-    </React.Suspense>
   );
 }

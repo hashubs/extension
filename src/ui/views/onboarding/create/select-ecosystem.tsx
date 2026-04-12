@@ -48,7 +48,7 @@ export function SelectEcosystem() {
 
   const [_showError, setShowError] = useState(false);
 
-  const { mutate: handleSubmit, isLoading: isGenerating } = useMutation({
+  const { mutate: handleSubmit, isPending: isGenerating } = useMutation({
     mutationFn: async () => {
       await wait(2000);
       invariant(password && password !== '', 'Password not set');

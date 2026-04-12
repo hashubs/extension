@@ -88,7 +88,6 @@ export function Processing() {
         });
       }
     },
-    useErrorBoundary: true,
   });
 
   useEffect(() => {

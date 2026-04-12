@@ -18,7 +18,9 @@ function identityComparator(a: Identity, b: Identity) {
  */
 export async function lookupAddressNames(address: string): Promise<string[]> {
   try {
-    const response = await ApiClient.getWalletsMeta({ addresses: [address] });
+    const response = await ApiClient.walletGetMetadata({
+      addresses: [address],
+    });
     return (
       response.data?.[0]?.identities
         .sort(identityComparator)
@@ -46,7 +48,7 @@ export async function lookupAddressName(
  */
 export async function resolveDomain(domain: string): Promise<string | null> {
   try {
-    const response = await ApiClient.getWalletsMeta({ addresses: [domain] });
+    const response = await ApiClient.walletGetMetadata({ addresses: [domain] });
     return response?.data?.[0]?.address || null;
   } catch {
     return null;

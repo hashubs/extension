@@ -13,8 +13,6 @@ export const useAuthState = () => {
       ]);
       return { isAuthenticated, existingUser, wallet };
     },
-    useErrorBoundary: true,
-    suspense: false,
     retry: false,
     refetchOnWindowFocus: false,
   });
@@ -29,9 +27,11 @@ export const useAuthState = () => {
 
 export function RequireAuth({ children }: { children: JSX.Element }) {
   const location = useLocation();
-  const { isLoading, isAuthenticated, existingUser } = useAuthState();
+  const { isAuthenticated, existingUser } = useAuthState();
 
-  if (isLoading) return null;
+  if (existingUser === undefined || isAuthenticated === undefined) {
+    return <div className="h-full w-full bg-background" />;
+  }
 
   if (!existingUser) {
     return <Navigate to="/" replace={true} />;

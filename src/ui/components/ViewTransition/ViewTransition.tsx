@@ -24,13 +24,14 @@ export function ViewTransition({
   const isBackRef = useRef(false);
   const shouldAnimateRef = useRef(false);
   const isMountedRef = useRef(false);
-  const isTransitioningRef = useRef(false);
 
   const getDepth = (path: string) => path.split('/').filter(Boolean).length;
 
-  const normalizePath = (path: string) => (path === '/' ? path : path.replace(/\/$/, ''));
+  const normalizePath = (path: string) =>
+    path === '/' ? path : path.replace(/\/$/, '');
 
   const matchesRoute = (path: string) => {
+    if (animatedRoutes.length === 0) return true;
     const normalized = normalizePath(path);
     return animatedRoutes.some((route) => {
       const normalizedRoute = normalizePath(route);
@@ -47,13 +48,10 @@ export function ViewTransition({
     return excludedTransitions.some((t) => {
       const exFrom = normalizePath(t.from);
       const exTo = normalizePath(t.to);
-
       const matchesFrom =
-        nFrom === exFrom ||
-        (exFrom !== '/' && nFrom.startsWith(exFrom + '/'));
+        nFrom === exFrom || (exFrom !== '/' && nFrom.startsWith(exFrom + '/'));
       const matchesTo =
         nTo === exTo || (exTo !== '/' && nTo.startsWith(exTo + '/'));
-
       return matchesFrom && matchesTo;
     });
   };
@@ -65,9 +63,9 @@ export function ViewTransition({
     if (state?.direction === 'back') return 'back';
     if (state?.direction === 'forward') return 'forward';
     if (navigationType === 'POP') return 'back';
-    const currentDepth = getDepth(location.pathname);
-    const prevDepth = getDepth(prevPath);
-    return currentDepth >= prevDepth ? 'forward' : 'back';
+    return getDepth(location.pathname) >= getDepth(prevPath)
+      ? 'forward'
+      : 'back';
   };
 
   const isBack = computeDirection() === 'back';
@@ -90,41 +88,45 @@ export function ViewTransition({
 
   const transitions = useTransition(location, {
     key: location.pathname,
-    from: () => ({
-      transform: shouldAnimateRef.current
-        ? isBackRef.current
-          ? 'translateX(-30%)'
-          : 'translateX(100%)'
-        : 'translateX(0%)',
-      zIndex: isBackRef.current ? 1 : 2,
-    }),
+
+    initial: null,
+
+    from: () => {
+      if (!shouldAnimateRef.current) return { transform: 'translateX(0%)' };
+      return {
+        transform: isBackRef.current ? 'translateX(-100%)' : 'translateX(100%)',
+      };
+    },
+
     enter: () => ({
       transform: 'translateX(0%)',
-      zIndex: isBackRef.current ? 1 : 2,
+      zIndex: 2,
     }),
-    leave: () => ({
-      transform: shouldAnimateRef.current
-        ? isBackRef.current
-          ? 'translateX(100%)'
-          : 'translateX(-30%)'
-        : 'translateX(0%)',
-      zIndex: isBackRef.current ? 2 : 1,
-    }),
-    config: isTransitioningRef.current
-      ? { tension: 600, friction: 40 }
-      : { tension: 280, friction: 26 },
-    immediate: (key) => key === 'zIndex' || !shouldAnimateRef.current,
+
+    leave: () => {
+      if (!shouldAnimateRef.current)
+        return { transform: 'translateX(0%)', zIndex: 1 };
+      return {
+        transform: isBackRef.current ? 'translateX(100%)' : 'translateX(-30%)',
+        zIndex: 1,
+      };
+    },
+
+    config: { tension: 280, friction: 26 },
+    immediate: (key) => key === 'zIndex',
     exitBeforeEnter: false,
-    onStart: () => {
-      isTransitioningRef.current = true;
-    },
-    onRest: () => {
-      isTransitioningRef.current = false;
-    },
   });
 
   return (
-    <div className="relative h-full w-full overflow-hidden bg-background">
+    <div
+      style={{
+        position: 'relative',
+        height: '100%',
+        width: '100%',
+        overflow: 'hidden',
+      }}
+      className="bg-background"
+    >
       {transitions((style, item) => (
         <animated.div
           key={item.key}

@@ -157,7 +157,6 @@ export function Oops() {
       const result = await getCurrentUser();
       return result || null;
     },
-    suspense: true,
     refetchOnWindowFocus: false,
   });
 

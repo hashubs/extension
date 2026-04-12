@@ -5,5 +5,5 @@ import { valueToHex } from './units/value-to-hex';
 export function normalizeChainId(
   value: string | number | bigint | BigNumber
 ): ChainId {
-  return valueToHex(value).toLowerCase() as ChainId;
+  return valueToHex(String(value)).toLowerCase() as ChainId;
 }

@@ -174,6 +174,7 @@ type WalletMethodParams<T = undefined> = T extends undefined
 interface WalletEvents {
   recordUpdated: () => void;
   currentAddressChange: (addresses: string[]) => void;
+  currentNetworkIdChange: (networkId: string | null) => void;
   chainChanged: (chain: Chain, origin: string) => void;
   switchChainError: (chainId: ChainId, origin: string) => void;
   permissionsUpdated: () => void;
@@ -671,6 +672,22 @@ export class Wallet {
     );
   }
 
+  async setCurrentNetworkId({
+    params: { networkId },
+    context,
+  }: WalletMethodParams<{ networkId: string | null }>) {
+    this.verifyInternalOrigin(context);
+    this.ensureRecord(this.record);
+    this.record = Model.setCurrentNetworkId(this.record, { networkId });
+    this.updateWalletStore(this.record);
+
+    this.emitter.emit('currentNetworkIdChange', networkId);
+  }
+
+  readCurrentNetworkId() {
+    return this.record?.walletManager.currentNetworkId || null;
+  }
+
   readCurrentAddress() {
     return this.record?.walletManager.currentAddress || null;
   }
@@ -726,6 +743,11 @@ export class Wallet {
   async getCurrentAddress({ context }: WalletMethodParams) {
     this.verifyInternalOrigin(context);
     return this.readCurrentAddress();
+  }
+
+  async getCurrentNetworkId({ context }: WalletMethodParams) {
+    this.verifyInternalOrigin(context);
+    return this.readCurrentNetworkId();
   }
 
   async uiGetWalletGroups({ context }: WalletMethodParams) {

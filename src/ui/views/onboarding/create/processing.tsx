@@ -49,7 +49,6 @@ export function Processing() {
       }
       setShowError(true);
     },
-    useErrorBoundary: false,
   });
 
   useEffect(() => {

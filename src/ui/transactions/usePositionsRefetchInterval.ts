@@ -1,4 +1,4 @@
-import { useRemoteConfigValue } from '@/modules/remote-config/useRemoteConfigValue';
+import { useRemoteConfigValue } from '@/ui/hooks/request/internal/useRemoteConfigValue';
 import { useStore } from '@store-unit/react';
 import { useEffect, useState } from 'react';
 import { Store } from 'store-unit';

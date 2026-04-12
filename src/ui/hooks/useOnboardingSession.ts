@@ -24,22 +24,16 @@ export function useOnboardingSession({
       const result = await getCurrentUser();
       return result || null;
     },
-    suspense: false,
     refetchOnWindowFocus: false,
   });
 
   useEffect(() => {
-    console.log('[DEBUG] useOnboardingSession: existingUser =', existingUser);
     if (existingUser) {
       if (navigateOnExistingUser === ONBOARDING_ROUTES.SESSION_EXPIRED) {
-        console.log(
-          '[DEBUG] useOnboardingSession: Redirecting to SESSION_EXPIRED'
-        );
         navigate('/onboarding/' + ONBOARDING_ROUTES.SESSION_EXPIRED, {
           replace: true,
         });
       } else {
-        console.log('[DEBUG] useOnboardingSession: Redirecting to SUCCESS');
         navigate('/onboarding/' + ONBOARDING_ROUTES.SUCCESS);
         emitter.emit('reloadExtension');
       }

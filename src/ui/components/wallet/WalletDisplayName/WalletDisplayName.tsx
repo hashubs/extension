@@ -10,7 +10,7 @@ export function WalletDisplayName({
   render,
   className,
 }: {
-  wallet?: ExternallyOwnedAccount | null;
+  wallet: ExternallyOwnedAccount | null | undefined;
   padding?: number;
   maxCharacters?: number;
   render?: (data: ReturnType<typeof useProfileName>) => React.ReactNode;

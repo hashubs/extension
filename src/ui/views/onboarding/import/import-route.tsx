@@ -1,5 +1,4 @@
-import { ErrorBoundary } from '@/ui/components/ErrorBoundary/ErrorBoundary';
-import { Processing as ScanningWallet } from '@/ui/components/processing';
+
 import {
   Button,
   Dialog,
@@ -9,8 +8,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/ui/ui-kit';
-import { Suspense, useCallback, useState } from 'react';
-import { MdErrorOutline } from 'react-icons/md';
+import { useCallback, useState } from 'react';
 import { Route, Routes, useLocation, useNavigate } from 'react-router-dom';
 import { PageLayout } from '../layout';
 import { SetPassword } from '../password';
@@ -72,32 +70,7 @@ export function ImportRoute() {
         onBack={isSuccessStep ? undefined : handleBack}
         customRightPanel={isSuccessStep ? <PannelRight /> : undefined}
       >
-        <ErrorBoundary
-          renderError={(error) => (
-            <div className="flex flex-col items-center justify-center p-8 w-full max-w-md mx-auto text-center">
-              <MdErrorOutline className="text-negative-500 mb-4" size={64} />
-              <h2 className="text-2xl font-bold text-on-surface mb-2">
-                Something went wrong
-              </h2>
-              <p className="text-on-surface-variant mb-8 leading-relaxed">
-                {error?.message ??
-                  'An unexpected error occurred. Please try again.'}
-              </p>
-              <Button
-                variant="primary"
-                size="lg"
-                className="w-full"
-                onClick={() =>
-                  navigate(`../../${ONBOARDING_ROUTES.WELCOME}`, {
-                    replace: true,
-                  })
-                }
-              >
-                Back to Home
-              </Button>
-            </div>
-          )}
-        >
+        <div className="w-full h-full relative">
           <Routes>
             <Route
               index
@@ -122,18 +95,7 @@ export function ImportRoute() {
             />
             <Route
               path={ONBOARDING_ROUTES.IMPORT.SELECT_WALLETS}
-              element={
-                <Suspense
-                  fallback={
-                    <ScanningWallet
-                      title="Scanning your wallets"
-                      description="Please wait while we scan your wallets..."
-                    />
-                  }
-                >
-                  <SelectWallets />
-                </Suspense>
-              }
+              element={<SelectWallets />}
             />
             <Route
               path={ONBOARDING_ROUTES.IMPORT.PROCESSING}
@@ -144,7 +106,7 @@ export function ImportRoute() {
               element={<Success />}
             />
           </Routes>
-        </ErrorBoundary>
+        </div>
       </PageLayout>
 
       <Dialog open={isInterruptOpen} onOpenChange={setIsInterruptOpen}>

@@ -256,8 +256,8 @@ async function pendingEvmTxToAddressAction(
   const actionTransaction = {
     hash,
     chain: {
-      id: network?.id || valueToHex(transaction.chainId),
-      name: network?.name || valueToHex(transaction.chainId),
+      id: network?.id || valueToHex(String(transaction.chainId)),
+      name: network?.name || valueToHex(String(transaction.chainId)),
       iconUrl: network?.icon_url || '',
     },
     explorerUrl: getExplorerUrl(network?.explorer_tx_url || null, hash),
@@ -289,7 +289,7 @@ async function pendingEvmTxToAddressAction(
         ? network.id
         : // It's okay to fallback to a stringified chainId because this is
           // only a representational object
-          valueToHex(transaction.chainId),
+          valueToHex(String(transaction.chainId)),
       nonce: Number(transaction.nonce) || 0,
     },
     local: true,
@@ -362,8 +362,8 @@ export async function incomingTxToIncomingAddressAction(
   const actionTransaction = {
     hash: ZERO_HASH,
     chain: {
-      id: network?.id || valueToHex(transaction.chainId),
-      name: network?.name || valueToHex(transaction.chainId),
+      id: network?.id || valueToHex(String(transaction.chainId)),
+      name: network?.name || valueToHex(String(transaction.chainId)),
       iconUrl: network?.icon_url || '',
     },
     explorerUrl: null,

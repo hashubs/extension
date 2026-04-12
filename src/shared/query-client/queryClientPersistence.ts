@@ -5,7 +5,7 @@ import {
   type QueryKey,
   defaultShouldDehydrateQuery,
   dehydrate,
-  hashQueryKey,
+  hashKey as hashQueryKey,
   hydrate,
 } from '@tanstack/react-query';
 import throttle from 'lodash/throttle';
@@ -77,7 +77,7 @@ function handleQueryCacheUpdate(queryClient: QueryClient, buster: string) {
         return false;
       }
     },
-    dehydrateMutations: false,
+    shouldDehydrateMutation: () => false,
   });
   const persistedClient: PersistedClient = {
     buster,

@@ -3,7 +3,7 @@ import { queryClient } from '@/shared/query-client/queryClient';
 import { ScreenViewTracker } from '@/shared/ScreenViewTracker';
 import { DesignTheme } from '@/ui/components/DesignTheme/DesignTheme';
 import { InactivityDetector } from '@/ui/components/Session/InactivityDetector';
-import { ViewSuspense } from '@/ui/components/ViewSuspense/ViewSuspense';
+
 import { initialize as initializeApperance } from '@/ui/features/appearance';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { AreaProvider } from 'react-area';
@@ -31,14 +31,12 @@ export function BaseApp({ bodyClassList, inspect, children }: BaseAppProps) {
           <ScreenViewTracker />
           <InactivityDetector />
           <ProgrammaticNavigationHelper />
-          <ViewSuspense logDelays={true}>
-            {inspect && (
-              <div className="bg-gray-50 border-b border-gray-200 p-2 text-[10px] text-gray-400 font-mono">
-                {inspect.message}
-              </div>
-            )}
-            {children}
-          </ViewSuspense>
+          {inspect && (
+            <div className="bg-gray-50 border-b border-gray-200 p-2 text-[10px] text-gray-400 font-mono">
+              {inspect.message}
+            </div>
+          )}
+          {children}
         </Router>
       </QueryClientProvider>
     </AreaProvider>

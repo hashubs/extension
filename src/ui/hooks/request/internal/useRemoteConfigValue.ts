@@ -1,6 +1,6 @@
+import type { RemoteConfig } from '@/modules/remote-config/types';
 import { walletPort } from '@/shared/channel';
 import { useQuery } from '@tanstack/react-query';
-import type { RemoteConfig } from './types';
 
 export function useRemoteConfigValue<K extends keyof RemoteConfig>(key: K) {
   return useQuery({
@@ -9,9 +9,7 @@ export function useRemoteConfigValue<K extends keyof RemoteConfig>(key: K) {
       const value = await walletPort.request('getRemoteConfigValue', { key });
       return value as RemoteConfig[K];
     },
-    useErrorBoundary: false,
     staleTime: 10000,
-    suspense: false,
     refetchOnMount: false,
     refetchOnWindowFocus: false,
   });

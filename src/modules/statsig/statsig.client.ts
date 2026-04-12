@@ -9,10 +9,8 @@ export const APPROVE_AND_TRADE_EXPERIMENT =
 export function useStatsigExperiment(
   name: string,
   {
-    suspense = false,
     enabled = true,
   }: {
-    suspense?: boolean;
     enabled?: boolean;
   } = {}
 ) {
@@ -29,7 +27,6 @@ export function useStatsigExperiment(
     },
     staleTime: Infinity, // never refetch experiment status while UI is open
     enabled,
-    suspense,
   });
 }
 
@@ -41,10 +38,8 @@ export function useApproveAndTradeInOneAction() {
 export function useStatsigFeatureGate(
   name: string,
   {
-    suspense = false,
     enabled = true,
   }: {
-    suspense?: boolean;
     enabled?: boolean;
   } = {}
 ) {
@@ -53,6 +48,5 @@ export function useStatsigFeatureGate(
     queryFn: () => getStatsigFeatureGate(name),
     staleTime: Infinity, // never refetch feature gate status while UI is open
     enabled,
-    suspense,
   });
 }

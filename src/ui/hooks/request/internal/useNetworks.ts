@@ -1,3 +1,7 @@
+import type { ChainId } from '@/modules/ethereum/transactions/chainId';
+import { createChain } from '@/modules/networks/chain';
+import { getNetworksBySearch } from '@/modules/networks/networks-api';
+import { NetworksStore } from '@/modules/networks/networks-store';
 import {
   mainNetworksStore,
   testenvNetworksStore,
@@ -7,12 +11,12 @@ import { invariant } from '@/shared/invariant';
 import { queryClient } from '@/shared/query-client/queryClient';
 import { usePreferences } from '@/ui/features/preferences';
 import type { QueryKeyHashFunction } from '@tanstack/react-query';
-import { hashQueryKey, useQuery } from '@tanstack/react-query';
+import {
+  hashKey as hashQueryKey,
+  keepPreviousData as keepPreviousDataFn,
+  useQuery,
+} from '@tanstack/react-query';
 import { useCallback, useEffect } from 'react';
-import type { ChainId } from '../ethereum/transactions/chainId';
-import { createChain } from './chain';
-import { getNetworksBySearch } from './networks-api';
-import { NetworksStore } from './networks-store';
 
 function useNetworksStore() {
   const { preferences } = usePreferences();
@@ -42,8 +46,6 @@ export function useNetworks(chains?: string[]) {
       return networksStore.load(chains ? { chains } : undefined);
     },
     staleTime: 1000 * 60 * 5,
-    suspense: false,
-    useErrorBoundary: true,
     enabled: Boolean(networksStore),
   });
 
@@ -82,9 +84,8 @@ export function useNetworkConfig(
   id: string | null,
   {
     staleTime = 1000 * 60 * 5,
-    suspense = false,
     enabled = true,
-  }: { staleTime?: number; suspense?: boolean; enabled?: boolean } = {}
+  }: { staleTime?: number; enabled?: boolean } = {}
 ) {
   const networksStore = useNetworksStore();
   return useQuery({
@@ -96,7 +97,6 @@ export function useNetworkConfig(
       return networksStore.fetchNetworkById(id);
     },
     staleTime,
-    suspense,
     enabled: Boolean(networksStore && id && enabled),
   });
 }
@@ -127,8 +127,6 @@ export function useMainnetNetwork({
       return network ?? null;
     },
     staleTime: 1000 * 60 * 5,
-    suspense: false,
-    useErrorBoundary: false,
   });
 }
 
@@ -145,8 +143,7 @@ export function useSearchNetworks({ query = '' }: { query?: string }) {
       emitter.emit('networksSearchResponse', query, data.length);
       return data;
     },
-    suspense: false,
-    keepPreviousData: true,
+    placeholderData: keepPreviousDataFn,
   });
   const { networks } = useNetworks();
   return { networks, ...queryResult };

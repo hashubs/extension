@@ -1,5 +1,6 @@
-import { BlockieImg } from '@/ui/components/BlockieImg';
-import { useAddressActivity } from '@/ui/hooks/request/external/useAddressActivity';
+import { BlockieAddress } from '@/ui/components/blockie';
+import { Processing as ScanningWallet } from '@/ui/components/processing';
+import { usePortfolioValues } from '@/ui/hooks/request/external/usePortfolioValues';
 import {
   AnimatedCheckmark,
   Button,
@@ -88,16 +89,10 @@ export function SelectWallets() {
       return prepareWalletsToImport(phrase);
     },
     enabled: Boolean(mnemonic),
-    useErrorBoundary: true,
   });
 
   const { data: activeWallets, isLoading: isCheckingActivity } =
-    useAddressActivity({
-      addresses: data?.addressesToCheck || [],
-      options: {
-        enabled: Boolean(data?.addressesToCheck),
-      },
-    });
+    usePortfolioValues(data?.addressesToCheck || []);
 
   const isScanning = !!isDeriving || !!isCheckingActivity;
   const wallets = data?.derivedWallets || [];
@@ -133,8 +128,10 @@ export function SelectWallets() {
 
     const active = activeWallets ?? {};
     const sortedRemaining = [...remaining].sort((a, b) => {
-      const aActive = active[normalizeAddress(a.address)]?.active ? 1 : 0;
-      const bActive = active[normalizeAddress(b.address)]?.active ? 1 : 0;
+      const aVal = active[normalizeAddress(a.address)]?.totalValue ?? 0;
+      const bVal = active[normalizeAddress(b.address)]?.totalValue ?? 0;
+      const aActive = aVal > 0 ? 1 : 0;
+      const bActive = bVal > 0 ? 1 : 0;
       return bActive - aActive;
     });
 
@@ -194,6 +191,15 @@ export function SelectWallets() {
 
   if (!mnemonic) return null;
 
+  if (isScanning) {
+    return (
+      <ScanningWallet
+        title="Scanning your wallets"
+        description="Please wait while we scan your wallets..."
+      />
+    );
+  }
+
   return (
     <>
       <SectionHeader
@@ -230,7 +236,7 @@ export function SelectWallets() {
                         key={wallet.address}
                         item={{
                           iconNode: (
-                            <BlockieImg
+                            <BlockieAddress
                               address={wallet.address}
                               size={meta.iconSize}
                               borderRadius={4}
@@ -267,7 +273,7 @@ export function SelectWallets() {
                               key={wallet.address}
                               item={{
                                 iconNode: (
-                                  <BlockieImg
+                                  <BlockieAddress
                                     address={wallet.address}
                                     size={meta.iconSize}
                                     borderRadius={4}

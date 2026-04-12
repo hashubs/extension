@@ -10,7 +10,6 @@ export function SessionExpired({ onRestart }: { onRestart: () => void }) {
       const result = await getCurrentUser();
       return result || null;
     },
-    suspense: false,
     refetchOnWindowFocus: false,
   });
 

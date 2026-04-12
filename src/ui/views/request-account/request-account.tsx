@@ -4,12 +4,12 @@ import { Permission } from '@/background/wallet/model/types';
 import { walletPort, windowPort } from '@/shared/channel';
 import { focusNode } from '@/shared/focus-node';
 import type { BlockchainType } from '@/shared/wallet/classifiers';
-import { BlockieImg } from '@/ui/components/BlockieImg';
+import { BlockieAddress } from '@/ui/components/blockie';
 import { DappSecurityCheck } from '@/ui/components/DappSecurityCheck/DappSecurityCheck';
 import { SiteFaviconImg } from '@/ui/components/SiteFaviconImg';
 import { WalletDisplayName } from '@/ui/components/wallet';
-import { usePrefetchWalletGroups } from '@/ui/hooks/useWalletGroups';
-import { usePhishingDefenceStatus } from '@/ui/hooks/request/external/usePhishingDefenceStatus';
+import { usePhishingDefenceStatus } from '@/ui/hooks/request/internal/usePhishingDefenceStatus';
+import { usePrefetchWalletGroups } from '@/ui/hooks/request/internal/useWalletGroups';
 import { useEvent } from '@/ui/hooks/useEvent';
 import { Button, Drawer, DrawerContent, DrawerTrigger } from '@/ui/ui-kit';
 import { useQuery } from '@tanstack/react-query';
@@ -77,8 +77,6 @@ function useCheckOriginPermissionAndRedirect({
       return result;
     },
     enabled: Boolean(address),
-    useErrorBoundary: true,
-    suspense: false,
     refetchOnWindowFocus: false,
     retry: false,
   });
@@ -100,7 +98,7 @@ function Account({
       >
         <div className="flex items-center gap-3">
           <div className="shrink-0 flex items-center justify-center">
-            <BlockieImg
+            <BlockieAddress
               address={selectedWallet.address}
               size={28}
               borderRadius={4}
@@ -335,15 +333,13 @@ export function RequestAccounts() {
   invariant(origin, 'origin get-parameter is required');
   invariant(windowId, 'windowId get-parameter is required');
 
-  const { data, isLoading, isError, error } = useQuery({
+  const { data, isPending, isError, error } = useQuery({
     retry: 1,
     queryKey: [
       'prepareRequestAccountsViewData',
       ecosystem,
       params.get('selectedAddress'),
     ],
-    useErrorBoundary: false,
-    suspense: false,
     queryFn: async () => {
       const selectedAddress = params.get('selectedAddress');
       const allWalletGroups = await walletPort.request('uiGetWalletGroups');
@@ -429,7 +425,7 @@ export function RequestAccounts() {
     }
   }
 
-  if (isLoading || !wallet) {
+  if (isPending || !wallet) {
     return null;
   }
 

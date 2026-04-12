@@ -10,9 +10,7 @@ export function useWalletGroups() {
   return useQuery({
     queryKey: WALLET_GROUPS_QUERY_KEY,
     queryFn: fetchWalletGroups,
-    suspense: false,
-    useErrorBoundary: true,
-    staleTime: 1000 * 60, // Consider fresh for 1 minute
+    staleTime: 1000 * 60,
   });
 }
 

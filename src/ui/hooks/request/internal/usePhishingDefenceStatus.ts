@@ -9,9 +9,8 @@ export function usePhishingDefenceStatus(origin?: string | null) {
         url: origin,
       });
     },
-    cacheTime: 0,
-    suspense: false,
-    refetchInterval: (data) =>
-      data?.status === 'loading' || data?.status === 'unknown' ? 100 : false,
+    gcTime: 0,
+    refetchInterval: (query) =>
+      query.state.data?.status === 'loading' || query.state.data?.status === 'unknown' ? 100 : false,
   });
 }

@@ -4,7 +4,7 @@ import { isSolanaAddress } from 'src/modules/solana/shared';
 import { normalizeAddress } from 'src/shared/normalize-address';
 import { generateSolanaBlockie } from './generateSolanaBlockie';
 
-export function BlockieImg({
+export function BlockieAddress({
   address,
   size,
   borderRadius,

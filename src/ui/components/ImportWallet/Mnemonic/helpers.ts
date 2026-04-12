@@ -70,7 +70,7 @@ export function suggestInitialWallets({
   existingAddressesSet,
 }: {
   wallets: DerivedWallets;
-  activeWallets: Record<string, { active: boolean }>;
+  activeWallets: Record<string, { active?: boolean; totalValue?: number }>;
   existingAddressesSet: Set<string>;
 }): {
   activeCount: number;
@@ -81,7 +81,7 @@ export function suggestInitialWallets({
     (w) => !existingAddressesSet.has(normalizeAddress(w.address))
   );
   const grouped = groupBy(newOnes, ({ address }) =>
-    activeWallets[normalizeAddress(address)]?.active ? 'active' : 'rest'
+    (activeWallets[normalizeAddress(address)]?.totalValue ?? 0) > 0 ? 'active' : 'rest'
   );
   const { active, rest } = grouped as Record<
     'active' | 'rest',

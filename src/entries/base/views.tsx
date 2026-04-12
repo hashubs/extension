@@ -9,7 +9,9 @@ import { ViewTransition } from '@/ui/components/ViewTransition/ViewTransition';
 import { WalletSelect } from '@/ui/components/wallet';
 import { HandshakeFailure } from '@/ui/views/handshake-failure';
 import { Login } from '@/ui/views/login';
+import { NetworkSelect } from '@/ui/views/network-select';
 import { Overview } from '@/ui/views/overview/overview';
+import { TestView } from '@/ui/views/test-view';
 
 function DefiSdkClientProvider({ children }: React.PropsWithChildren) {
   return <>{children}</>;
@@ -64,6 +66,15 @@ export function Views({ initialRoute }: { initialRoute?: string }) {
                 </RequireAuth>
               }
             />
+            <Route
+              path="/select-network"
+              element={
+                <RequireAuth>
+                  <NetworkSelect />
+                </RequireAuth>
+              }
+            />
+            <Route path="/test-view" element={<TestView />} />
             <Route path="/handshake-failure" element={<HandshakeFailure />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>

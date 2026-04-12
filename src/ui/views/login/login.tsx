@@ -5,7 +5,7 @@ import { queryClient } from '@/shared/query-client/queryClient';
 import { PublicUser } from '@/shared/types/User';
 import { wait } from '@/shared/wait';
 import { zeroizeAfterSubmission } from '@/shared/zeroize-submission';
-import { BlockieImg } from '@/ui/components/BlockieImg';
+import { BlockieAddress } from '@/ui/components/blockie';
 import { Button, Input } from '@/ui/ui-kit';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
@@ -24,8 +24,6 @@ export function Login() {
   const { data: user, isLoading } = useQuery({
     queryKey: ['account/getExistingUser'],
     queryFn: () => accountPublicRPCPort.request('getExistingUser'),
-    suspense: false,
-    useErrorBoundary: true,
   });
 
   const { data: lastUsedAddress } = useQuery({
@@ -36,7 +34,6 @@ export function Login() {
       invariant(user?.id, "user['id'] is required");
       return walletPort.request('getLastUsedAddress', { userId: user.id });
     },
-    suspense: false,
   });
 
   const loginMutation = useMutation({
@@ -53,7 +50,7 @@ export function Login() {
       zeroizeAfterSubmission();
       setUnlocked(true);
       await wait(100);
-      queryClient.invalidateQueries(['authState']);
+      queryClient.invalidateQueries({ queryKey: ['authState'] });
       navigate(params.get('next') || '/', { replace: true });
     },
   });
@@ -71,7 +68,7 @@ export function Login() {
 
           <div className="relative z-10 flex flex-col items-center gap-4">
             {lastUsedAddress ? (
-              <BlockieImg
+              <BlockieAddress
                 address={lastUsedAddress}
                 size={100}
                 borderRadius={8}
@@ -115,7 +112,7 @@ export function Login() {
           <div className="flex flex-col space-y-2 mt-3">
             <Button
               onClick={handleUnlock}
-              loading={loginMutation.isLoading}
+              loading={loginMutation.isPending}
               size="md"
               variant="primary"
               className="py-1.75"

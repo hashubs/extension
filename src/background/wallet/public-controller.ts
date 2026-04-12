@@ -876,4 +876,15 @@ export class PublicController {
     invariant(context?.origin, 'This method requires origin');
     return isKnownDapp({ origin: context.origin });
   }
+
+  async setCurrentNetworkId({
+    params: { networkId },
+    context,
+  }: PublicMethodParams<{ networkId: string | null }>) {
+    return this.wallet.setCurrentNetworkId({ params: { networkId }, context });
+  }
+
+  async getCurrentNetworkId({ context }: PublicMethodParams) {
+    return this.wallet.getCurrentNetworkId({ context });
+  }
 }

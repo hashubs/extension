@@ -18,9 +18,8 @@ const inputVariants = cva(
         default:
           'border-muted-foreground/10 focus:border-muted-foreground/10 focus:ring-muted-foreground/5',
         error:
-          'border-destructive/10 focus:border-destructive/10 focus:ring-destructive/5',
-        success:
-          'border-teal-500/10 focus:border-teal-500/10 focus:ring-teal-500/5',
+          'border-destructive focus:border-destructive focus:ring-destructive/5',
+        success: 'border-teal-500 focus:border-teal-500 focus:ring-teal-500/5',
       },
     },
     defaultVariants: {

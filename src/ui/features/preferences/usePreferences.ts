@@ -22,8 +22,6 @@ export function usePreferences() {
   const query = useQuery({
     queryKey: ['wallet/getPreferences'],
     queryFn: () => walletPort.request('getPreferences'),
-    useErrorBoundary: true,
-    suspense: true,
   });
   const mutation = useOptimisticMutation(setPreferences, {
     relatedQueryKey: ['wallet/getPreferences'],
@@ -57,8 +55,6 @@ export function useGlobalPreferences() {
   const query = useQuery({
     queryKey: ['wallet/getGlobalPreferences'],
     queryFn: () => walletPort.request('getGlobalPreferences'),
-    useErrorBoundary: true,
-    suspense: true,
   });
 
   const mutation = useOptimisticMutation(setGlobalPreferences, {

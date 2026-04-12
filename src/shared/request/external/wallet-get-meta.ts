@@ -19,7 +19,7 @@ interface Response {
   data: WalletMeta[];
 }
 
-export async function getWalletsMeta(
+export async function walletGetMetadata(
   this: ApiContext,
   params: Payload,
   options: ClientOptions = CLIENT_DEFAULTS

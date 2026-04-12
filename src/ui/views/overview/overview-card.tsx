@@ -1,3 +1,4 @@
+import * as React from 'react';
 import { useState } from 'react';
 import {
   FiArrowDownLeft,
@@ -5,9 +6,9 @@ import {
   FiRefreshCw,
   FiShoppingCart,
 } from 'react-icons/fi';
-import { IoChevronDown, IoGlobeOutline } from 'react-icons/io5';
 import { LuHistory } from 'react-icons/lu';
 import { OverviewHeader } from './header';
+import { NetworkSelector } from './network-selector';
 
 type ActionKey = 'send' | 'receive' | 'swap' | 'buy' | 'history';
 
@@ -32,7 +33,6 @@ export function OverviewCard({
   balance = '$0.12',
   balanceChange = '+$35',
   onAction,
-  onNetworkSelect,
   onMenuOpen,
 }: Props) {
   const [pressedAction, setPressedAction] = useState<ActionKey | null>(null);
@@ -43,7 +43,6 @@ export function OverviewCard({
         <div className="bg-white dark:bg-[#171717] p-[14px] rounded-[20px]">
           <OverviewHeader onMenuOpen={onMenuOpen} />
 
-          {/* Balance */}
           <div className="mb-3">
             <p className="text-sm font-medium text-muted-foreground">
               Wallet (USD)
@@ -55,20 +54,9 @@ export function OverviewCard({
             </p>
           </div>
 
-          {/* Network Selector */}
-          <button
-            onClick={onNetworkSelect}
-            className="flex items-center justify-between p-2 bg-accent rounded-[20px] w-full hover:opacity-80 transition-opacity"
-          >
-            <div className="flex items-center gap-2 pl-1">
-              <IoGlobeOutline size={18} className="text-[#627eea]" />
-              <span className="text-sm">All Networks</span>
-            </div>
-            <IoChevronDown size={16} className="text-muted-foreground" />
-          </button>
+          <NetworkSelector />
         </div>
 
-        {/* Action Buttons */}
         <div className="grid grid-cols-5 gap-1 px-1 pt-2.5 pb-1">
           {ACTIONS.map(({ key, label, icon }) => (
             <button
