@@ -1,5 +1,4 @@
 import type { AnyAddressAction } from '@/modules/ethereum/transactions/addressAction';
-import { ViewTransition } from '@/ui/components/ViewTransition/ViewTransition';
 import { useAddressParams } from '@/ui/hooks/request/internal/useAddressParams';
 import { useUnifiedActivity } from '@/ui/views/actions/useUnifiedActivity';
 import {
@@ -344,17 +343,11 @@ function ActionHome() {
   );
 }
 
-const animatedRoutes = ['/actions', '/actions/filters'];
-
 export function Actions() {
   return (
-    <ViewTransition animatedRoutes={animatedRoutes}>
-      {(location) => (
-        <Routes location={location}>
-          <Route path="/" element={<ActionHome />} />
-          <Route path="/filters" element={<ActionFilters />} />
-        </Routes>
-      )}
-    </ViewTransition>
+    <Routes>
+      <Route path="/" element={<ActionHome />} />
+      <Route path="/filters" element={<ActionFilters />} />
+    </Routes>
   );
 }
