@@ -1,17 +1,21 @@
-import { RouteRestoration } from '@/shared/RouteRestoration';
-import { getWindowType } from '@/shared/window-type';
 import React from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
+
+import { RouteRestoration } from '@/shared/RouteRestoration';
+import { getWindowType } from '@/shared/window-type';
+import { ViewTransition } from '@/ui/components/ViewTransition/ViewTransition';
 import { RequireAuth } from './auth';
 import { SomeKindOfResolver } from './resolver';
 
-import { ViewTransition } from '@/ui/components/ViewTransition/ViewTransition';
-import { WalletSelect } from '@/ui/components/wallet';
 import { HandshakeFailure } from '@/ui/views/handshake-failure';
 import { Login } from '@/ui/views/login';
+import { Networks } from '@/ui/views/network';
 import { NetworkSelect } from '@/ui/views/network-select';
-import { Overview } from '@/ui/views/overview/overview';
-import { TestView } from '@/ui/views/test-view';
+import { Overview } from '@/ui/views/overview';
+import { WalletSelect } from '@/ui/views/select-wallet';
+
+import { Actions } from '@/ui/views/actions';
+import { TestView } from '@/ui/views/tests/test-view';
 
 function DefiSdkClientProvider({ children }: React.PropsWithChildren) {
   return <>{children}</>;
@@ -71,6 +75,22 @@ export function Views({ initialRoute }: { initialRoute?: string }) {
               element={
                 <RequireAuth>
                   <NetworkSelect />
+                </RequireAuth>
+              }
+            />
+            <Route
+              path="/networks/*"
+              element={
+                <RequireAuth>
+                  <Networks />
+                </RequireAuth>
+              }
+            />
+            <Route
+              path="/actions/*"
+              element={
+                <RequireAuth>
+                  <Actions />
                 </RequireAuth>
               }
             />

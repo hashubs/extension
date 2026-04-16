@@ -1,12 +1,17 @@
 import { EXTENSION } from '@/app/constants';
-import { API_URL, TESTNET_API_URL } from '@/env/config';
+import {
+  API_URL,
+  CRAWLER_API_URL,
+  DEFILLAMA_API_URL,
+  TESTNET_API_URL,
+} from '@/env/config';
 import { platform } from '@/shared/analytics/platform';
 import { createUrl } from '@/shared/create-url';
 import { invariant } from '@/shared/invariant';
 import { version } from '@/shared/package-version';
 import ky, { type Options as KyOptions } from 'ky';
 
-export type NetworksSource = 'mainnet' | 'testnet';
+export type NetworksSource = 'mainnet' | 'testnet' | 'crawler' | 'llama.fi';
 
 export interface BackendSourceParams {
   source: NetworksSource;
@@ -44,10 +49,18 @@ const resolveUrl = (input: UrlInput): string | URL => {
   } else {
     const { endpoint, source = 'mainnet' } = input;
     invariant(endpoint, 'endpoint param must be a string');
-    const base = source === 'testnet' ? TESTNET_API_URL : API_URL;
+    let base = API_URL;
+    if (source === 'testnet') {
+      base = TESTNET_API_URL;
+    } else if (source === 'crawler') {
+      base = CRAWLER_API_URL;
+    } else if (source === 'llama.fi') {
+      base = DEFILLAMA_API_URL;
+    }
+
     invariant(
       base,
-      `One of API URLs not found in env: ${TESTNET_API_URL}, ${API_URL}`
+      `One of API URLs not found in env: ${TESTNET_API_URL}, ${API_URL}, ${CRAWLER_API_URL}`
     );
     return createUrl({ base, pathname: endpoint });
   }

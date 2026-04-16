@@ -12,7 +12,7 @@ const getFormatter = memoize(
   }
 );
 
-export function formatPercent(
+export function formatPercentLocale(
   value: BigNumber.Value,
   locale: string,
   options?: { maximumFractionDigits?: number; minimumFractionDigits?: number }
@@ -25,4 +25,21 @@ export function formatPercent(
   );
   const sign = valueAsNumber < 0 ? minus : '';
   return `${sign}${formatter.format(Math.abs(valueAsNumber))}`;
+}
+
+export function formatPercentDisplay(value: number | null | undefined): string {
+  if (value == null) return '0.00%';
+  if (value === 0) return '+0.00%';
+
+  const sign = value >= 0 ? '+' : '-';
+  const absValue = Math.abs(value);
+
+  if (absValue >= 1_000_000) {
+    return `${sign}${(absValue / 1_000_000).toFixed(1)}M%`;
+  }
+  if (absValue >= 1_000) {
+    return `${sign}${(absValue / 1_000).toFixed(2)}K%`;
+  }
+
+  return `${sign}${absValue.toFixed(2)}%`;
 }

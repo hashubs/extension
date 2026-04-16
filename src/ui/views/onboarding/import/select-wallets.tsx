@@ -18,7 +18,7 @@ import { isSolanaAddress } from '@/modules/solana/shared';
 import { invariant } from '@/shared/invariant';
 import { isEthereumAddress } from '@/shared/is-ethereum-address';
 import { normalizeAddress } from '@/shared/normalize-address';
-import { formatPriceValue } from '@/shared/units/format-price-value';
+import { formatFiat } from '@/shared/units/format-fiat';
 import { wait } from '@/shared/wait';
 import { encodeForMasking } from '@/shared/wallet/encode-locally';
 import {
@@ -26,11 +26,13 @@ import {
   suggestInitialWallets,
 } from '@/ui/components/ImportWallet/Mnemonic/helpers';
 import { useAllExistingMnemonicAddresses } from '@/ui/hooks/request/internal/useAllExistingAddresses';
+import { useFiatConversion } from '@/ui/hooks/useFiatConversion';
 import { truncateAddress } from '@/ui/lib/utils';
 import { useQuery } from '@tanstack/react-query';
 import EcosystemEthereumIcon from 'jsx:src/ui/assets/ecosystem-ethereum.svg';
 import EcosystemSolanaIcon from 'jsx:src/ui/assets/ecosystem-solana.svg';
 import { FaChevronDown } from 'react-icons/fa6';
+import { ONBOARDING_ROUTES } from '../routes';
 import { SectionHeader } from '../section-header';
 
 type WalletEcosystem = 'evm' | 'solana';
@@ -67,8 +69,6 @@ const ECOSYSTEM_META: Record<
   },
 };
 
-import { ONBOARDING_ROUTES } from '../routes';
-
 export function SelectWallets() {
   const {
     selectedAddresses,
@@ -96,6 +96,8 @@ export function SelectWallets() {
 
   const isScanning = !!isDeriving || !!isCheckingActivity;
   const wallets = data?.derivedWallets || [];
+
+  const { convertUsdToFiat, defaultCurrency } = useFiatConversion();
 
   const existingAddresses = useAllExistingMnemonicAddresses();
   const existingAddressesSet = useMemo(
@@ -186,7 +188,7 @@ export function SelectWallets() {
 
     const totalValue = activeWallets?.[lookupKey]?.totalValue ?? 0;
 
-    return formatPriceValue(totalValue, 'en-US', 'USD');
+    return formatFiat(convertUsdToFiat(totalValue), defaultCurrency);
   };
 
   if (!mnemonic) return null;

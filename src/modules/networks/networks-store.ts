@@ -57,6 +57,10 @@ export class NetworksStore extends Store<State> {
     this.testnetMode = testnetMode;
   }
 
+  toString() {
+    return `NetworksStore-${this.testnetMode ? 'testnet' : 'mainnet'}`;
+  }
+
   private async updateNetworks() {
     const chainConfigs = await this.getOtherNetworkData?.();
     const savedChainConfigs = chainConfigs?.ethereumChainConfigs;

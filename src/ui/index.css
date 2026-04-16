@@ -175,7 +175,7 @@
 
 @layer base {
   * {
-    @apply border-muted-foreground/80 outline-ring/50 box-border;
+    @apply border-muted-foreground/80 outline-ring/50 box-border select-none;
   }
 
   ::-webkit-scrollbar {

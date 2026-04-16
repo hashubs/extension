@@ -6,6 +6,7 @@ type ItemBase = {
   iconRight?: IconType;
   label: string;
   subLabel?: string;
+  subLabelElement?: React.ReactNode;
   onClick?: () => void;
   onClickIconRight?: () => void;
   badge?: React.ReactNode;
@@ -67,11 +68,9 @@ export function CardItem({ item }: { item: ItemType }) {
       )}
     >
       <div className="flex items-center gap-3">
-        {/* Image */}
         {'imgUrl' in item && item.imgUrl !== undefined ? (
           <Image src={item.imgUrl} alt={item.label} disabled={disabled} />
-        ) : /* Arbitrary React node icon (e.g. SVG component) */
-        'iconNode' in item && item.iconNode ? (
+        ) : 'iconNode' in item && item.iconNode ? (
           <div
             className={cn(
               'w-8 h-8 rounded-lg flex items-center justify-center overflow-hidden shrink-0',
@@ -80,8 +79,7 @@ export function CardItem({ item }: { item: ItemType }) {
           >
             {item.iconNode}
           </div>
-        ) : /* react-icons IconType */
-        'icon' in item && item.icon ? (
+        ) : 'icon' in item && item.icon ? (
           <div
             className={cn(
               'w-8 h-8 rounded-lg flex items-center justify-center transition-colors',
@@ -114,6 +112,7 @@ export function CardItem({ item }: { item: ItemType }) {
               {item.subLabel}
             </span>
           )}
+          {item.subLabelElement}
         </div>
       </div>
 

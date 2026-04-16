@@ -11,10 +11,14 @@ import { NotificationWindow } from './notification-window/notification-window';
 import { transactionService } from './transactions/transaction-service';
 import { setUninstallURL } from './uninstall';
 import { globalPreferences } from './wallet/global-preferences';
+import { CurrencyController } from './currency/currency-controller';
 
 let didInitialize = false;
 
-export const ServiceLocator: { account?: Account } = {};
+export const ServiceLocator: {
+  account?: Account;
+  currencyController?: CurrencyController;
+} = {};
 
 export async function initialize() {
   if (didInitialize) {
@@ -35,6 +39,7 @@ export async function initialize() {
   const account = new Account({ notificationWindow });
   await account.initialize();
   const accountPublicRPC = new AccountPublicRPC(account);
+  const currencyController = new CurrencyController();
   // const dnaService = new DnaService({
   //   getWallet: () => account.getCurrentWallet(),
   // });
@@ -66,13 +71,16 @@ export async function initialize() {
     // referralProgramService,
     globalPreferences,
     notificationWindow,
+    currencyController,
   });
   ServiceLocator.account = account;
+  ServiceLocator.currencyController = currencyController;
   return {
     account,
     accountPublicRPC,
     transactionService,
     // dnaService,
     notificationWindow,
+    currencyController,
   };
 }

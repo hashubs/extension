@@ -1,0 +1,191 @@
+@host = https://wallet-server-v1.hashubs.workers.dev
+
+@addressNativeSOL = solana:mainnet/slip44:501
+@addressSOL = solana:mainnet/spl-token:omfgRBnxHsNJh6YeGbGAmWenNkenzsXyBXm3WDhmeta
+
+@addressNativeEVM = eip155:137/slip44:966
+@addressEVM = eip155:1/erc20:0x2b566950ba2298acef3c730cc0129b2f4fbd30a3
+
+@walletAddressEVM = 0x60E39eaD71123e5F7C8470F2aa83effb90fCb8d1
+@walletAddressSOL = EppJnCU4iXxYM1NWuVUnV9qzW1BCFiELMKWQW4dxMMWX
+
+@SOLANA_CHAIN = 792703809
+
+### Test Nightly
+# GET {{host}}/test/nightly/market-data?address=BgtczEGgf9mZMcGBLi4J5Pn8PtmFy6Xz5uBKkMfspump&chain=solana
+# Accept: application/json
+
+### 1. GET Token Info (Relay API)
+GET {{host}}/test/token?assetId={{addressEVM}}&include=metadata,market,pair
+Accept: application/json
+
+### 2. POST Search Token By Address
+POST {{host}}/api/currencies/v2
+Content-Type: application/json
+
+{
+  "chainIds":[143],
+  "address":"0x754704Bc059F8C67012fEd69BC8A327a5aafb603",
+  "defaultList":false,
+  "limit":12,
+  "useExternalSearch":true
+}
+
+### 3. POST Search Token List
+POST {{host}}/api/currencies/v2
+Content-Type: application/json
+{
+  "chainIds":[792703809],
+  "term":"usdc",
+  "defaultList":false,
+  "limit":12,
+  "depositAddressOnly":true
+}
+
+### 4. GET Trending Tokens
+GET {{host}}/api/currencies/trending?sortBy=coingecko6hTrending&limit=20
+Accept: application/json
+
+### 5. GET EVM Wallet Balances
+GET {{host}}/wallet/evm/{{walletAddressEVM}}/balances?chainIds=10
+Accept: application/json
+
+### 5.1 GET EVM Wallet Balances with offset
+GET {{host}}/wallet/evm/{{walletAddressEVM}}/balances?limit=1&offset=AQAAAAAAAAA
+Accept: application/json
+
+### 6. GET SVM Wallet Balances (Solana)
+GET {{host}}/wallet/svm/{{walletAddressSOL}}/balances
+Accept: application/json
+
+### 6.1 GET SVM Wallet Balances (Solana) with offset
+GET {{host}}/wallet/svm/{{walletAddressSOL}}/balances?limit=1&offset=AQAAAAAAAAA
+Accept: application/json
+
+### 7. GET EVM Wallet Activity (Zerion)
+GET {{host}}/wallet/activity?evmAddress={{walletAddressEVM}}&limit=10
+Accept: application/json
+
+### 8. GET EVM Wallet Activity (Zerion) Filter by Chain (CAIP-2)
+GET {{host}}/wallet/activity?evmAddress={{walletAddressEVM}}&chain=eip155:8453&limit=10
+Accept: application/json
+
+### 9. GET EVM Wallet Activity (Zerion) Filter by Asset (CAIP-19)
+GET {{host}}/wallet/activity?evmAddress={{walletAddressEVM}}&fungibleId=eth&limit=10
+Accept: application/json
+
+### 10. GET SVM Wallet Activity (Zerion)
+GET {{host}}/wallet/activity?svmAddress={{walletAddressSOL}}&limit=10
+Accept: application/json
+
+### Activity Transactions - EVM only
+POST {{host}}/wallet/activity
+Content-Type: application/json
+
+{
+  "addresses": ["0x60e39ead71123e5f7c8470f2aa83effb90fcb8d1"],
+  "currency": "usd",
+  "chain": "eip155:10",
+  "limit": 100
+}
+
+### Activity Transactions - SVM only
+POST {{host}}/wallet/activity
+Content-Type: application/json
+
+{
+  "addresses": ["DC715bNY31k7gHkJXbPqRunEFCg1686VYpLYKMJptmLX"],
+  "currency": "usd",
+  "limit": 10
+}
+
+### Activity Transactions - EVM + SVM (mixed)
+POST {{host}}/wallet/activity
+Content-Type: application/json
+
+{
+  "addresses": [
+    "0x60e39ead71123e5f7c8470f2aa83effb90fcb8d1",
+    "DC715bNY31k7gHkJXbPqRunEFCg1686VYpLYKMJptmLX"
+  ],
+  "currency": "usd",
+  "limit": 100
+}
+
+### Activity Transactions - with chain filter
+POST {{host}}/wallet/activity
+Content-Type: application/json
+
+{
+  "addresses": ["0x60e39ead71123e5f7c8470f2aa83effb90fcb8d1"],
+  "currency": "usd",
+  "chain": "ethereum",
+  "limit": 50
+}
+
+### Activity Transactions - with actionTypes filter
+POST {{host}}/wallet/portfolio/pnl
+Content-Type: application/json
+
+{
+  "addresses": ["0x60e39ead71123e5f7c8470f2aa83effb90fcb8d1"],
+  "currency": "usd",
+  "mode": "mainnet"
+}
+
+# Cr6v6hzmEGhxEHUiVtQRuVTj65cGRzhmKZ6mru8ARY1r
+
+### Portfolio Asset - Mainnet
+POST https://wallet-server-v1.hashubs.workers.dev/wallet/portfolio
+Content-Type: application/json
+
+{
+  "addresses": ["0x60e39ead71123e5f7c8470f2aa83effb90fcb8d1"],
+  "currency": "usd",
+  "portfolioType": ["asset"],
+  "mode": "testnet"
+}
+
+### asset Fungible info
+GET https://wallet-server-v1.hashubs.workers.dev/security/check?url=https://evmwallethealth.pages.dev
+
+### eip155:42220/slip44:52752 Celo
+GET {{host}}/asset/fungible?id=eip155:42220/slip44:52752:asset_6OSCwy-nZsqphwav8fwvi5oioialH6REd1criuuPo_RMKMX3sbahG72nsFc8LWGP
+
+### eip155:1625/erc20:0xe0720fcd29268f4e953ed37d0ab301bc04d65c1c ERC20
+GET {{host}}/asset/fungible?id=solana:mainnet/slip44:501:asset_qA5ECkBYpVlzn0XVv6blzgE8SGzdzEvDRB6PYOBBBST6tPgL_MNo7QWI0BTU7x7r
+
+### eip155:7777777/slip44:60:asset_w83SN0cYOjqvAKx0Tfl8Qg
+GET {{host}}/asset/fungible?id=eip155:137/slip44:966:asset_sXFs-jQFbBAYe5QTJgp6rjdivc8G5rT9kMghD5WIeiV5Pss4G9uJBwGEt6gfjIdQ
+
+###
+POST {{host}}/asset/fungible/chart
+Content-Type: application/json
+
+{
+  "addresses": ["0x60e39ead71123e5f7c8470f2aa83effb90fcb8d1"],
+  "currency": "usd",
+  "fungibleId": "asset_qA5ECkBYpVlzn0XVv6blzgE8SGzdzEvDRB6PYOBBBST6tPgL_MNo7QWI0BTU7x7r",
+  "period": "1d"
+}
+
+###
+POST {{host}}/wallet/address/activity
+Content-Type: application/json
+
+{
+  "addresses": ["0x1b10845bd3bfd221ccb679a963b76cb1264cfc88", "0x60e39ead71123e5f7c8470f2aa83effb90fcb8d1", "4anhhRQtFQCcJfrAywyvn5tFFDndz4RTw18UEenPg7CE", "DC715bNY31k7gHkJXbPqRunEFCg1686VYpLYKMJptmLX", "HPFUV6Ar6qajZTuSK7dA2bwSPKAw5oQDumB33iub4WbB"],
+  "currency": "usd",
+  "fungibleId": "asset_qA5ECkBYpVlzn0XVv6blzgE8SGzdzEvDRB6PYOBBBST6tPgL_MNo7QWI0BTU7x7r",
+  "period": "1d"
+}
+
+
+###
+POST {{host}}/wallet/meta/identifiers
+Content-Type: application/json
+
+{
+  "addresses": ["0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045", "0x064Bd35c9064fC3e628a3BE3310a1cf65488103D"],
+  "mode": "testnet"
+}

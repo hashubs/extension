@@ -1,12 +1,13 @@
 import { normalizeAddress } from '@/shared/normalize-address';
 import { middot } from '@/shared/typography';
-import { formatCurrencyToParts } from '@/shared/units/formatCurrencyValue';
+import { formatFiatToParts } from '@/shared/units/format-fiat';
 import { getAddressType } from '@/shared/wallet/classifiers';
 import { getWalletId } from '@/shared/wallet/wallet-list';
 import { BlockieAddress } from '@/ui/components/blockie';
 import { WalletDisplayName } from '@/ui/components/wallet';
 import { usePortfolioValues } from '@/ui/hooks/request/external/usePortfolioValues';
 import { WalletNameType } from '@/ui/hooks/request/internal/useProfileName';
+import { useFiatConversion } from '@/ui/hooks/useFiatConversion';
 import { cn } from '@/ui/lib/utils';
 import { NeutralDecimals } from '@/ui/ui-kit';
 import { useMemo } from 'react';
@@ -32,6 +33,8 @@ function WalletListItem({
 }) {
   const ecosystemPrefix =
     getAddressType(wallet.address) === 'evm' ? 'ETH' : 'SOL';
+
+  const { convertUsdToFiat, defaultCurrency } = useFiatConversion();
 
   return (
     <div
@@ -64,7 +67,10 @@ function WalletListItem({
           </span>
           <span className="text-xs text-muted-foreground truncate">
             <NeutralDecimals
-              parts={formatCurrencyToParts(wallet.valueUsd, 'en', 'USD')}
+              parts={formatFiatToParts(
+                convertUsdToFiat(wallet.valueUsd),
+                defaultCurrency
+              )}
             />
           </span>
         </div>
@@ -119,7 +125,7 @@ export function WalletList({
   const allAddresses = useMemo(
     () =>
       groups.flatMap(
-            (group) =>
+        (group) =>
           group.walletIds
             .map((walletId) => walletMap.get(walletId)?.wallet.address)
             .filter(Boolean) as string[]

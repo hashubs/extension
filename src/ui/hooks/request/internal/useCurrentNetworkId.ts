@@ -1,5 +1,5 @@
-import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { walletPort } from '@/shared/channel';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useEffect } from 'react';
 
 export const CURRENT_NETWORK_QUERY_KEY = ['wallet/getCurrentNetworkId'];

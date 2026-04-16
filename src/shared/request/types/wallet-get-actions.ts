@@ -207,7 +207,7 @@ type Act = {
   transaction: ActionTransaction;
 };
 
-type Action = {
+export type Action = {
   address: string;
   /** @description Unique identifier for the action */
   id: string;

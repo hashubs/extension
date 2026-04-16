@@ -137,6 +137,7 @@ initialize().then((values) => {
   notifyContentScriptsAndUIAboutInitialization();
   // const httpConnection = new HttpConnection(() => account.getCurrentWallet());
   const memoryCacheRPC = new MemoryCacheRPC();
+  const currencyController = values.currencyController;
 
   new ContentScriptManager().removeExpiredRecords().activate();
 
@@ -170,6 +171,12 @@ initialize().then((values) => {
     createPortMessageHandler({
       check: (port) => port.name === 'sessionCacheService',
       controller: new SessionCacheService(),
+    })
+  );
+  portRegistry.addMessageHandler(
+    createPortMessageHandler({
+      check: (port) => port.name === 'currencyPort',
+      controller: currencyController,
     })
   );
   portRegistry.addMessageHandler(

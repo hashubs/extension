@@ -16,7 +16,7 @@ const buttonVariants = cva(
           'bg-secondary text-secondary-foreground hover:enabled:bg-secondary/80',
         danger: 'bg-destructive/50 hover:enabled:bg-destructive/80',
         solid: 'bg-foreground text-background hover:enabled:bg-foreground/90',
-        outline: 'border border-accent',
+        outline: 'border border-muted-foreground/10',
         ghost: 'bg-transparent hover:enabled:bg-accent/80',
         'gradient-teal':
           'bg-gradient-to-r from-teal-600 to-teal-700 text-white shadow-lg shadow-teal-500/25 hover:enabled:bg-teal-600/80',

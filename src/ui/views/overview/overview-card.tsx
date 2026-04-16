@@ -1,4 +1,4 @@
-import * as React from 'react';
+import { useConnectionHeaderDrag } from '@/ui/hooks/useConnectionHeaderDrag';
 import { useState } from 'react';
 import {
   FiArrowDownLeft,
@@ -7,38 +7,42 @@ import {
   FiShoppingCart,
 } from 'react-icons/fi';
 import { LuHistory } from 'react-icons/lu';
+import { useNavigate } from 'react-router-dom';
 import { OverviewHeader } from './header';
 import { NetworkSelector } from './network-selector';
 
-type ActionKey = 'send' | 'receive' | 'swap' | 'buy' | 'history';
+type ActionKey = 'send' | 'receive' | 'swap' | 'buy' | 'actions';
 
 const ACTIONS: { key: ActionKey; label: string; icon: React.ReactNode }[] = [
   { key: 'send', label: 'Send', icon: <FiArrowUpRight size={18} /> },
   { key: 'receive', label: 'Receive', icon: <FiArrowDownLeft size={18} /> },
   { key: 'swap', label: 'Swap', icon: <FiRefreshCw size={18} /> },
   { key: 'buy', label: 'Buy', icon: <FiShoppingCart size={18} /> },
-  { key: 'history', label: 'History', icon: <LuHistory size={18} /> },
+  { key: 'actions', label: 'History', icon: <LuHistory size={18} /> },
 ];
+
+type DragHandlers = ReturnType<typeof useConnectionHeaderDrag>['dragHandlers'];
 
 interface Props {
   accountName?: string;
   balance?: string;
   balanceChange?: string;
-  onAction?: (action: ActionKey) => void;
-  onNetworkSelect?: () => void;
   onMenuOpen?: () => void;
+  dragHandlers?: DragHandlers;
 }
 
 export function OverviewCard({
   balance = '$0.12',
   balanceChange = '+$35',
-  onAction,
   onMenuOpen,
+  dragHandlers,
 }: Props) {
+  const navigate = useNavigate();
+
   const [pressedAction, setPressedAction] = useState<ActionKey | null>(null);
 
   return (
-    <div className="p-1.5">
+    <div className="p-1.5" {...dragHandlers}>
       <div className="p-1.5 rounded-[24px] bg-[#f6f6f8] dark:bg-[#1f1f1f]">
         <div className="bg-white dark:bg-[#171717] p-[14px] rounded-[20px]">
           <OverviewHeader onMenuOpen={onMenuOpen} />
@@ -64,7 +68,7 @@ export function OverviewCard({
               onMouseDown={() => setPressedAction(key)}
               onMouseUp={() => setPressedAction(null)}
               onMouseLeave={() => setPressedAction(null)}
-              onClick={() => onAction?.(key)}
+              onClick={() => navigate(`/${key}`)}
               className="flex flex-col items-center gap-1.5 bg-transparent border-none cursor-pointer p-1.5"
             >
               <div

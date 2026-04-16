@@ -1,9 +1,7 @@
-import type {
-  DeviceAccount,
-  ExternallyOwnedAccount,
-} from '@/background/wallet/model/account-container';
 import { setCurrentAddress } from '@/shared/request/internal/setCurrentAddress';
 import type { BareWallet } from '@/shared/types/bare-wallet';
+import { DeviceAccount } from '@/shared/types/device';
+import { ExternallyOwnedAccount } from '@/shared/types/externally-owned-account';
 import type { BlockchainType } from '@/shared/wallet/classifiers';
 import { Header } from '@/ui/components/header';
 import { WalletList } from '@/ui/components/wallet/wallet-list/wallet-list';

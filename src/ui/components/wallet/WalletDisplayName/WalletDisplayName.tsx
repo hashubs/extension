@@ -1,4 +1,4 @@
-import { ExternallyOwnedAccount } from '@/background/wallet/model/account-container';
+import { ExternallyOwnedAccount } from '@/shared/types/externally-owned-account';
 import { useProfileName } from '@/ui/hooks/request/internal/useProfileName';
 import { cn } from '@/ui/lib/utils';
 import React from 'react';

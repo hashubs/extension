@@ -1,3 +1,4 @@
+import { PortfolioType } from '../external/wallet-get-portfolio';
 import { ActionType } from './wallet-get-actions';
 
 export interface Payload {
@@ -27,4 +28,12 @@ export interface Payload {
   searchQuery?: string;
   /** @description Include spam transactions */
   includeSpam?: boolean;
+  /** @description Include testnet chains for positions */
+  includeTestnet?: boolean;
+  /** @description Portfolio type */
+  portfolioType?: PortfolioType;
+  /** @description Time interval for chart data */
+  period?: '1h' | '1d' | '1w' | '1m' | '1y' | 'max';
+  /** @description Environment mode (default: mainnet) */
+  mode?: 'mainnet' | 'testnet';
 }

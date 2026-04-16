@@ -1,8 +1,9 @@
 import { invariant } from '@/shared/invariant';
+import { BACKEND_NETWORK_ORIGIN } from '../ethereum/chains/constants';
 import { toCustomNetworkId } from '../ethereum/chains/helpers';
 import type { AddEthereumChainParameter } from '../ethereum/types/add-ethereum-chain-parameter';
 import type { NetworkConfig } from './network-config';
-import { Networks } from './networks';
+import { NetworkConfigMetaData, Networks } from './networks';
 
 export function toNetworkConfig(
   value: AddEthereumChainParameter,
@@ -26,7 +27,7 @@ export function toNetworkConfig(
     explorer_address_url: null,
     explorer_name: null,
     explorer_token_url: null,
-    explorer_tx_url: null,
+    explorer_tx_url: value.blockExplorerUrls?.[0] || null,
     explorer_urls: null,
     icon_url: value.iconUrls?.[0] || '',
     native_asset: {
@@ -61,6 +62,7 @@ export function toAddEthereumChainParameter(
     | 'name'
     | 'icon_url'
     | 'explorer_tx_url'
+    | 'explorer_home_url'
     | 'hidden'
     | 'is_testnet'
     | 'specification'
@@ -80,11 +82,42 @@ export function toAddEthereumChainParameter(
       decimals: (item.native_asset?.decimals || NaN) as 18,
       name: item.native_asset?.name || '<unknown>',
     },
-    chainId: Networks.getChainId(item),
+    chainId: Networks.isEip155(item)
+      ? Networks.getChainId(item)
+      : (item as any).id || '0',
     chainName: item.name,
-    blockExplorerUrls: item.explorer_tx_url ? [item.explorer_tx_url] : [],
+    blockExplorerUrls: item.explorer_tx_url
+      ? [item.explorer_tx_url]
+      : item.explorer_home_url
+      ? [item.explorer_home_url]
+      : [],
     iconUrls: [item.icon_url],
     hidden: item.hidden,
     is_testnet: item.is_testnet,
   };
+}
+
+export function getOriginUrlFromMetaData(metadata: NetworkConfigMetaData) {
+  if (
+    metadata.origin === globalThis.location.origin ||
+    metadata.origin === BACKEND_NETWORK_ORIGIN
+  ) {
+    return null;
+  }
+  try {
+    const url = new URL(metadata.origin);
+    return url.hostname;
+  } catch (error) {
+    return metadata.origin;
+  }
+}
+
+export function getChainCaip(network: NetworkConfig): string {
+  if (network.standard === 'eip155' && network.specification.eip155) {
+    return `eip155:${network.specification.eip155.id}`;
+  }
+  if (network.standard === 'solana') {
+    return network.is_testnet ? 'solana:devnet' : 'solana:mainnet';
+  }
+  return network.id;
 }

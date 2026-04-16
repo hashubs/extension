@@ -1,8 +1,5 @@
 import { ViewTransition } from '@/ui/components/ViewTransition/ViewTransition';
-import { WalletSelect } from '@/ui/components/wallet';
 import { initialize as initializeApperance } from '@/ui/features/appearance';
-import { HandshakeFailure } from '@/ui/views/handshake-failure';
-import { Login } from '@/ui/views/login';
 import {
   ChooseGlobalProviderGuard,
   RequestAccounts,
@@ -10,6 +7,10 @@ import {
 import { Navigate, Route, Routes } from 'react-router-dom';
 import { BaseApp } from '../base/App';
 import { RequireAuth } from '../base/auth';
+
+import { HandshakeFailure } from '@/ui/views/handshake-failure';
+import { Login } from '@/ui/views/login';
+import { WalletSelect } from '@/ui/views/select-wallet';
 
 initializeApperance();
 

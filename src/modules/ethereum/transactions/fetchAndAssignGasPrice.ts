@@ -78,7 +78,11 @@ async function fetchGasPriceForTransaction(
 ): Promise<ChainGasPrice> {
   const chainId = resolveChainId(transaction);
   const network = wrappedGetNetworkById(networks, chainId);
-  return fetchGasPrice({ network, source, apiClient });
+  return fetchGasPrice({
+    network,
+    source: source as 'mainnet' | 'testnet',
+    apiClient,
+  });
 }
 
 export function hasGasEstimation(transaction: IncomingTransaction) {

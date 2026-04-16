@@ -119,7 +119,7 @@ export class Networks {
    * Update this predicate when adding new supported ecosystems
    */
   static isSupportedEcosystem(network: NetworkConfig) {
-    return Networks.isEip155(network) || network.id === 'solana';
+    return Networks.isEip155(network) || network.standard === 'solana';
   }
 
   constructor({

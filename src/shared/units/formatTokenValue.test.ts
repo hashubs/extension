@@ -1,4 +1,4 @@
-import { roundTokenValue } from './format-token-value';
+import { roundTokenValue } from './format-token';
 
 const testCases = [
   ['19500.035', '19500.035'],

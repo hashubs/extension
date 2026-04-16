@@ -73,3 +73,8 @@ export function useGlobalPreferences() {
     setGlobalPreferencesAsync: mutation.mutateAsync,
   };
 }
+
+export function useIsTestnetMode() {
+  const { preferences } = usePreferences();
+  return Boolean(preferences?.testnetMode?.on);
+}

@@ -1,8 +1,8 @@
 import { EXTENSION } from '@/app/constants';
-import type { ExternallyOwnedAccount } from '@/background/wallet/model/account-container';
 import { Permission } from '@/background/wallet/model/types';
 import { walletPort, windowPort } from '@/shared/channel';
 import { focusNode } from '@/shared/focus-node';
+import { ExternallyOwnedAccount } from '@/shared/types/externally-owned-account';
 import type { BlockchainType } from '@/shared/wallet/classifiers';
 import { BlockieAddress } from '@/ui/components/blockie';
 import { DappSecurityCheck } from '@/ui/components/DappSecurityCheck/DappSecurityCheck';

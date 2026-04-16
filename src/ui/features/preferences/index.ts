@@ -1,1 +1,1 @@
-export { usePreferences } from './usePreferences';
+export { usePreferences, useIsTestnetMode } from './usePreferences';

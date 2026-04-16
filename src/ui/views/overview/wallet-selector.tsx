@@ -23,6 +23,7 @@ export function WalletSelector() {
   return (
     <div
       onClick={handleSelectWallet}
+      role="button"
       className="flex items-center gap-2.5 cursor-pointer"
     >
       <BlockieAddress address={address} size={32} borderRadius={6} />

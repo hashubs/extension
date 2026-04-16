@@ -1,37 +1,67 @@
-// import { QUERY_KEYS } from '@/constants/query-key';
-// import {
-//   sanitizePortfolio,
-//   type SanitizedPortfolio,
-// } from '@/lib/token/sanitize-portfolio';
-// import { buildFromServerBalance } from '@/lib/token/token-builders';
-// import { SenthiumAPI } from '@/modules/api/senthium-api.client';
-// import { persistentQuery } from '@/shared/query-client/queryClientPersistence';
-// import { useQuery } from '@tanstack/react-query';
+import {
+  SanitizedPortfolio,
+  sanitizePortfolio,
+} from '@/shared/fungible/sanitize-portfolio';
+import { buildFromServerBalance } from '@/shared/fungible/token-builders';
+import { ApiClient } from '@/shared/request/api.client';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useEffect } from 'react';
+import { useWalletAddresses } from '../internal/useWalletAddresses';
 
-// interface Params {
-//   evmAddress?: string;
-//   svmAddress?: string;
-//   enabled?: boolean;
-// }
+interface Params {
+  addresses: string[];
+  enabled?: boolean;
+  mode: 'mainnet' | 'testnet';
+}
 
-// export function useWalletPortfolio({
-//   evmAddress,
-//   svmAddress,
-//   enabled = true,
-// }: Params) {
-//   return useQuery<SanitizedPortfolio[]>({
-//     queryKey: persistentQuery[('walletGetPortfolio', evmAddress, svmAddress)],
-//     queryFn: async () => {
-//       const res = await SenthiumAPI.walletGetPortfolio({
-//         addresses: [evmAddress, svmAddress].filter(Boolean) as string[],
-//         currency: 'usd',
-//         portfolioType: 'asset',
-//       });
-//       return res.data.map((item) =>
-//         buildFromServerBalance(sanitizePortfolio(item))
-//       );
-//     },
-//     enabled: enabled && !!(evmAddress || svmAddress),
-//     staleTime: 30_000,
-//   });
-// }
+export function useWalletPortfolio({
+  addresses,
+  enabled = true,
+  mode = 'mainnet',
+}: Params) {
+  return useQuery<SanitizedPortfolio[]>({
+    queryKey: ['wallet/portfolio', addresses, mode],
+    queryFn: async () => {
+      const res = await ApiClient.walletGetPortfolio({
+        addresses: addresses.filter(Boolean),
+        currency: 'usd',
+        portfolioType: 'asset',
+        mode,
+      });
+      return res.data.map((item) =>
+        buildFromServerBalance(sanitizePortfolio(item), mode === 'testnet')
+      );
+    },
+    enabled: enabled && addresses.length > 0,
+    staleTime: 30_000,
+  });
+}
+
+export function usePrefetchWalletPortfolio() {
+  const queryClient = useQueryClient();
+  const { data: addresses } = useWalletAddresses();
+
+  useEffect(() => {
+    if (!addresses || addresses.length === 0) return;
+
+    const modes: ('mainnet' | 'testnet')[] = ['mainnet', 'testnet'];
+
+    modes.forEach((mode) => {
+      queryClient.prefetchQuery({
+        queryKey: ['wallet-portfolio', addresses, mode],
+        queryFn: async () => {
+          const res = await ApiClient.walletGetPortfolio({
+            addresses: addresses.filter(Boolean),
+            currency: 'usd',
+            portfolioType: 'asset',
+            mode,
+          });
+          return res.data.map((item) =>
+            buildFromServerBalance(sanitizePortfolio(item), mode === 'testnet')
+          );
+        },
+        staleTime: 30_000,
+      });
+    });
+  }, [addresses, queryClient]);
+}

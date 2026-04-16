@@ -85,7 +85,7 @@ const DrawerContent = React.forwardRef<
             {description}
           </DrawerDescription>
         )}
-        <div className="bg-muted my-2 h-1 w-[100px] rounded-full mx-auto hidden shrink-0 group-data-[vaul-drawer-direction=bottom]/drawer-content:block" />
+        <div className="bg-muted my-2 h-1 w-[50px] rounded-full mx-auto hidden shrink-0 group-data-[vaul-drawer-direction=bottom]/drawer-content:block" />
         {children}
       </DrawerPrimitive.Content>
     </DrawerPortal>

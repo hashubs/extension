@@ -1,14 +1,12 @@
-import { EXTENSION } from '@/app/constants';
-import { invariant } from '@/shared/invariant';
-import { Payload } from '@/shared/request/types/payload';
-import { AddressAction } from '@/shared/request/types/wallet-get-actions';
 import { produce } from 'immer';
-import type { ApiContext } from '../api-bare';
-import type { ClientOptions } from '../shared';
-import { CLIENT_DEFAULTS, HttpClient } from '../shared';
+import { invariant } from '../../../shared/invariant';
+import { ApiContext } from '../api-bare';
+import { CLIENT_DEFAULTS, ClientOptions, HttpClient } from '../shared';
+import { Payload } from '../types/payload';
+import { Action } from '../types/wallet-get-actions';
 
 export interface Response {
-  data: AddressAction[];
+  data: Action[];
   meta: {
     pagination: {
       /**
@@ -27,15 +25,12 @@ export async function walletGetActions(
   options: ClientOptions = CLIENT_DEFAULTS
 ) {
   invariant(params.addresses.length > 0, 'Addresses param is empty');
-  const firstAddress = params.addresses[0];
-  const provider = await this.getAddressProviderHeader(firstAddress);
   const kyOptions = this.getKyOptions();
-  const endpoint = 'wallet/get-actions/v1';
+  const endpoint = '/wallet/activity';
   const result = await HttpClient.post<Response>(
     {
       endpoint,
       body: JSON.stringify(params),
-      headers: { [`${EXTENSION.slug}-wallet-provider`]: provider },
       ...options,
     },
     kyOptions

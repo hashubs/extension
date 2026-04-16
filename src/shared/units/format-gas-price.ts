@@ -1,5 +1,5 @@
 import { baseToCommon, commonToBase } from './convert';
-import { roundTokenValue } from './format-token-value';
+import { roundTokenValue } from './format-token';
 
 export const GWEI_DECIMALS = 9;
 

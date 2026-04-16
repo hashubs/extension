@@ -1,6 +1,6 @@
-import { ExternallyOwnedAccount } from '@/background/wallet/model/account-container';
 import type { BareWallet } from '@/shared/types/bare-wallet';
 import type { DeviceAccount } from '@/shared/types/device';
+import { ExternallyOwnedAccount } from '@/shared/types/externally-owned-account';
 import { isReadonlyAccount } from '@/shared/types/validators';
 import {
   DEFAULT_WALLET_LIST_GROUP_ID,

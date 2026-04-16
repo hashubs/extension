@@ -1,5 +1,3 @@
-export {
-  PauseInjectionControl,
-  PausedHeader,
-  usePausedData,
-} from './PauseInjection';
+export { PausedHeader } from './PausedHeader';
+export { PauseInjectionDrawer } from './PauseInjectionDrawer';
+export { usePausedData } from './usePausedData';

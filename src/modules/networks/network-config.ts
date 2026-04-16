@@ -35,12 +35,12 @@ interface NetworkConfigBase {
   is_testnet?: boolean;
   name: string;
   icon_url: string;
-  explorer_token_url: string | null;
-  explorer_tx_url: string | null;
-  explorer_address_url: string | null;
-  explorer_home_url: string | null;
-  explorer_name: string | null;
-  explorer_urls: string[] | null;
+  explorer_token_url?: string | null;
+  explorer_tx_url?: string | null;
+  explorer_address_url?: string | null;
+  explorer_home_url?: string | null;
+  explorer_name?: string | null;
+  explorer_urls?: string[] | null;
   /**
    * The node URL that we use internally and do not expose to dApps.
    */

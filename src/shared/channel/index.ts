@@ -12,6 +12,7 @@ import browser from 'webextension-polyfill';
 import type { SessionCacheService } from '@/background/resource/session-cache-service';
 import { emitter } from '@/shared/events';
 import { navigateProgrammatically } from '@/shared/programmatic';
+import type { CurrencyRPC } from '@/shared/types/currency';
 import type { RPCPort } from './channels.types';
 
 export const walletPort = new PortMessageChannel({
@@ -44,6 +45,10 @@ export const memoryCacheRPCPort = new PortMessageChannel({
 export const sessionCacheService = new PortMessageChannel({
   name: 'sessionCacheService',
 }) as RPCPort<SessionCacheService>;
+
+export const currencyPort = new PortMessageChannel({
+  name: 'currencyPort',
+}) as RPCPort<CurrencyRPC>;
 
 class WindowPort extends PortMessageChannel {
   static maybeRestoreRouteForSidepanel() {
@@ -92,6 +97,7 @@ export function initialize() {
   windowPort.initialize();
   // dnaServicePort.initialize();
   sessionCacheService.initialize();
+  currencyPort.initialize();
   // initDnaApi();
 
   walletPort.emitter.on('message', (msg) => {

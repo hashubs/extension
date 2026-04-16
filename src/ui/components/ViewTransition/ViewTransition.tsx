@@ -119,6 +119,7 @@ export function ViewTransition({
 
   return (
     <div
+      id="view-transition-container"
       style={{
         position: 'relative',
         height: '100%',
