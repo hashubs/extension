@@ -45,7 +45,7 @@ export const FungibleItem = memo(
             {!hiddenBadge && <ChainBadge caip={data.assetId} />}
           </div>
           <div>
-            <p className="truncate max-w-[150px] text-sm">
+            <p className="truncate max-w-[150px] text-sm font-medium">
               {symbolOnly ? data.symbol : data.name}
             </p>
             <div className="flex items-center gap-1.5">
@@ -66,7 +66,7 @@ export const FungibleItem = memo(
         </div>
 
         <div className="text-right">
-          <p className="text-foreground text-sm">
+          <p className="text-foreground text-sm font-medium">
             {formatFiat(convertUsdToFiat(data.valueUsd), defaultCurrency)}
           </p>
           <p className="text-muted-foreground truncate max-w-[150px] text-[12px] m-0">

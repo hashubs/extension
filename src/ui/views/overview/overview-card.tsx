@@ -8,8 +8,8 @@ import {
 } from 'react-icons/fi';
 import { LuHistory } from 'react-icons/lu';
 import { useNavigate } from 'react-router-dom';
-import { OverviewHeader } from './header';
 import { NetworkSelector } from './network-selector';
+import { OverviewHeader } from './overview-header';
 
 type ActionKey = 'send' | 'receive' | 'swap' | 'buy' | 'actions';
 
@@ -28,6 +28,7 @@ interface Props {
   balance?: string;
   balanceChange?: string;
   onMenuOpen?: () => void;
+  onConnectionSite?: () => void;
   dragHandlers?: DragHandlers;
 }
 
@@ -35,6 +36,7 @@ export function OverviewCard({
   balance = '$0.12',
   balanceChange = '+$35',
   onMenuOpen,
+  onConnectionSite,
   dragHandlers,
 }: Props) {
   const navigate = useNavigate();
@@ -45,7 +47,10 @@ export function OverviewCard({
     <div className="p-1.5" {...dragHandlers}>
       <div className="p-1.5 rounded-[24px] bg-[#f6f6f8] dark:bg-[#1f1f1f]">
         <div className="bg-white dark:bg-[#171717] p-[14px] rounded-[20px]">
-          <OverviewHeader onMenuOpen={onMenuOpen} />
+          <OverviewHeader
+            onMenuOpen={onMenuOpen}
+            onConnectionSite={onConnectionSite}
+          />
 
           <div className="mb-3">
             <p className="text-sm font-medium text-muted-foreground">

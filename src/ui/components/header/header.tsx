@@ -17,7 +17,7 @@ export function Header({ title, onBack, right }: Props) {
       >
         <LuChevronLeft size={20} />
       </button>
-      <h1 className="text-base font-semibold tracking-wide">{title}</h1>
+      <h1 className="text-base font-medium tracking-wide">{title}</h1>
       {right}
     </div>
   );

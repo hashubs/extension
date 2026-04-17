@@ -11,14 +11,14 @@ import { cn } from '@/ui/lib/utils';
 function Popover({ onOpenChange, ...props }: PopoverPrimitive.Root.Props) {
   const handleOpenChange = React.useCallback(
     (open: boolean, eventDetails: PopoverRootChangeEventDetails) => {
-      // const el = document.getElementById('view-transition-container');
-      // if (el) {
-      //   if (open) {
-      //     el.style.setProperty('overflow', 'unset');
-      //   } else {
-      //     el.style.setProperty('overflow', 'hidden');
-      //   }
-      // }
+      const el = document.getElementById('view-transition-container');
+      if (el) {
+        if (open) {
+          el.style.setProperty('overflow', 'unset');
+        } else {
+          el.style.setProperty('overflow', 'hidden');
+        }
+      }
       onOpenChange?.(open, eventDetails);
     },
     [onOpenChange]

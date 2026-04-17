@@ -98,7 +98,12 @@ export function AddNetwork() {
 
   return (
     <div className="flex flex-col h-full overflow-hidden relative">
-      <Header title="Add Network" onBack={() => navigate(-1)} />
+      <Header
+        title="Add Network"
+        onBack={() =>
+          navigate('/settings/networks', { state: { direction: 'back' } })
+        }
+      />
 
       <Tabs
         defaultValue="browse"

@@ -102,32 +102,30 @@ export function ActionsList({
     <div className="flex flex-col gap-6" style={{ alignContent: 'start' }}>
       <div className="flex flex-col gap-6 w-full">
         {emptyTargetDay && targetDate && !isLoading && (
-          <div className="flex flex-col gap-2">
+          <div className="flex flex-col gap-2 p-4 w-full">
             <div className="flex items-center gap-3">
-              <div className="flex pl-2">
-                <ActionDaySelector
-                  trigger={
-                    <span className="text-[13px] font-bold text-foreground">
-                      {new Intl.DateTimeFormat('en', {
-                        dateStyle: 'medium',
-                      }).format(targetDate)}
-                    </span>
-                  }
-                  selectedDate={targetDate}
-                  maxDate={TODAY}
-                  minDate={FIRST_DATE}
-                  onDateSelect={onChangeDate}
-                />
-              </div>
+              <ActionDaySelector
+                trigger={
+                  <span className="text-[13px] font-medium text-foreground">
+                    {new Intl.DateTimeFormat('en', {
+                      dateStyle: 'medium',
+                    }).format(targetDate)}
+                  </span>
+                }
+                selectedDate={targetDate}
+                maxDate={TODAY}
+                minDate={FIRST_DATE}
+                onDateSelect={onChangeDate}
+              />
               <button
                 type="button"
                 onClick={() => onChangeDate(null)}
-                className="text-[13px] font-semibold text-blue-500 hover:text-blue-400 truncate"
+                className="text-[13px] font-semibold text-teal-500 hover:text-teal-400 truncate"
               >
                 Show Latest Actions
               </button>
             </div>
-            <div className="px-4 py-3 mx-4 rounded-lg bg-muted/10 text-[13px] text-muted-foreground">
+            <div className="text-[13px] text-muted-foreground">
               No transactions found for this day.
             </div>
           </div>
@@ -161,7 +159,7 @@ export function ActionsList({
                     <div className="flex">
                       <ActionDaySelector
                         trigger={
-                          <span className="text-[14px] font-bold text-foreground hover:opacity-80 transition-opacity">
+                          <span className="text-[14px] font-medium text-foreground hover:opacity-80 transition-opacity">
                             {new Intl.DateTimeFormat('en', {
                               dateStyle: 'medium',
                             }).format(Number(item.timestamp))}

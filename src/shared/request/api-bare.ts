@@ -1,4 +1,6 @@
 import type { Options as KyOptions } from 'ky';
+import { assetGetFungibleChart } from './external/asset-get-fungible-chart';
+import { assetGetFungibleInfo } from './external/asset-get-fungible-info';
 import { crawlTokenImages } from './external/crawl-token-images';
 import { defillamaGetAssetChart } from './external/defillama-get-asset-chart';
 import { defillamaGetPriceFungible } from './external/defillama-get-price-fungible';
@@ -33,6 +35,9 @@ export const ApiBare = {
   walletGetPortfolioPnl,
   walletGetPortfolioSummary,
   walletGetPortfolioValues,
+
+  assetGetFungibleChart,
+  assetGetFungibleInfo,
 
   defillamaGetPriceFungible,
   defillamaGetAssetChart,

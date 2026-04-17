@@ -1,0 +1,90 @@
+import type { Theme } from '@/ui/features/appearance';
+import type { ChartPoint } from './types';
+
+export function toScatterData<T>(points: ChartPoint<T>[]) {
+  return points.map(([x, y, extra]) => ({ x, y, extra }));
+}
+
+export function getChartColor({
+  theme,
+  isPositive,
+  isHighlighted,
+}: {
+  theme: Theme;
+  isPositive: boolean;
+  isHighlighted: boolean;
+}) {
+  return isPositive
+    ? theme === 0
+      ? isHighlighted
+        ? '#99dbb4'
+        : '#1fc260'
+      : isHighlighted
+      ? '#2d4435'
+      : '#31b566'
+    : theme === 1
+    ? isHighlighted
+      ? '#ffd0c9'
+      : '#ff4a4a'
+    : isHighlighted
+    ? '#8a393b'
+    : '#ff5c5c';
+}
+
+export function getSortedRangeIndexes({
+  startRangeIndex,
+  endRangeIndex,
+}: {
+  startRangeIndex: number | null;
+  endRangeIndex: number | null;
+}) {
+  if (startRangeIndex === null) {
+    return { startRangeIndex, endRangeIndex };
+  }
+  if (endRangeIndex === null) {
+    return { startRangeIndex: endRangeIndex, endRangeIndex: startRangeIndex };
+  }
+  if (startRangeIndex > endRangeIndex) {
+    return { startRangeIndex: endRangeIndex, endRangeIndex: startRangeIndex };
+  }
+  return { startRangeIndex, endRangeIndex };
+}
+
+/**
+ * For the charts with small value dispersion, we need to show it more flat
+ * to avoid the illusion of big price changes
+ */
+const FLAT_CHART_MIN_MAX_RATIO = 1.005;
+
+export function getYLimits(points: ChartPoint[]) {
+  const values = points.map(([, value]) => value);
+  const minLimit = Math.min(...values);
+  const maxLimit = Math.max(...values);
+  const diff = maxLimit - minLimit;
+  if (minLimit && maxLimit / minLimit < FLAT_CHART_MIN_MAX_RATIO) {
+    const flatChartYOffset = diff * 5;
+    return {
+      min: minLimit - flatChartYOffset,
+      max: maxLimit + flatChartYOffset,
+    };
+  }
+  // Small offset to avoid chart points and active item indicator
+  // be partially hidden by the chart container border
+  const normalChartYOffset = diff * 0.05;
+  return {
+    min: minLimit - normalChartYOffset,
+    max: maxLimit + normalChartYOffset,
+  };
+}
+
+const CHART_RIGHT_PADDING = 0.05; // 5% offset on the right side of the chart
+
+export function getXLimits(points: ChartPoint[]) {
+  const firstPoint = points.at(0)?.[0] || 0;
+  const lastPoint = points.at(-1)?.[0] || 0;
+  const diff = lastPoint - firstPoint;
+  return {
+    min: firstPoint,
+    max: lastPoint + diff * CHART_RIGHT_PADDING,
+  };
+}

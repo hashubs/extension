@@ -18,6 +18,7 @@ type ItemBase = {
   rightElement?: React.ReactNode;
   disabled?: boolean;
   classNameLabel?: string;
+  isItemStart?: boolean;
 };
 
 type ItemWithIcon = ItemBase & {
@@ -67,7 +68,12 @@ export function CardItem({ item }: { item: ItemType }) {
         item.className
       )}
     >
-      <div className="flex items-center gap-3">
+      <div
+        className={cn(
+          'flex items-center gap-3',
+          item.isItemStart ? 'items-start' : 'items-center'
+        )}
+      >
         {'imgUrl' in item && item.imgUrl !== undefined ? (
           <Image src={item.imgUrl} alt={item.label} disabled={disabled} />
         ) : 'iconNode' in item && item.iconNode ? (
@@ -108,7 +114,12 @@ export function CardItem({ item }: { item: ItemType }) {
             {item.label}
           </span>
           {item.subLabel && (
-            <span className="text-xs text-muted-foreground max-w-[200px] truncate">
+            <span
+              className={cn(
+                'text-xs text-muted-foreground max-w-[200px]',
+                !item.isItemStart && 'truncate'
+              )}
+            >
               {item.subLabel}
             </span>
           )}

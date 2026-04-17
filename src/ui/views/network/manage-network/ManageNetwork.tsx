@@ -137,7 +137,10 @@ export function ManageNetwork() {
 
   return (
     <div className="flex flex-col h-full no-scrollbar">
-      <Header title="Network" onBack={() => navigate(-1)} />
+      <Header
+        title="Network"
+        onBack={() => navigate('/settings', { state: { direction: 'back' } })}
+      />
 
       <div className="flex-1 p-4 pt-0 space-y-4 no-scrollbar overflow-y-auto">
         {!isSolana && (

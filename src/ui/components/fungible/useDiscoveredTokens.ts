@@ -16,7 +16,7 @@ import { useCrawlTokenImages } from '@/ui/hooks/request/external/use-crawl-token
 import { useWalletPortfolio } from '@/ui/hooks/request/external/use-wallet-portfolio';
 import { useNetworks } from '@/ui/hooks/request/internal/useNetworks';
 import { keepPreviousData, useQueries, useQuery } from '@tanstack/react-query';
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 
 export function useDiscoveredTokens(
   address: string | null,
@@ -46,6 +46,7 @@ export function useDiscoveredTokens(
         Boolean(n.is_testnet) === (mode === 'testnet') &&
         !n.hidden
     );
+
     if (activeNetworkId && activeNetworkId !== 'all') {
       const filtered = baseNetworks.filter(
         (n: NetworkConfig) => n.id === activeNetworkId
@@ -57,46 +58,57 @@ export function useDiscoveredTokens(
   }, [allNetworks, address, addressType, activeNetworkId, mode]);
 
   const customTokens = useMemo(() => {
-    return allCustomTokens.filter((token: CustomToken) => {
-      return token.accountAddress?.toLowerCase() === address?.toLowerCase();
-    });
+    return allCustomTokens.filter(
+      (token: CustomToken) =>
+        token.accountAddress?.toLowerCase() === address?.toLowerCase()
+    );
   }, [allCustomTokens, address]);
 
   const serverPortfolioQuery = useWalletPortfolio({
     addresses: address ? [address] : [],
     enabled: !!address && !(addressType === 'solana' && mode === 'testnet'),
-    mode: mode,
+    mode,
   });
 
-  const serverPortfolio = useMemo(() => {
-    return serverPortfolioQuery.data ?? [];
-  }, [serverPortfolioQuery.data]);
+  const serverPortfolio = useMemo(
+    () => serverPortfolioQuery.data ?? [],
+    [serverPortfolioQuery.data]
+  );
 
   const hasServerData = serverPortfolio.length > 0;
 
-  const serverAssetIdSet = useMemo(() => {
-    return new Set(serverPortfolio.map((bt) => bt.assetId));
-  }, [serverPortfolio]);
+  const serverAssetIdSet = useMemo(
+    () => new Set(serverPortfolio.map((bt) => bt.assetId)),
+    [serverPortfolio]
+  );
 
-  const serverNativeChainSet = useMemo(() => {
-    return new Set(
-      serverPortfolio
-        .filter((bt) => bt.type === 'TOKEN_TYPE_NATIVE')
-        .map((bt) => bt.assetId.split('/')[0])
-    );
-  }, [serverPortfolio]);
+  const serverNativeChainSet = useMemo(
+    () =>
+      new Set(
+        serverPortfolio
+          .filter((bt) => bt.type === 'TOKEN_TYPE_NATIVE')
+          .map((bt) => bt.assetId.split('/')[0])
+      ),
+    [serverPortfolio]
+  );
+
+  const chainsNeedingRpc = useMemo(() => {
+    return activeChains.filter((chain) => {
+      const caip = getChainCaip(chain);
+      return (
+        !hasServerData || !!chain.is_testnet || !serverNativeChainSet.has(caip)
+      );
+    });
+  }, [activeChains, hasServerData, serverNativeChainSet]);
 
   const nativeTokenRpcQueries = useQueries({
-    queries: activeChains.map((chain) => {
+    queries: chainsNeedingRpc.map((chain) => {
       const caip = getChainCaip(chain);
-      const nativeExistsInServer = serverNativeChainSet.has(caip);
       return {
         queryKey: ['token-balances', 'native-fallback', caip, address, mode],
         queryFn: () =>
           ApiClient.rpcTokenBalancesBatch([chain], address || '', []),
-        enabled:
-          !!address &&
-          (!hasServerData || !!chain.is_testnet || !nativeExistsInServer),
+        enabled: !!address,
         staleTime: 30_000,
         refetchInterval: 60_000,
         placeholderData: keepPreviousData,
@@ -104,18 +116,32 @@ export function useDiscoveredTokens(
     }),
   });
 
+  const chainByCaipPrefix = useMemo(() => {
+    const map = new Map<string, NetworkConfig>();
+    activeChains.forEach((c) => {
+      map.set(getChainCaip(c), c as NetworkConfig);
+    });
+    return map;
+  }, [activeChains]);
+
+  const customTokensNeedingRpc = useMemo(() => {
+    return customTokens.filter(
+      (token: CustomToken) => !serverAssetIdSet.has(token.assetId)
+    );
+  }, [customTokens, serverAssetIdSet]);
+
   const customTokenRpcQueries = useQueries({
-    queries: customTokens.map((token: CustomToken) => {
-      const chain = activeChains.find((c) => {
-        const caip = getChainCaip(c);
-        return token.assetId.startsWith(`${caip}/`);
-      });
+    queries: customTokensNeedingRpc.map((token: CustomToken) => {
+      const chainCaip = (token.assetId || '').split('/')[0];
+      const chain = chainByCaipPrefix.get(chainCaip);
 
       return {
         queryKey: ['token-balances', 'custom', token.assetId, address, mode],
         queryFn: () =>
           chain
-            ? ApiClient.rpcTokenBalancesBatch([chain], address || '', [token])
+            ? ApiClient.rpcTokenBalancesBatch([chain as any], address || '', [
+                token,
+              ])
             : Promise.resolve({}),
         enabled: !!address && !!chain,
         staleTime: 30_000,
@@ -139,21 +165,19 @@ export function useDiscoveredTokens(
   const missingPriceTokenIds = useMemo(() => {
     const ids = new Set<string>();
 
-    activeChains.forEach((c) => {
+    chainsNeedingRpc.forEach((c) => {
       const caip = getChainCaip(c);
       if (!serverNativeChainSet.has(caip)) {
         ids.add(caip);
       }
     });
 
-    customTokens.forEach((ct: CustomToken) => {
-      if (!serverAssetIdSet.has(ct.assetId)) {
-        ids.add(ct.assetId);
-      }
+    customTokensNeedingRpc.forEach((ct: CustomToken) => {
+      ids.add(ct.assetId);
     });
 
     return Array.from(ids).sort();
-  }, [activeChains, customTokens, serverAssetIdSet, serverNativeChainSet]);
+  }, [chainsNeedingRpc, customTokensNeedingRpc, serverNativeChainSet]);
 
   const marketPriceQuery = useQuery({
     queryKey: ['token-prices', 'unified', missingPriceTokenIds.join(','), mode],
@@ -166,8 +190,8 @@ export function useDiscoveredTokens(
         if (parts.length === 1 || parts[1]?.startsWith('slip44:')) {
           nativeChainIds.push(parts[0]);
         } else {
-          const address = parts[1]?.split(':').slice(1).join(':') || '';
-          tokenEntries.push({ assetId, address });
+          const addr = parts[1]?.split(':').slice(1).join(':') || '';
+          tokenEntries.push({ assetId, address: addr });
         }
       }
 
@@ -184,48 +208,22 @@ export function useDiscoveredTokens(
 
   const marketPriceData = marketPriceQuery.data || {};
 
-  const chainIds = useMemo(
-    () => activeChains.map((c) => getChainCaip(c)),
+  const activeChainIds = useMemo(
+    () =>
+      new Set(activeChains.map((c) => (getChainCaip(c) || '').toLowerCase())),
     [activeChains]
   );
-
-  useEffect(() => {
-    const nativePrices: Record<string, number> = {};
-
-    if (hasServerData) {
-      serverPortfolio.forEach((bt) => {
-        if (bt.type === 'TOKEN_TYPE_NATIVE' && bt.priceUsd) {
-          const chainId = (bt.assetId || '').split('/')[0];
-          if (chainId) nativePrices[chainId] = bt.priceUsd;
-        }
-      });
-    }
-
-    if (marketPriceQuery.data) {
-      for (const chainId of chainIds) {
-        if (!nativePrices[chainId] && marketPriceQuery.data[chainId]) {
-          nativePrices[chainId] = marketPriceQuery.data[chainId].price;
-        }
-      }
-    }
-  }, [hasServerData, serverPortfolio, marketPriceQuery.data, chainIds]);
-
-  const activeChainIds = useMemo(() => {
-    return new Set(
-      activeChains.map((c) => (getChainCaip(c) || '').toLowerCase())
-    );
-  }, [activeChains]);
 
   const allTokens = useMemo(() => {
     const map = new Map<string, SanitizedPortfolio>();
 
     if (hasServerData) {
-      serverPortfolio.forEach((bt) => {
+      for (const bt of serverPortfolio) {
         const parsed = parseCaip19(bt.assetId);
-        if (!parsed) return;
+        if (!parsed) continue;
 
         const caip = parsed.caip.toLowerCase();
-        if (!activeChainIds.has(caip)) return;
+        if (!activeChainIds.has(caip)) continue;
 
         const mapKey =
           bt.type === 'TOKEN_TYPE_NATIVE'
@@ -236,67 +234,83 @@ export function useDiscoveredTokens(
           ...bt,
           valueUsd: (bt.priceUsd || 0) * Number(bt.amount),
         });
-      });
+      }
     }
 
-    activeChains.forEach((chain) => {
+    for (const chain of chainsNeedingRpc) {
       const caip = getChainCaip(chain);
       const tokenKey = (caip || '').toLowerCase();
-      if (map.has(tokenKey)) return;
+      if (map.has(tokenKey)) continue;
 
       const balance = rpcBalanceMap?.[caip];
-      const price = marketPriceData[caip]?.price || 0;
-      const priceChange = marketPriceData[caip]?.priceChange || 0;
-      const token = buildNativeToken(chain, balance, { price, priceChange });
+      const priceInfo = marketPriceData[caip];
+      const token = buildNativeToken(chain, balance, {
+        price: priceInfo?.price || 0,
+        priceChange: priceInfo?.priceChange || 0,
+      });
 
       map.set(tokenKey, token);
-    });
+    }
 
-    customTokens.forEach((ct: CustomToken) => {
+    for (const ct of customTokens) {
       const chainId = (ct.assetId || '').split('/')[0].toLowerCase();
-      if (!activeChainIds.has(chainId)) return;
+      if (!activeChainIds.has(chainId)) continue;
 
       const balance = rpcBalanceMap?.[ct.assetId];
-      const price = marketPriceData[ct.assetId]?.price || 0;
-      const priceChange = marketPriceData[ct.assetId]?.priceChange || 0;
+      const priceInfo = marketPriceData[ct.assetId];
       const token = buildCustomToken(
         ct,
         balance,
-        { price, priceChange },
+        {
+          price: priceInfo?.price || 0,
+          priceChange: priceInfo?.priceChange || 0,
+        },
         mode === 'testnet'
       );
 
       map.set((token.assetId || '').toLowerCase(), token);
-    });
+    }
 
     return Array.from(map.values());
   }, [
-    activeChains,
-    hasServerData,
-    serverPortfolio,
-    rpcBalanceMap,
-    customTokens,
-    marketPriceData,
     activeChainIds,
+    chainsNeedingRpc,
+    customTokens,
+    hasServerData,
+    marketPriceData,
+    mode,
+    rpcBalanceMap,
+    serverPortfolio,
   ]);
 
-  const isLoading = serverPortfolioQuery.isLoading || isNetworksLoading;
-
-  const visibleTokens = useMemo(
-    () => allTokens.filter((t) => !t.hidden),
-    [allTokens]
-  );
-
-  const hiddenTokens = useMemo(
-    () => allTokens.filter((t) => t.hidden),
-    [allTokens]
-  );
+  const { visibleTokens, hiddenTokens } = useMemo(() => {
+    const visible: SanitizedPortfolio[] = [];
+    const hidden: SanitizedPortfolio[] = [];
+    for (const t of allTokens) {
+      if (t.hidden) {
+        hidden.push(t);
+      } else {
+        visible.push(t);
+      }
+    }
+    return { visibleTokens: visible, hiddenTokens: hidden };
+  }, [allTokens]);
 
   const { mutate: crawlImages } = useCrawlTokenImages();
+  const crawlCalledRef = useRef(false);
+
   useEffect(() => {
-    if (isLoading || !address) return;
+    if (isNetworksLoading || serverPortfolioQuery.isLoading || !address) return;
+    if (crawlCalledRef.current) return;
+    crawlCalledRef.current = true;
     crawlImages({ walletAddress: address });
-  }, [isLoading, address, crawlImages]);
+  }, [isNetworksLoading, serverPortfolioQuery.isLoading, address, crawlImages]);
+
+  useEffect(() => {
+    crawlCalledRef.current = false;
+  }, [address]);
+
+  const isLoading = serverPortfolioQuery.isLoading || isNetworksLoading;
 
   return {
     data: visibleTokens,

@@ -246,7 +246,9 @@ function ActionHome() {
           <button
             type="button"
             className="size-[30px] rounded-[9px] flex items-center justify-center bg-muted hover:bg-muted/80"
-            onClick={() => navigate('/overview')}
+            onClick={() =>
+              navigate('/overview', { state: { direction: 'back' } })
+            }
             aria-label="Back"
           >
             <LuChevronLeft size={20} />

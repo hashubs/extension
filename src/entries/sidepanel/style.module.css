@@ -5,6 +5,6 @@
 
 .layoutSidepanel :global(#root) {
   width: 100%;
-  max-width: 400px; /* Matching the popup width for consistency */
+  max-width: 700px;
   margin-inline: auto;
 }

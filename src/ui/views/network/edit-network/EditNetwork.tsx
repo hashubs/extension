@@ -97,7 +97,9 @@ export function EditNetwork() {
     <div className="flex flex-col h-full overflow-hidden relative">
       <Header
         title={network.name}
-        onBack={() => navigate(-1)}
+        onBack={() =>
+          navigate('/settings/networks', { state: { direction: 'back' } })
+        }
         right={
           isCustomNetworkId(network.id) && (
             <Button

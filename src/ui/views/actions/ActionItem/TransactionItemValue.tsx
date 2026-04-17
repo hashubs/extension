@@ -13,7 +13,6 @@ import { useFiatConversion } from '@/ui/hooks/useFiatConversion';
 import { cn } from '@/ui/lib/utils';
 import { useMemo } from 'react';
 
-// Sign helper matching Zerion
 function getSign(
   decimaledValue?: number | string,
   direction?: ActionDirection | null
@@ -28,7 +27,6 @@ export function HistoryTokenValue({
   amount,
   fungible,
   direction,
-  // withLink, // We'll ignore links for now to keep it simple and within Senthium patterns
   kind,
 }: {
   actionType?: ActionType;

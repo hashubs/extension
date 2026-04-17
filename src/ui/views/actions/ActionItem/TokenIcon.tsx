@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState } from 'react';
 
 interface BaseProps {
   src?: string | null;
@@ -16,32 +16,32 @@ export function TokenIcon({ src, symbol, size = 32, style, title }: Props) {
     <div
       data-image-src={String(src)}
       style={{
-        userSelect: "none",
-        backgroundColor: "#282a2d",
-        borderRadius: "50%",
-        textAlign: "center",
+        userSelect: 'none',
+        backgroundColor: '#282a2d',
+        borderRadius: '50%',
+        textAlign: 'center',
         lineHeight: `${size}px`,
         fontSize: size <= 24 ? 8 : size <= 36 ? 10 : 14,
         width: size,
         height: size,
-        color: "white",
+        color: 'white',
         ...style,
       }}
     >
-      {symbol?.slice(0, 3) || "???"}
+      {symbol?.slice(0, 3) || '???'}
     </div>
   );
 
   return src && !hasError ? (
     <img
       src={src}
-      alt={title || symbol || ""}
+      alt={title || symbol || ''}
       title={title}
       style={{
         width: size,
         height: size,
-        display: "block",
-        borderRadius: "50%", // Senthium assets generally are rounded
+        display: 'block',
+        borderRadius: '50%',
         ...style,
       }}
       onError={() => setHasError(true)}

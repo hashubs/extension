@@ -48,7 +48,7 @@ export function PhishingWarning({ url, onClose }: Props) {
         </div>
 
         <p className="text-gray-400 text-base leading-relaxed mb-4">
-          Senthium has blocked this site because it was identified as a known
+          Selvo has blocked this site because it was identified as a known
           phishing or malicious domain.
         </p>
 

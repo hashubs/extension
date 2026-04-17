@@ -14,7 +14,8 @@ import { useCallback, useEffect, useMemo } from 'react';
 import { IoChevronForward } from 'react-icons/io5';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 
-import AllNetworksIcon from 'url:@/ui/assets/all-networks.png';
+const AllNetworkImage =
+  'https://pub-c00e8ea6219e4be79477cc4888b05ffe.r2.dev/all-networks.png';
 
 export function NetworkSelector() {
   const navigate = useNavigate();
@@ -78,7 +79,6 @@ export function NetworkSelector() {
 
   const networkIcon = useMemo(() => {
     if (activeNetwork && networkId !== 'all') {
-      console.log('[LOG NETWORK SELECTOR] activeNetwork', activeNetwork);
       const caip = `${activeNetwork.standard}:${activeNetwork.specification.eip155?.id}`;
       const logo = activeNetwork.icon_url || getChainLogo(caip);
       return logo;
@@ -88,10 +88,9 @@ export function NetworkSelector() {
         ? NetworkId.SolanaDevnet
         : NetworkId.Solana;
       const solanaNet = networks?.getByNetworkId(createChain(targetId));
-      console.log('[LOG NETWORK SELECTOR] solanaNet', solanaNet);
-      return solanaNet?.icon_url || AllNetworksIcon;
+      return solanaNet?.icon_url || AllNetworkImage;
     }
-    return AllNetworksIcon;
+    return AllNetworkImage;
   }, [activeNetwork, networkId, isSolanaWallet, networks, isTestnetMode]);
 
   return (
@@ -99,12 +98,12 @@ export function NetworkSelector() {
       onClick={isSolanaWallet ? undefined : handleSelectNetwork}
       role="button"
       className={cn(
-        'flex items-center justify-between px-2.5 py-1.5 bg-accent/50 rounded-full transition-colors',
+        'flex items-center justify-between px-2.5 py-2 bg-accent/50 rounded-full transition-colors',
         isSolanaWallet ? 'cursor-default' : 'cursor-pointer hover:bg-accent'
       )}
     >
       <div className="flex items-center gap-1.5">
-        <div className="w-[18px] h-[18px] shrink-0 flex items-center justify-center overflow-hidden rounded-full">
+        <div className="size-[18px] shrink-0 flex items-center justify-center overflow-hidden rounded-full">
           <Image
             key={networkIcon}
             src={networkIcon}

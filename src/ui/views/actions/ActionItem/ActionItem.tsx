@@ -14,7 +14,7 @@ function ActionTitle({ addressAction }: { addressAction: AnyAddressAction }) {
   const actionTitle = `${titlePrefix}${addressAction.type.displayValue}`;
 
   return (
-    <span className="text-[15px] font-bold text-foreground truncate">
+    <span className="text-[15px] font-medium text-foreground truncate">
       {actionTitle}
     </span>
   );

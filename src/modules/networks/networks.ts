@@ -330,6 +330,27 @@ export class Networks {
     }
   }
 
+  getChainByCaip(caip: string): NetworkConfig {
+    const [namespace, reference] = caip.split(':');
+
+    if (namespace === 'eip155') {
+      const chainId = normalizeChainId(reference) as ChainId;
+      return this.getNetworkById(chainId);
+    }
+
+    if (namespace === 'solana') {
+      const network = this.solanaNetworks.find(
+        (n) => n.id === reference || n.id.toLowerCase().includes('solana')
+      );
+      if (!network) {
+        throw new UnsupportedNetwork(`Unsupported CAIP network: ${caip}`);
+      }
+      return network;
+    }
+
+    throw new UnsupportedNetwork(`Unsupported CAIP namespace: ${namespace}`);
+  }
+
   isNativeAsset(asset: Asset, chainId: ChainId): boolean {
     const network = this.getNetworkById(chainId);
     return Networks.isNativeAsset(asset, network);

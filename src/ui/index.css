@@ -189,6 +189,8 @@
     color: var(--primary);
     background-color: var(--background);
     display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr;
     --body-width: 400px;
     --body-height: 600px;
     width: var(--body-width);

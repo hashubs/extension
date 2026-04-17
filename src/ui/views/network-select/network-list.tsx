@@ -13,7 +13,9 @@ import { cn } from '@/ui/lib/utils';
 import { Card, CardItem } from '@/ui/ui-kit/card';
 
 import { NetworkConfig } from '@/modules/networks/network-config';
-import AllNetworksIcon from 'url:@/ui/assets/all-networks.png';
+
+const AllNetworkImage =
+  'https://pub-c00e8ea6219e4be79477cc4888b05ffe.r2.dev/all-networks.png';
 
 const compareNetworks = (a: any, b: any) => {
   const aString = a.name.toString().toLowerCase();
@@ -183,7 +185,7 @@ export function NetworkList({
           item={{
             label: 'All Networks',
             subLabel: 'View assets across all chains',
-            imgUrl: AllNetworksIcon,
+            imgUrl: AllNetworkImage,
             onClick: () => onSelect('all'),
             iconRight: activeNetworkId === 'all' ? IoCheckmark : undefined,
             iconRightClassName: 'text-green-500 rounded-none',

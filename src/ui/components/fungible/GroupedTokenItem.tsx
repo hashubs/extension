@@ -64,7 +64,7 @@ export function GroupedTokenItem({
               </div>
 
               <div>
-                <p className="font-semibold text-sm">{first.name}</p>
+                <p className="text-sm">{first.name}</p>
                 <div className="flex items-center gap-1 mt-0.5">
                   {previewChains.map((h) => {
                     const assetId = h.assetId;
@@ -92,7 +92,7 @@ export function GroupedTokenItem({
             </div>
 
             <div className="text-right">
-              <p className="text-foreground font-semibold text-sm">
+              <p className="text-foreground text-sm">
                 {formatFiat(convertUsdToFiat(totalValueUsd), defaultCurrency)}
               </p>
               <p className="text-muted-foreground text-[12px] m-0">

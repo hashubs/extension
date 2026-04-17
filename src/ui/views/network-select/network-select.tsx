@@ -73,7 +73,10 @@ export function NetworkSelect() {
 
   return (
     <div className="flex flex-col h-full overflow-hidden">
-      <Header title="Select Network" onBack={() => navigate(-1)} />
+      <Header
+        title="Select Network"
+        onBack={() => navigate('/overview', { state: { direction: 'back' } })}
+      />
 
       <div className="flex flex-col flex-1 min-h-0 px-4 space-y-4">
         <Input

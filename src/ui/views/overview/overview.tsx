@@ -1,8 +1,7 @@
-import { SortOption } from '@/shared/fungible/tokens-sort';
+import { SanitizedPortfolio } from '@/shared/fungible/sanitize-portfolio';
 import { formatFiat, formatFiatToParts } from '@/shared/units/format-fiat';
-import { FungibleList } from '@/ui/components/fungible/FungibleList';
+import { FungibleListGroupedVirtual } from '@/ui/components/fungible/FungibleListGroupedVirtual';
 import { useDiscoveredTokens } from '@/ui/components/fungible/useDiscoveredTokens';
-import { useWalletPortfolioPnl } from '@/ui/hooks/request/external/use-wallet-portfolio-pnl';
 import { useWalletPortfolioSummary } from '@/ui/hooks/request/external/use-wallet-portfolio-summary';
 import { useAddressParams } from '@/ui/hooks/request/internal/useAddressParams';
 import {
@@ -11,36 +10,77 @@ import {
 } from '@/ui/hooks/request/internal/useCurrentNetworkId';
 import { usePrefetchWalletGroups } from '@/ui/hooks/request/internal/useWalletGroups';
 import { useFiatConversion } from '@/ui/hooks/useFiatConversion';
-import { Button, NeutralDecimals } from '@/ui/ui-kit';
-import { useMemo, useState } from 'react';
+import { NeutralDecimals } from '@/ui/ui-kit';
+import { memo, useCallback, useEffect, useMemo, useState } from 'react';
 import { FaWallet } from 'react-icons/fa6';
 import { LuPlus } from 'react-icons/lu';
 import { useNavigate } from 'react-router-dom';
-import { ConnectionHeaderReveal } from './connection-header';
+import { ConnectionSite } from './connection-site';
 import { OverviewCard } from './overview-card';
 
+interface TokenHeaderProps {
+  totalValueUsd: number;
+  convertUsdToFiat: (usd: number) => number;
+  defaultCurrency: string;
+  onImport: () => void;
+}
+
+const TokenHeader = memo(function TokenHeader({
+  totalValueUsd,
+  convertUsdToFiat,
+  defaultCurrency,
+  onImport,
+}: TokenHeaderProps) {
+  return (
+    <div className="flex items-center justify-between mb-4">
+      <div className="flex items-center gap-2">
+        <FaWallet size={15} />
+        <span className="text-sm font-medium">
+          <NeutralDecimals
+            parts={formatFiatToParts(
+              convertUsdToFiat(totalValueUsd),
+              defaultCurrency
+            )}
+          />
+        </span>
+      </div>
+
+      <button
+        onClick={onImport}
+        className="flex items-center gap-[7px] hover:opacity-80 transition-opacity"
+      >
+        <LuPlus size={15} />
+        <span className="font-medium text-sm">Import</span>
+      </button>
+    </div>
+  );
+});
+
 export function Overview() {
+  console.time('Overview Render');
+  useEffect(() => {
+    console.timeEnd('Overview Render');
+  });
+
   const navigate = useNavigate();
 
   usePrefetchWalletGroups();
   usePrefetchCurrentNetworkId();
 
   const { networkId: storedNetworkId } = useCurrentNetworkId();
-
   const { singleAddress: currentAddress } = useAddressParams();
 
-  const [sortValue, setSortValue] = useState<SortOption>('native-top');
-  const [showSortSelector, setShowSortSelector] = useState(false);
+  const isAllNetworks = !storedNetworkId || storedNetworkId === 'all';
+
+  const [isConnectionSite, setIsConnectionSite] = useState(false);
+  const [scrollElement, setScrollElement] = useState<HTMLDivElement | null>(
+    null
+  );
 
   const { data, hiddenTokens, isLoading } = useDiscoveredTokens(
     currentAddress,
     storedNetworkId || 'all'
   );
-
-  const { data: portfolioPnl } = useWalletPortfolioPnl({
-    addresses: [currentAddress],
-  });
-  console.log('[Overview] portfolioPnl', portfolioPnl);
 
   const { data: portfolioSummary } = useWalletPortfolioSummary({
     addresses: [currentAddress],
@@ -48,74 +88,65 @@ export function Overview() {
 
   const { convertUsdToFiat, defaultCurrency } = useFiatConversion();
 
-  const isAllNetworks = !storedNetworkId || storedNetworkId === 'all';
-
   const totalValueUsd = useMemo(() => {
-    const visible = data?.reduce((sum, h) => sum + (h.valueUsd || 0), 0) || 0;
+    const visible = data?.reduce((sum, h) => sum + (h.valueUsd || 0), 0) ?? 0;
     const hidden =
-      hiddenTokens?.reduce((sum, h) => sum + (h.valueUsd || 0), 0) || 0;
+      hiddenTokens?.reduce((sum, h) => sum + (h.valueUsd || 0), 0) ?? 0;
     return visible + hidden;
   }, [data, hiddenTokens]);
 
-  const balanceFormatted = formatFiat(
-    convertUsdToFiat(portfolioSummary?.totalValue || 0),
-    defaultCurrency
+  const balanceFormatted = useMemo(
+    () =>
+      formatFiat(
+        convertUsdToFiat(portfolioSummary?.totalValue || 0),
+        defaultCurrency
+      ),
+    [portfolioSummary?.totalValue, convertUsdToFiat, defaultCurrency]
   );
 
+  const handleImport = useCallback(() => navigate('/import-token'), [navigate]);
+
+  const handleTokenClick = useCallback(
+    (token: SanitizedPortfolio) => {
+      navigate(`/fungible/${encodeURIComponent(token.id)}`);
+    },
+    [navigate]
+  );
+
+  const handleConnectionSite = () => {
+    setIsConnectionSite(!isConnectionSite);
+  };
+
   return (
-    <ConnectionHeaderReveal>
-      {(dragHandlers) => (
-        <div
-          className="w-full h-full flex flex-col select-none"
-          {...dragHandlers}
-        >
-          <OverviewCard
-            balance={balanceFormatted}
-            dragHandlers={dragHandlers}
-          />
+    <div
+      ref={setScrollElement}
+      className="w-full h-full min-h-0 overflow-y-auto flex flex-col"
+    >
+      <ConnectionSite isHidden={!isConnectionSite} />
 
-          <Button variant="secondary" onClick={() => navigate('/test-view')}>
-            Test View
-          </Button>
+      <OverviewCard
+        balance={balanceFormatted}
+        onMenuOpen={() => navigate('/settings')}
+        onConnectionSite={handleConnectionSite}
+      />
 
-          <div className="flex-1 p-4">
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-2">
-                <FaWallet size={15} />
-                <span className="text-sm font-medium">
-                  <NeutralDecimals
-                    parts={formatFiatToParts(
-                      convertUsdToFiat(totalValueUsd),
-                      defaultCurrency
-                    )}
-                  />
-                </span>
-              </div>
+      <div className="flex-1 p-4">
+        <TokenHeader
+          totalValueUsd={totalValueUsd}
+          convertUsdToFiat={convertUsdToFiat}
+          defaultCurrency={defaultCurrency}
+          onImport={handleImport}
+        />
 
-              <button
-                onClick={() => navigate('/import-token')}
-                className="flex items-center gap-[7px] hover:opacity-80 transition-opacity"
-              >
-                <LuPlus size={15} />
-                <span className="font-medium text-sm">Import</span>
-              </button>
-            </div>
-
-            <FungibleList
-              data={data || []}
-              hiddenData={hiddenTokens || []}
-              sortOrder={sortValue}
-              isLoading={isLoading}
-              grouped={isAllNetworks}
-              hiddenBadge={!isAllNetworks}
-              onTokenClick={(token) => {
-                console.log('Token clicked:', token);
-                // navigate(`/fungible/${token.assetId}`);
-              }}
-            />
-          </div>
-        </div>
-      )}
-    </ConnectionHeaderReveal>
+        <FungibleListGroupedVirtual
+          data={data || []}
+          hiddenData={hiddenTokens || []}
+          isLoading={isLoading}
+          hiddenBadge={!isAllNetworks}
+          scrollElement={scrollElement}
+          onTokenClick={handleTokenClick}
+        />
+      </div>
+    </div>
   );
 }

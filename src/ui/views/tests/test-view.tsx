@@ -12,7 +12,10 @@ export function TestView() {
 
   return (
     <div className="mt-8 space-y-4">
-      <Header title="Test View" onBack={() => navigate(-1)} />
+      <Header
+        title="Test View"
+        onBack={() => navigate('/overview', { state: { direction: 'back' } })}
+      />
 
       <CurrencySelector />
       <div className="grid grid-cols-2 gap-3">

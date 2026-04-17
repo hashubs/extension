@@ -15,13 +15,15 @@ import { Overview } from '@/ui/views/overview';
 import { WalletSelect } from '@/ui/views/select-wallet';
 
 import { Actions } from '@/ui/views/actions';
+import { FungibleInfo } from '@/ui/views/fungible-info';
+import { Settings } from '@/ui/views/settings';
 import { TestView } from '@/ui/views/tests/test-view';
 
 function DefiSdkClientProvider({ children }: React.PropsWithChildren) {
   return <>{children}</>;
 }
 
-const animatedRoutes = ['/overview'];
+const animatedRoutes = ['/overview', '/actions', '/settings'];
 
 const excludedTransitions = [
   { from: '/', to: '/overview' },
@@ -63,6 +65,14 @@ export function Views({ initialRoute }: { initialRoute?: string }) {
               }
             />
             <Route
+              path="/fungible/:id"
+              element={
+                <RequireAuth>
+                  <FungibleInfo />
+                </RequireAuth>
+              }
+            />
+            <Route
               path="/select-wallet"
               element={
                 <RequireAuth>
@@ -91,6 +101,14 @@ export function Views({ initialRoute }: { initialRoute?: string }) {
               element={
                 <RequireAuth>
                   <Actions />
+                </RequireAuth>
+              }
+            />
+            <Route
+              path="/settings/*"
+              element={
+                <RequireAuth>
+                  <Settings />
                 </RequireAuth>
               }
             />

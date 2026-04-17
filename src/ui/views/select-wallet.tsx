@@ -84,7 +84,10 @@ export function WalletSelect() {
 
   return (
     <div className="flex flex-col h-full overflow-hidden bg-background">
-      <Header title="Select Wallet" onBack={() => navigate(-1)} />
+      <Header
+        title="Select Wallet"
+        onBack={() => navigate('/overview', { state: { direction: 'back' } })}
+      />
 
       <div className="px-4 pb-3 pt-0.5 border-b border-muted-foreground/10">
         <Input
