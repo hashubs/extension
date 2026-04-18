@@ -39,7 +39,7 @@ const NetworkRow = React.memo(
     metadata?: NetworkConfigMetaData;
     groupKey: string;
     dateFormatter: Intl.DateTimeFormat;
-    onSelect: (id: string) => void;
+    onSelect: (id: string, name: string) => void;
   }) => {
     const caip = `${item.standard}:${item.specification.eip155?.id}`;
     const logoUrl = groupKey === 'other' ? getChainLogo(caip) : item.icon_url;
@@ -74,7 +74,7 @@ const NetworkRow = React.memo(
           label: item.name,
           subLabel,
           imgUrl: logoUrl,
-          onClick: () => onSelect(item.id),
+          onClick: () => onSelect(item.id, item.name),
           iconRight: isActive ? IoCheckmark : undefined,
           iconRightClassName: 'text-green-500 hover:text-green-500',
           className: cn(
@@ -89,7 +89,7 @@ const NetworkRow = React.memo(
 
 interface NetworkListProps {
   activeNetworkId: string;
-  onSelect: (networkId: string) => void;
+  onSelect: (networkId: string, networkName: string) => void;
   searchQuery?: string;
 }
 
@@ -186,7 +186,7 @@ export function NetworkList({
             label: 'All Networks',
             subLabel: 'View assets across all chains',
             imgUrl: AllNetworkImage,
-            onClick: () => onSelect('all'),
+            onClick: () => onSelect('all', 'All Networks'),
             iconRight: activeNetworkId === 'all' ? IoCheckmark : undefined,
             iconRightClassName: 'text-green-500 rounded-none',
             className: cn(

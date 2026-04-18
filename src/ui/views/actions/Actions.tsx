@@ -10,12 +10,9 @@ import {
   useRef,
   useState,
 } from 'react';
-import { Route, Routes, useNavigate } from 'react-router-dom';
-import {
-  ActionFilters,
-  ActionFiltersButton,
-  useActionFilterParams,
-} from './ActionFilters';
+import { LuListFilter } from 'react-icons/lu';
+import { useNavigate } from 'react-router-dom';
+import { useActionFilterParams } from './ActionFilters';
 import { ActionInfo } from './ActionInfo';
 import { ActionSearch } from './ActionSearch';
 import { ActionsList } from './ActionsList/ActionsList';
@@ -118,7 +115,7 @@ function getAddressActionsCursor(dateStr: string) {
   return btoa(JSON.stringify([customIso]));
 }
 
-function ActionHome() {
+export function ActionsView() {
   const navigate = useNavigate();
 
   const {
@@ -160,6 +157,7 @@ function ActionHome() {
       actionTypes: parsedActionTypes,
       assetTypes: parsedAssetTypes,
       searchQuery: deferredSearchQuery || undefined,
+      fungibleId: searchParams.fungibleId,
       initialCursor: searchParams.date
         ? getAddressActionsCursor(searchParams.date)
         : undefined,
@@ -214,6 +212,33 @@ function ActionHome() {
     setSearchParams({});
     setSearchQuery('');
   }, [setSearchParams]);
+
+  const handleBack = () => {
+    if (searchParams.fungibleId) {
+      navigate(`/fungible/${encodeURIComponent(searchParams.fungibleId)}`, {
+        state: { direction: 'back' },
+      });
+    } else {
+      navigate('/overview', { state: { direction: 'back' } });
+    }
+  };
+
+  const handleGoToFilter = () => {
+    if (searchParams.fungibleId) {
+      navigate(
+        `/actions/filters?fungibleId=${encodeURIComponent(
+          searchParams.fungibleId
+        )}`
+      );
+    } else {
+      navigate('/actions/filters');
+    }
+  };
+
+  const hasAnyFilter =
+    hasActiveFilters ||
+    Boolean(searchParams.chain) ||
+    Boolean(searchParams.date);
 
   useEffect(() => {
     if (searchRef.current) {
@@ -276,14 +301,20 @@ function ActionHome() {
               </div>
             </div>
 
-            <ActionFiltersButton
-              hasActiveFilters={hasActiveFilters}
-              selectedChain={searchParams.chain || null}
-              date={searchParams.date}
-            />
+            <button
+              type="button"
+              className="size-[32px] rounded-[9px] flex items-center justify-center bg-muted hover:bg-muted/80 relative"
+              onClick={handleGoToFilter}
+              aria-label="Filters"
+            >
+              <LuListFilter size={15} />
+              {hasAnyFilter && (
+                <span className="absolute top-2 right-1.5 size-2 bg-blue-500 rounded-full ring-2 ring-background transition-transform" />
+              )}
+            </button>
           </>
         }
-        onBack={() => navigate('/overview', { state: { direction: 'back' } })}
+        onBack={handleBack}
       />
 
       <div
@@ -331,14 +362,5 @@ function ActionHome() {
         {selectedTx && <ActionInfo addressAction={selectedTx} />}
       </Modal>
     </div>
-  );
-}
-
-export function Actions() {
-  return (
-    <Routes>
-      <Route path="/" element={<ActionHome />} />
-      <Route path="/filters" element={<ActionFilters />} />
-    </Routes>
   );
 }

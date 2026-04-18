@@ -9,8 +9,8 @@ import { BaseApp } from '../base/App';
 import { RequireAuth } from '../base/auth';
 
 import { HandshakeFailure } from '@/ui/views/handshake-failure';
-import { Login } from '@/ui/views/login';
-import { WalletSelect } from '@/ui/views/select-wallet';
+import { LoginView } from '@/ui/views/login';
+import { WalletSelectorView } from '@/ui/views/wallet-selector';
 
 initializeApperance();
 
@@ -30,7 +30,7 @@ export function App({ initialView, inspect }: AppProps) {
             {initialView ? (
               <Route path="/" element={<Navigate to={initialView} />} />
             ) : null}
-            <Route path="/login" element={<Login />} />
+            <Route path="/login" element={<LoginView />} />
             <Route
               path="/requestAccounts"
               element={
@@ -45,7 +45,7 @@ export function App({ initialView, inspect }: AppProps) {
               path="/requestAccounts/select-wallet"
               element={
                 <RequireAuth>
-                  <WalletSelect />
+                  <WalletSelectorView />
                 </RequireAuth>
               }
             />

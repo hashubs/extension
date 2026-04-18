@@ -1,3 +1,4 @@
+import { AnyAddressAction } from '@/modules/ethereum/transactions/addressAction';
 import { NetworkConfig } from '@/modules/networks/network-config';
 import { parseCaip19 } from '@/shared/chains/parse-caip19';
 import { getR2TokenUrl } from '@/shared/get-r2-url';
@@ -14,11 +15,13 @@ import { useFiatConversion } from '@/ui/hooks/useFiatConversion';
 import { cn, truncateAddress } from '@/ui/lib/utils';
 import { Image } from '@/ui/ui-kit';
 import { ImageStack } from '@/ui/ui-kit/image';
+import { ActionItem } from '@/ui/views/actions/ActionItem';
 import { useState } from 'react';
 import {
   LuArrowUpDown,
   LuDollarSign,
   LuLink,
+  LuLoader,
   LuReceiptText,
   LuSend,
 } from 'react-icons/lu';
@@ -30,9 +33,21 @@ interface Props {
   data: OptimisticFungibleInfo;
   chain?: NetworkConfig;
   onActionClick: (label: string) => void;
+  recentActions?: AnyAddressAction[];
+  isActionsLoading?: boolean;
+  onViewAllActivity: () => void;
+  onSelectAction?: (tx: AnyAddressAction) => void;
 }
 
-export function FungibleInfo({ data, chain, onActionClick }: Props) {
+export function FungibleInfo({
+  data,
+  chain,
+  onActionClick,
+  recentActions = [],
+  isActionsLoading,
+  onViewAllActivity,
+  onSelectAction,
+}: Props) {
   const navigate = useNavigate();
   const { convertUsdToFiat, defaultCurrency } = useFiatConversion();
 
@@ -293,11 +308,11 @@ export function FungibleInfo({ data, chain, onActionClick }: Props) {
         )}
 
         {description && (
-          <div className="px-4 pt-4 pb-2">
+          <div className="px-4 pt-4">
             <h2 className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground mb-3">
               About
             </h2>
-            <div className="rounded-xl bg-muted/40 px-4 py-3">
+            <div className="rounded-xl bg-muted/40 px-4 py-3 border border-border/20">
               <p className="text-[13px] text-muted-foreground leading-relaxed">
                 {isExpanded ? description : description.slice(0, 180)}
                 {shouldTruncate && (
@@ -313,13 +328,52 @@ export function FungibleInfo({ data, chain, onActionClick }: Props) {
           </div>
         )}
 
-        <div className="h-28" />
+        {(recentActions.length > 0 || isActionsLoading) && (
+          <div className="px-4 pt-4">
+            <div className="flex items-center justify-between mb-3">
+              <h2 className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground">
+                Recent Activity
+              </h2>
+              {recentActions.length > 0 && (
+                <button
+                  onClick={onViewAllActivity}
+                  className="text-[11px] font-semibold text-primary hover:underline"
+                >
+                  View All
+                </button>
+              )}
+            </div>
+
+            <div className="rounded-xl bg-muted/40 overflow-hidden divide-y divide-border/20 border border-border/20">
+              {isActionsLoading && recentActions.length === 0 ? (
+                <div className="flex flex-col items-center justify-center py-8 gap-2">
+                  <LuLoader className="size-5 text-primary animate-spin" />
+                  <span className="text-[12px] text-muted-foreground">
+                    Loading activity...
+                  </span>
+                </div>
+              ) : (
+                recentActions.map((action) => (
+                  <ActionItem
+                    key={action.id}
+                    addressAction={action as AnyAddressAction}
+                    onClick={
+                      onSelectAction ? () => onSelectAction(action) : undefined
+                    }
+                  />
+                ))
+              )}
+            </div>
+          </div>
+        )}
+
+        <div className="h-8" />
       </div>
 
-      <div className="sticky bottom-0 p-4 z-10 bg-background/90 backdrop-blur-md border-t border-border/40 flex items-center gap-2">
+      <div className="sticky bottom-0 px-4 py-3 z-10 bg-background/40 backdrop-blur-md border-t border-border/40 flex items-center gap-2">
         <button
           onClick={() => onActionClick('Swap')}
-          className="flex-1 flex items-center justify-center gap-2 py-[14px] rounded-2xl bg-muted border border-border/50 hover:bg-muted/80 active:scale-[0.98] transition-all"
+          className="flex-1 flex items-center justify-center gap-2 h-[38px] rounded-2xl bg-muted border border-border/50 hover:bg-muted/80 active:scale-[0.98] transition-all"
         >
           <LuArrowUpDown size={15} className="text-foreground/80" />
           <span className="text-[14px] font-semibold">Swap</span>
@@ -328,7 +382,7 @@ export function FungibleInfo({ data, chain, onActionClick }: Props) {
         <button
           onClick={() => onActionClick('Send')}
           disabled={data.amount.amount <= 0}
-          className="size-[50px] flex items-center justify-center rounded-2xl bg-muted border border-border/50 hover:bg-muted/80 active:scale-[0.98] transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+          className="w-[50px] h-[38px] flex items-center justify-center rounded-2xl bg-muted border border-border/50 hover:bg-muted/80 active:scale-[0.98] transition-all disabled:opacity-40 disabled:cursor-not-allowed"
           aria-label="Send"
         >
           <LuSend size={16} className="text-foreground/80" />
@@ -336,7 +390,7 @@ export function FungibleInfo({ data, chain, onActionClick }: Props) {
 
         <button
           onClick={() => onActionClick('Buy')}
-          className="size-[50px] flex items-center justify-center rounded-2xl bg-muted border border-border/50 hover:bg-muted/80 active:scale-[0.98] transition-all"
+          className="w-[50px] h-[38px] flex items-center justify-center rounded-2xl bg-muted border border-border/50 hover:bg-muted/80 active:scale-[0.98] transition-all"
           aria-label="Buy"
         >
           <LuDollarSign size={16} className="text-foreground/80" />

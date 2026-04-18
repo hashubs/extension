@@ -16,7 +16,7 @@ import { isMatchForEcosystem } from 'src/shared/wallet/shared';
 
 const MIN_WALLETS_FOR_SEARCH = 5;
 
-export function WalletSelect() {
+export function WalletSelectorView() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
 

@@ -1,16 +1,23 @@
+import { AnyAddressAction } from '@/modules/ethereum/transactions/addressAction';
 import { SanitizedPortfolio } from '@/shared/fungible/sanitize-portfolio';
 import {
+  FungibleInfo as FungibleInfoComponent,
   OptimisticFungibleInfo,
   useFungibleInfo,
-  FungibleInfo as FungibleInfoComponent,
 } from '@/ui/components/fungible/fungible-info';
+import { useAddressParams } from '@/ui/hooks/request/internal/useAddressParams';
+import { ActionInfo } from '@/ui/views/actions/ActionInfo';
+import { Modal } from '@/ui/views/actions/Modal';
+import { useUnifiedActivity } from '@/ui/views/actions/useUnifiedActivity';
+import { useState } from 'react';
 import { LuLoader } from 'react-icons/lu';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 
-export function FungibleInfo() {
+export function FungibleInfoView() {
   const { id } = useParams();
   const navigate = useNavigate();
   const decodedId = id ? decodeURIComponent(id) : undefined;
+  const [selectedTx, setSelectedTx] = useState<AnyAddressAction | null>(null);
 
   const { state } = useLocation();
   const initialData = state?.token as SanitizedPortfolio | undefined;
@@ -33,17 +40,44 @@ export function FungibleInfo() {
 
   const { chain, fungibleInfo, isBalanceLoading } = useFungibleInfo(decodedId);
 
+  const { singleAddress } = useAddressParams();
+  const { actions, isLoading: isActionsLoading } = useUnifiedActivity({
+    addresses: [singleAddress],
+    fungibleId: decodedId,
+  });
+
+  const recentActions = actions.slice(0, 5);
+
   const handleActionClick = (label: string) => {
     if (label === 'Send') navigate('send');
   };
 
+  const handleViewAllActivity = () => {
+    navigate(`/actions?fungibleId=${encodeURIComponent(decodedId)}`, {
+      state: { direction: 'forward' },
+    });
+  };
+
   if (fungibleInfo && !isBalanceLoading && chain) {
     return (
-      <FungibleInfoComponent
-        data={fungibleInfo}
-        chain={chain}
-        onActionClick={handleActionClick}
-      />
+      <>
+        <FungibleInfoComponent
+          data={fungibleInfo}
+          chain={chain}
+          onActionClick={handleActionClick}
+          recentActions={recentActions}
+          isActionsLoading={isActionsLoading}
+          onViewAllActivity={handleViewAllActivity}
+          onSelectAction={setSelectedTx}
+        />
+        <Modal
+          isOpen={!!selectedTx}
+          onClose={() => setSelectedTx(null)}
+          title={selectedTx?.type.displayValue || ''}
+        >
+          {selectedTx && <ActionInfo addressAction={selectedTx} />}
+        </Modal>
+      </>
     );
   }
 
@@ -82,11 +116,24 @@ export function FungibleInfo() {
     };
 
     return (
-      <FungibleInfoComponent
-        data={optimisticData}
-        chain={undefined}
-        onActionClick={handleActionClick}
-      />
+      <>
+        <FungibleInfoComponent
+          data={optimisticData}
+          chain={undefined}
+          onActionClick={handleActionClick}
+          recentActions={recentActions}
+          isActionsLoading={isActionsLoading}
+          onViewAllActivity={handleViewAllActivity}
+          onSelectAction={setSelectedTx}
+        />
+        <Modal
+          isOpen={!!selectedTx}
+          onClose={() => setSelectedTx(null)}
+          title={selectedTx?.type.displayValue || ''}
+        >
+          {selectedTx && <ActionInfo addressAction={selectedTx} />}
+        </Modal>
+      </>
     );
   }
 

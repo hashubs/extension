@@ -18,6 +18,7 @@ interface ActionSelectorProps {
   onChange: (value: string | string[]) => void;
   multi?: boolean;
   className?: string;
+  disabled?: boolean;
 }
 
 export function ActionSelector({
@@ -28,6 +29,7 @@ export function ActionSelector({
   onChange,
   multi = false,
   className,
+  disabled,
 }: ActionSelectorProps) {
   const [isOpen, setIsOpen] = useState(false);
 
@@ -52,11 +54,17 @@ export function ActionSelector({
     return value === optionValue;
   };
 
+  const handleOpen = () => {
+    if (disabled) return;
+    setIsOpen(true);
+  };
+
   return (
     <>
       <button
         type="button"
-        onClick={() => setIsOpen(true)}
+        onClick={handleOpen}
+        disabled={disabled}
         className={cn(
           'appearance-none cursor-pointer outline-none w-full',
           className

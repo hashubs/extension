@@ -1,20 +1,20 @@
-import { getChainLogo } from '@/shared/chains/chain-logos';
 import { Header } from '@/ui/components/header';
 import { Button, Card } from '@/ui/ui-kit';
-import { useCallback, useMemo, useState } from 'react';
-import { LuChevronRight, LuListFilter } from 'react-icons/lu';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { LuChevronRight } from 'react-icons/lu';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { ActionDaySelector } from './ActionDaySelector';
 import { ActionSelector } from './ActionSelector';
 
-import { getChainCaip } from '@/modules/networks/helpers';
-import { useNetworks } from '@/ui/hooks/request/internal/useNetworks';
+import { cn } from '@/ui/lib/utils';
 
 export type ActionSearchParams = {
   date?: string;
   chain?: string;
   actionTypes?: string;
   assetTypes?: string;
+  fungibleId?: string;
+  chainName?: string;
 };
 
 const ACTION_TYPE_OPTIONS = [
@@ -71,6 +71,8 @@ export function useActionFilterParams() {
       chain: searchParams.get('chain') || undefined,
       actionTypes: searchParams.get('actionTypes') || undefined,
       assetTypes: searchParams.get('assetTypes') || undefined,
+      fungibleId: searchParams.get('fungibleId') || undefined,
+      chainName: searchParams.get('chainName') || undefined,
     }),
     [searchParams]
   );
@@ -108,7 +110,8 @@ export function useActionFilterParams() {
     parsedParams.actionTypes ||
       parsedParams.assetTypes ||
       parsedParams.chain ||
-      parsedParams.date
+      parsedParams.date ||
+      parsedParams.fungibleId
   );
 
   return {
@@ -152,36 +155,7 @@ function FilterRow({
   return <div className={className}>{Content}</div>;
 }
 
-export function ActionFiltersButton({
-  hasActiveFilters,
-  selectedChain,
-  date,
-}: {
-  hasActiveFilters: boolean;
-  selectedChain: string | null;
-  date: string | undefined;
-}) {
-  const navigate = useNavigate();
-
-  const hasAnyFilter =
-    hasActiveFilters || Boolean(selectedChain) || Boolean(date);
-
-  return (
-    <button
-      type="button"
-      className="size-[32px] rounded-[9px] flex items-center justify-center bg-muted hover:bg-muted/80 relative"
-      onClick={() => navigate('/actions/filters')}
-      aria-label="Filters"
-    >
-      <LuListFilter size={15} />
-      {hasAnyFilter && (
-        <span className="absolute top-2 right-1.5 size-2 bg-blue-500 rounded-full ring-2 ring-background transition-transform" />
-      )}
-    </button>
-  );
-}
-
-export function ActionFilters() {
+export function ActionFiltersView() {
   const navigate = useNavigate();
   const { searchParams, hasActiveFilters, actionTypeKeys, assetTypeParam } =
     useActionFilterParams();
@@ -197,6 +171,71 @@ export function ActionFilters() {
   const [stagedAssetType, setStagedAssetType] = useState<string | undefined>(
     assetTypeParam
   );
+  const [stagedChainName, setStagedChainName] = useState<string | undefined>(
+    searchParams.chainName
+  );
+
+  const isFromFungibleInfo = !!searchParams.fungibleId;
+
+  // Sync staged state with URL params when they change (e.g. returning from network selector)
+  useEffect(() => {
+    setStagedChain(searchParams.chain || null);
+  }, [searchParams.chain]);
+
+  useEffect(() => {
+    setStagedDate(searchParams.date);
+  }, [searchParams.date]);
+
+  useEffect(() => {
+    setStagedActionTypeKeys(actionTypeKeys);
+  }, [actionTypeKeys]);
+
+  useEffect(() => {
+    setStagedAssetType(assetTypeParam);
+  }, [assetTypeParam]);
+
+  useEffect(() => {
+    setStagedChainName(searchParams.chainName);
+  }, [searchParams.chainName]);
+
+  const handleSelectNetwork = useCallback(() => {
+    if (isFromFungibleInfo) return;
+
+    const params = new URLSearchParams();
+    if (stagedDate) params.set('date', stagedDate);
+    if (stagedActionTypeKeys.length) {
+      params.set('actionTypes', stagedActionTypeKeys.join(','));
+    }
+    if (stagedAssetType && stagedAssetType !== 'all') {
+      params.set('assetTypes', stagedAssetType);
+    }
+    if (searchParams.fungibleId) {
+      params.set('fungibleId', searchParams.fungibleId);
+    }
+    if (stagedChainName) {
+      params.set('chainName', stagedChainName);
+    }
+
+    const nextPath = `/actions/filters?${params.toString()}`;
+
+    const selectorParams = new URLSearchParams();
+    selectorParams.set('selectOnly', 'true');
+    selectorParams.set('paramName', 'chain');
+    selectorParams.set('chain', stagedChain || 'all');
+    selectorParams.set('next', nextPath);
+
+    navigate(`/select-network?${selectorParams.toString()}`, {
+      state: { direction: 'forward' },
+    });
+  }, [
+    navigate,
+    isFromFungibleInfo,
+    stagedChain,
+    stagedDate,
+    stagedActionTypeKeys,
+    stagedAssetType,
+    searchParams.fungibleId,
+  ]);
 
   const handleApply = () => {
     const params = new URLSearchParams();
@@ -209,54 +248,52 @@ export function ActionFilters() {
       params.set('assetTypes', stagedAssetType);
     }
 
+    if (searchParams.fungibleId) {
+      params.set('fungibleId', searchParams.fungibleId);
+    }
+
+    if (stagedChainName) {
+      params.set('chainName', stagedChainName);
+    }
+
     navigate({
       pathname: '/actions',
       search: params.toString(),
     });
   };
 
-  const { networks } = useNetworks();
-  const allNetworks = useMemo(() => networks?.getNetworks() || [], [networks]);
-
   const hasAnyFilter =
     hasActiveFilters ||
     Boolean(searchParams.chain) ||
     Boolean(searchParams.date);
 
+  const handleBack = () => {
+    if (searchParams.fungibleId) {
+      navigate(
+        `/actions?fungibleId=${encodeURIComponent(searchParams.fungibleId)}`,
+        { state: { direction: 'back' } }
+      );
+    } else {
+      navigate('/actions', { state: { direction: 'back' } });
+    }
+  };
+
   return (
     <div className="flex flex-col h-full bg-background overflow-hidden relative">
-      <Header title="Filters" onBack={() => navigate('/actions')} />
+      <Header title="Filters" onBack={handleBack} />
 
       <div className="flex-1 overflow-y-auto no-scrollbar">
         <div className="flex flex-col px-4 py-4 space-y-4">
           <div>
-            <Card title="Select Network">
-              <ActionSelector
-                title="Select Network"
-                options={[
-                  { value: 'all', label: 'All Networks' },
-                  ...allNetworks.map((n) => {
-                    const caip = getChainCaip(n);
-                    return {
-                      value: caip,
-                      label: n.name,
-                      icon: getChainLogo(caip),
-                    };
-                  }),
-                ]}
-                value={stagedChain || 'all'}
-                onChange={(v) => {
-                  const val = v === 'all' ? null : (v as string);
-                  setStagedChain(val);
-                }}
-                trigger={
-                  <FilterRow
-                    label={
-                      allNetworks.find((n) => getChainCaip(n) === stagedChain)
-                        ?.name || 'All Networks'
-                    }
-                  />
-                }
+            <Card
+              title="Select Network"
+              className={cn(
+                isFromFungibleInfo && 'opacity-50 cursor-not-allowed'
+              )}
+            >
+              <FilterRow
+                label={stagedChainName || 'All Networks'}
+                onClick={handleSelectNetwork}
               />
             </Card>
           </div>
@@ -332,7 +369,7 @@ export function ActionFilters() {
       </div>
 
       <div className="flex flex-col gap-2 p-4 bg-background border-t border-border mt-auto">
-        <Button onClick={handleApply} variant="gradient-teal" size="lg" shimmer>
+        <Button onClick={handleApply} variant="gradient-teal" size="md" shimmer>
           Show Results
         </Button>
         {hasAnyFilter && (

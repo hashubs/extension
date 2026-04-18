@@ -1,1 +1,1 @@
-export { FungibleInfo } from "./fungible-info";
+export { FungibleInfoView } from './fungible-info';

@@ -161,20 +161,6 @@ export function ActionDaySelector({
         isOpen={isOpen}
         onClose={() => setIsOpen(false)}
         title="Jump to date"
-        footer={
-          selectedDate && (
-            <button
-              type="button"
-              onClick={() => {
-                onDateSelect(null);
-                setIsOpen(false);
-              }}
-              className="w-full py-3.5 text-[15px] font-semibold text-white bg-white/5 hover:bg-white/10 rounded-2xl transition-colors"
-            >
-              Clear Date
-            </button>
-          )
-        }
       >
         <DayPicker
           selectedDate={selectedDate}

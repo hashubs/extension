@@ -1,5 +1,5 @@
-import { preferenceStore } from '@/ui/features/appearance';
 import { useCurrency } from '@/modules/currency/useCurrency';
+import { preferenceStore } from '@/ui/features/appearance';
 import { Button } from '@/ui/ui-kit';
 
 export function CurrencySelector() {
@@ -13,10 +13,12 @@ export function CurrencySelector() {
           key={c}
           variant={currency.toLowerCase() === c ? 'default' : 'secondary'}
           className="h-7 px-2.5 text-[10px] font-bold uppercase tracking-wider"
-          onClick={() => preferenceStore.setState({ 
-            ...preferenceStore.getState(),
-            currency: c 
-          })}
+          onClick={() =>
+            preferenceStore.setState({
+              ...preferenceStore.getState(),
+              currency: c,
+            })
+          }
         >
           {c}
         </Button>
@@ -24,3 +26,10 @@ export function CurrencySelector() {
     </div>
   );
 }
+
+export const CurrencyBadge = () => {
+  const { currency } = useCurrency();
+  return (
+    <span className="text-xs font-medium text-foreground/60">{currency}</span>
+  );
+};

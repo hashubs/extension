@@ -1,10 +1,11 @@
-import { ThemePreference } from '@/ui/features/appearance';
+import { preferenceStore, ThemePreference } from '@/ui/features/appearance';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/ui/ui-kit/dropdown-menu';
+import { useStore } from '@store-unit/react';
 import {
   LuCheck,
   LuChevronDown,
@@ -23,20 +24,24 @@ const themeOptions: {
   { value: ThemePreference.system, icon: LuMonitor, label: 'System' },
 ];
 
-interface DarkModeSelectorComponentProps {
+interface DarkModeSelectorProps {
   open: boolean;
-  theme: ThemePreference;
   onOpenChange: (open: boolean) => void;
-  onSetTheme: (theme: ThemePreference) => void;
 }
 
-export function DarkModeSelectorComponent({
+export function DarkModeSelector({
   open,
-  theme,
   onOpenChange,
-  onSetTheme,
-}: DarkModeSelectorComponentProps) {
-  const current = themeOptions.find((o) => o.value === theme)!;
+}: DarkModeSelectorProps) {
+  const { mode } = useStore(preferenceStore);
+
+  const setTheme = (theme: ThemePreference) => {
+    preferenceStore.setState((current) => ({
+      ...current,
+      mode: theme,
+    }));
+  };
+  const current = themeOptions.find((o) => o.value === mode)!;
 
   return (
     <DropdownMenu open={open} onOpenChange={onOpenChange}>
@@ -60,7 +65,7 @@ export function DarkModeSelectorComponent({
             key={value}
             onClick={(e) => {
               e.stopPropagation();
-              onSetTheme(value);
+              setTheme(value);
               onOpenChange(false);
             }}
             className="flex items-center justify-between"
@@ -71,7 +76,7 @@ export function DarkModeSelectorComponent({
                 {label}
               </span>
             </div>
-            {theme === value && <LuCheck size={12} />}
+            {mode === value && <LuCheck size={12} />}
           </DropdownMenuItem>
         ))}
       </DropdownMenuContent>

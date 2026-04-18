@@ -1,1 +1,1 @@
-export { Actions } from './Actions';
+export { ActionsRoutes } from './action-routes';

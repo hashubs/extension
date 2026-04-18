@@ -14,7 +14,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { AnimatedBackground } from './components/AnimatedBackground';
 import { ForgotPassword } from './forgot-password';
 
-export function Login() {
+export function LoginView() {
   const [params] = useSearchParams();
   const navigate = useNavigate();
   const [password, setPassword] = useState('');

@@ -187,7 +187,7 @@ export function ActionsList({
                 ) : (
                   <div className="px-0 relative w-full h-full pb-[2px]">
                     <ActionItem
-                      addressAction={item.data as any}
+                      addressAction={item.data as AnyAddressAction}
                       onClick={
                         onSelectTx ? () => onSelectTx(item.data) : undefined
                       }

@@ -10,7 +10,7 @@ type navigationType = {
   items: ItemType[];
 };
 
-export function DeveloperTools() {
+export function DeveloperToolsView() {
   const navigate = useNavigate();
   const { preferences, setPreferences } = usePreferences();
 

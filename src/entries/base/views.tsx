@@ -8,14 +8,14 @@ import { RequireAuth } from './auth';
 import { SomeKindOfResolver } from './resolver';
 
 import { HandshakeFailure } from '@/ui/views/handshake-failure';
-import { Login } from '@/ui/views/login';
-import { NetworkSelect } from '@/ui/views/network-select';
+import { LoginView } from '@/ui/views/login';
+import { NetworkSelectorView } from '@/ui/views/network-selector';
 import { Overview } from '@/ui/views/overview';
-import { WalletSelect } from '@/ui/views/select-wallet';
+import { WalletSelectorView } from '@/ui/views/wallet-selector';
 
-import { Actions } from '@/ui/views/actions';
-import { FungibleInfo } from '@/ui/views/fungible-info';
-import { Settings } from '@/ui/views/settings';
+import { ActionsRoutes } from '@/ui/views/actions';
+import { FungibleInfoView } from '@/ui/views/fungible-info';
+import { SettingsRoutes } from '@/ui/views/settings';
 import { TestView } from '@/ui/views/tests/test-view';
 
 function DefiSdkClientProvider({ children }: React.PropsWithChildren) {
@@ -54,7 +54,7 @@ export function Views({ initialRoute }: { initialRoute?: string }) {
                 />
               }
             />
-            <Route path="/login" element={<Login />} />
+            <Route path="/login" element={<LoginView />} />
             <Route
               path="/overview/*"
               element={
@@ -67,7 +67,7 @@ export function Views({ initialRoute }: { initialRoute?: string }) {
               path="/fungible/:id"
               element={
                 <RequireAuth>
-                  <FungibleInfo />
+                  <FungibleInfoView />
                 </RequireAuth>
               }
             />
@@ -75,7 +75,7 @@ export function Views({ initialRoute }: { initialRoute?: string }) {
               path="/select-wallet"
               element={
                 <RequireAuth>
-                  <WalletSelect />
+                  <WalletSelectorView />
                 </RequireAuth>
               }
             />
@@ -83,7 +83,7 @@ export function Views({ initialRoute }: { initialRoute?: string }) {
               path="/select-network"
               element={
                 <RequireAuth>
-                  <NetworkSelect />
+                  <NetworkSelectorView />
                 </RequireAuth>
               }
             />
@@ -91,7 +91,7 @@ export function Views({ initialRoute }: { initialRoute?: string }) {
               path="/actions/*"
               element={
                 <RequireAuth>
-                  <Actions />
+                  <ActionsRoutes />
                 </RequireAuth>
               }
             />
@@ -99,7 +99,7 @@ export function Views({ initialRoute }: { initialRoute?: string }) {
               path="/settings/*"
               element={
                 <RequireAuth>
-                  <Settings />
+                  <SettingsRoutes />
                 </RequireAuth>
               }
             />

@@ -1,1 +1,1 @@
-export { Settings } from './settings';
+export { SettingsRoutes } from './setting-routes';

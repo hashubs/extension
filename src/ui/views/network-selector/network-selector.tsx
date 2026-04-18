@@ -2,22 +2,24 @@ import { setCurrentNetworkId } from '@/shared/request/internal/setCurrentNetwork
 import { Header } from '@/ui/components/header';
 import { useCurrentNetworkId } from '@/ui/hooks/request/internal/useCurrentNetworkId';
 import { Input } from '@/ui/ui-kit';
-import { NetworkList } from '@/ui/views/network-select/network-list';
+import { NetworkList } from '@/ui/views/network-selector/network-list';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useCallback, useEffect, useState } from 'react';
 import { IoSearchOutline } from 'react-icons/io5';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 
-export function NetworkSelect() {
+export function NetworkSelectorView() {
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { networkId: storedNetworkId } = useCurrentNetworkId();
 
   const [searchQuery, setSearchQuery] = useState('');
+  const isSelectOnly = searchParams.get('selectOnly') === 'true';
+  const customParamName = searchParams.get('paramName') || 'network';
 
   const resolvedActiveId =
-    searchParams.get('network') || storedNetworkId || 'all';
+    searchParams.get(customParamName) || storedNetworkId || 'all';
 
   const [localActiveId, setLocalActiveId] = useState(resolvedActiveId);
 
@@ -36,25 +38,35 @@ export function NetworkSelect() {
   });
 
   const onSelect = useCallback(
-    async (networkId: string) => {
+    async (networkId: string, networkName: string) => {
       setLocalActiveId(networkId);
 
       const idToSave = networkId === 'all' ? null : networkId;
       const next = searchParams.get('next');
       const newParams = new URLSearchParams(searchParams);
 
+      const customNameParam = `${customParamName}Name`;
+
+      // Clean up internal params before appending to 'next'
+      newParams.delete('next');
+      newParams.delete('selectOnly');
+      newParams.delete('paramName');
+
       if (networkId === 'all') {
-        newParams.delete('network');
+        newParams.delete(customParamName);
+        newParams.delete(customNameParam);
       } else {
-        newParams.set('network', networkId);
+        newParams.set(customParamName, networkId);
+        newParams.set(customNameParam, networkName);
       }
 
       setSearchParams(newParams, { replace: true });
 
-      await updateNetwork(idToSave).catch(console.error);
+      if (!isSelectOnly) {
+        await updateNetwork(idToSave).catch(console.error);
+      }
 
       if (next) {
-        newParams.delete('next');
         const connector = next.includes('?') ? '&' : '?';
         const target = `${next}${
           newParams.toString() ? `${connector}${newParams.toString()}` : ''
@@ -68,7 +80,14 @@ export function NetworkSelect() {
         navigate(-1);
       }
     },
-    [navigate, searchParams, setSearchParams, updateNetwork]
+    [
+      navigate,
+      searchParams,
+      setSearchParams,
+      updateNetwork,
+      isSelectOnly,
+      customParamName,
+    ]
   );
 
   return (
