@@ -85,7 +85,7 @@ Content-Type: application/json
 {
   "addresses": ["0x60e39ead71123e5f7c8470f2aa83effb90fcb8d1"],
   "currency": "usd",
-  "chain": "eip155:10",
+  "fungibleId": "eip155:1/slip44:60:asset_w83SN0cYOjqvAKx0Tfl8Qg",
   "limit": 100
 }
 
@@ -143,7 +143,7 @@ Content-Type: application/json
   "addresses": ["0x60e39ead71123e5f7c8470f2aa83effb90fcb8d1"],
   "currency": "usd",
   "portfolioType": ["asset"],
-  "mode": "testnet"
+  "mode": "mainnet"
 }
 
 ### asset Fungible info

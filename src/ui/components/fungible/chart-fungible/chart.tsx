@@ -10,7 +10,6 @@ import { themeStore } from '@/ui/features/appearance';
 import { useFungibleChart } from '@/ui/hooks/request/external/use-fungible-chart';
 import { useFiatConversion } from '@/ui/hooks/useFiatConversion';
 import { cn } from '@/ui/lib/utils';
-import { FungibleInfoUI } from '@/ui/views/fungible-info/use-fungible-info';
 import { useStore } from '@store-unit/react';
 import type { PointStyle } from 'chart.js';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -30,6 +29,7 @@ import type {
 } from './types';
 
 import { useParams } from 'react-router-dom';
+import { OptimisticFungibleInfo } from '../fungible-info';
 import './interaction'; // registers magneticActions mode side-effect
 
 const PERIOD_OPTIONS: { label: string; value: ChartPeriod }[] = [
@@ -147,7 +147,7 @@ export interface FungibleChartChangeData {
 }
 
 interface AssetChartProps {
-  data: FungibleInfoUI | null;
+  data: OptimisticFungibleInfo | null;
   currentPrice?: number;
   currentChangePercent?: number;
   onChartDataChange?: (data: FungibleChartChangeData) => void;
@@ -165,7 +165,7 @@ export function FungibleChart({
 
   const { defaultCurrency } = useFiatConversion();
 
-  const [period, setPeriod] = useState<ChartPeriod>('1w');
+  const [period, setPeriod] = useState<ChartPeriod>('1d');
 
   const themeRef = useRef(theme);
   themeRef.current = theme;

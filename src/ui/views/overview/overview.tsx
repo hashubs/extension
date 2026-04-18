@@ -11,7 +11,7 @@ import {
 import { usePrefetchWalletGroups } from '@/ui/hooks/request/internal/useWalletGroups';
 import { useFiatConversion } from '@/ui/hooks/useFiatConversion';
 import { NeutralDecimals } from '@/ui/ui-kit';
-import { memo, useCallback, useEffect, useMemo, useState } from 'react';
+import { memo, useCallback, useMemo, useState } from 'react';
 import { FaWallet } from 'react-icons/fa6';
 import { LuPlus } from 'react-icons/lu';
 import { useNavigate } from 'react-router-dom';
@@ -57,11 +57,6 @@ const TokenHeader = memo(function TokenHeader({
 });
 
 export function Overview() {
-  console.time('Overview Render');
-  useEffect(() => {
-    console.timeEnd('Overview Render');
-  });
-
   const navigate = useNavigate();
 
   usePrefetchWalletGroups();
@@ -108,7 +103,9 @@ export function Overview() {
 
   const handleTokenClick = useCallback(
     (token: SanitizedPortfolio) => {
-      navigate(`/fungible/${encodeURIComponent(token.id)}`);
+      navigate(`/fungible/${encodeURIComponent(token.id)}`, {
+        state: { token },
+      });
     },
     [navigate]
   );

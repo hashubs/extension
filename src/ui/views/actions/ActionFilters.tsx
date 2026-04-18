@@ -105,7 +105,10 @@ export function useActionFilterParams() {
   );
 
   const hasActiveFilters = Boolean(
-    parsedParams.actionTypes || parsedParams.assetTypes || parsedParams.chain || parsedParams.date
+    parsedParams.actionTypes ||
+      parsedParams.assetTypes ||
+      parsedParams.chain ||
+      parsedParams.date
   );
 
   return {
@@ -166,7 +169,7 @@ export function ActionFiltersButton({
   return (
     <button
       type="button"
-      className="size-[30px] rounded-[9px] flex items-center justify-center bg-muted hover:bg-muted/80 relative"
+      className="size-[32px] rounded-[9px] flex items-center justify-center bg-muted hover:bg-muted/80 relative"
       onClick={() => navigate('/actions/filters')}
       aria-label="Filters"
     >
@@ -180,12 +183,8 @@ export function ActionFiltersButton({
 
 export function ActionFilters() {
   const navigate = useNavigate();
-  const {
-    searchParams,
-    hasActiveFilters,
-    actionTypeKeys,
-    assetTypeParam,
-  } = useActionFilterParams();
+  const { searchParams, hasActiveFilters, actionTypeKeys, assetTypeParam } =
+    useActionFilterParams();
 
   const [stagedChain, setStagedChain] = useState<string | null>(
     searchParams.chain || null
@@ -220,7 +219,9 @@ export function ActionFilters() {
   const allNetworks = useMemo(() => networks?.getNetworks() || [], [networks]);
 
   const hasAnyFilter =
-    hasActiveFilters || Boolean(searchParams.chain) || Boolean(searchParams.date);
+    hasActiveFilters ||
+    Boolean(searchParams.chain) ||
+    Boolean(searchParams.date);
 
   return (
     <div className="flex flex-col h-full bg-background overflow-hidden relative">

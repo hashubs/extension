@@ -1,4 +1,5 @@
 import type { AnyAddressAction } from '@/modules/ethereum/transactions/addressAction';
+import { Header } from '@/ui/components/header';
 import { useAddressParams } from '@/ui/hooks/request/internal/useAddressParams';
 import { useUnifiedActivity } from '@/ui/views/actions/useUnifiedActivity';
 import {
@@ -9,7 +10,6 @@ import {
   useRef,
   useState,
 } from 'react';
-import { LuChevronLeft } from 'react-icons/lu';
 import { Route, Routes, useNavigate } from 'react-router-dom';
 import {
   ActionFilters,
@@ -238,64 +238,53 @@ function ActionHome() {
       ref={setScrollElement}
       className="flex flex-col h-full w-full overflow-y-auto relative"
     >
-      <div
-        className="sticky top-0 bg-background/80 backdrop-blur-md shrink-0 z-20 overflow-hidden"
-        style={{ height: '62px' }}
-      >
-        <div className="absolute inset-0 flex items-center justify-between px-4 gap-3">
-          <button
-            type="button"
-            className="size-[30px] rounded-[9px] flex items-center justify-center bg-muted hover:bg-muted/80"
-            onClick={() =>
-              navigate('/overview', { state: { direction: 'back' } })
-            }
-            aria-label="Back"
-          >
-            <LuChevronLeft size={20} />
-          </button>
-
-          <div
-            className="relative flex-1 flex items-center justify-center overflow-hidden"
-            style={{ height: '36px' }}
-          >
-            <h1
-              className="absolute text-base font-semibold tracking-wide transition-all duration-300 ease-in-out whitespace-nowrap"
-              style={{
-                opacity: searchPinned ? 0 : 1,
-                transform: searchPinned
-                  ? 'translateY(-10px)'
-                  : 'translateY(0px)',
-                pointerEvents: searchPinned ? 'none' : 'auto',
-              }}
-            >
-              History
-            </h1>
-
+      <Header
+        customElement={
+          <>
             <div
-              className="absolute w-full transition-all duration-300 ease-in-out"
-              style={{
-                opacity: searchPinned ? 1 : 0,
-                transform: searchPinned
-                  ? 'translateY(0px)'
-                  : 'translateY(10px)',
-                pointerEvents: searchPinned ? 'auto' : 'none',
-              }}
+              className="relative flex-1 flex items-center justify-center overflow-hidden"
+              style={{ height: '36px' }}
             >
-              <ActionSearch
-                value={searchQuery}
-                onChange={setSearchQuery}
-                searchPinned={searchPinned}
-              />
-            </div>
-          </div>
+              <h1
+                className="absolute text-base font-semibold tracking-wide transition-all duration-300 ease-in-out whitespace-nowrap"
+                style={{
+                  opacity: searchPinned ? 0 : 1,
+                  transform: searchPinned
+                    ? 'translateY(-10px)'
+                    : 'translateY(0px)',
+                  pointerEvents: searchPinned ? 'none' : 'auto',
+                }}
+              >
+                History
+              </h1>
 
-          <ActionFiltersButton
-            hasActiveFilters={hasActiveFilters}
-            selectedChain={searchParams.chain || null}
-            date={searchParams.date}
-          />
-        </div>
-      </div>
+              <div
+                className="absolute w-full transition-all duration-300 ease-in-out"
+                style={{
+                  opacity: searchPinned ? 1 : 0,
+                  transform: searchPinned
+                    ? 'translateY(0px)'
+                    : 'translateY(10px)',
+                  pointerEvents: searchPinned ? 'auto' : 'none',
+                }}
+              >
+                <ActionSearch
+                  value={searchQuery}
+                  onChange={setSearchQuery}
+                  searchPinned={searchPinned}
+                />
+              </div>
+            </div>
+
+            <ActionFiltersButton
+              hasActiveFilters={hasActiveFilters}
+              selectedChain={searchParams.chain || null}
+              date={searchParams.date}
+            />
+          </>
+        }
+        onBack={() => navigate('/overview', { state: { direction: 'back' } })}
+      />
 
       <div
         ref={searchRef}

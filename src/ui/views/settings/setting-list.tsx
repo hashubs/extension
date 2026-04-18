@@ -40,7 +40,7 @@ export function SettingsList() {
           iconRight: LuChevronRight,
           label: 'Developer Tools',
           onClick: () =>
-            navigate('/settings/connectivity', {
+            navigate('/settings/developer-tools', {
               state: { direction: 'forward' },
             }),
           iconClassName: 'text-lime-500 bg-lime-500/10',

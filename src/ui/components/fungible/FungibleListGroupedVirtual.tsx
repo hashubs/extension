@@ -143,7 +143,6 @@ export function FungibleListGroupedVirtual({
 
     for (const [symbol, groupItems] of groupMap.entries()) {
       if (groupItems.length === 1) {
-        // Single item — render directly, no group header needed
         items.push({ type: 'token', data: groupItems[0] });
       } else {
         const isOpen = openGroups.has(symbol);
