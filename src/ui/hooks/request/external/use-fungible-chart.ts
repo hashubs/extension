@@ -72,8 +72,8 @@ export function useFungibleChart({
       }
     },
     enabled: enabled && !!id && address.length > 0,
-    staleTime: 5 * 60 * 1000,
-    refetchInterval: 10 * 60 * 1000,
+    staleTime: 30_000,
+    refetchInterval: 30_000,
     placeholderData: keepPreviousData,
   });
 

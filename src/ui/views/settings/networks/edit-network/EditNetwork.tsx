@@ -6,6 +6,7 @@ import { toAddEthereumChainParameter } from '@/modules/networks/helpers';
 import { Networks } from '@/modules/networks/networks';
 import { walletPort } from '@/shared/channel';
 import { invariant } from '@/shared/invariant';
+import { FormField } from '@/ui/components/form';
 import { Header } from '@/ui/components/header';
 import { useNetworks } from '@/ui/hooks/request/internal/useNetworks';
 import { Button } from '@/ui/ui-kit';
@@ -14,10 +15,12 @@ import { Switch } from '@/ui/ui-kit/switch';
 import { useMutation } from '@tanstack/react-query';
 import { isEqual } from 'lodash';
 import { useEffect, useMemo, useState } from 'react';
+import { Content } from 'react-area';
 import { IoTrashOutline } from 'react-icons/io5';
 import { useNavigate, useParams } from 'react-router-dom';
-import { FormField } from '../_shared/FormField';
 import { updateNetworks } from '../_shared/updateNetworks';
+
+const BACK_ROUTE = '/settings/networks';
 
 export function EditNetwork() {
   const { id: chainStr } = useParams();
@@ -63,7 +66,7 @@ export function EditNetwork() {
       });
       await updateNetworks();
     },
-    onSuccess: () => navigate(-1),
+    onSuccess: () => navigate(BACK_ROUTE, { state: { direction: 'back' } }),
   });
 
   const toggleMutation = useMutation({
@@ -84,7 +87,7 @@ export function EditNetwork() {
       await walletPort.request('removeEthereumChain', { chain: network.id });
       await updateNetworks();
     },
-    onSuccess: () => navigate(-1),
+    onSuccess: () => navigate(BACK_ROUTE, { state: { direction: 'back' } }),
   });
 
   if (!network || !chainConfig || !localConfig) {
@@ -97,22 +100,20 @@ export function EditNetwork() {
     <div className="flex flex-col h-full overflow-hidden relative">
       <Header
         title={network.name}
-        onBack={() =>
-          navigate('/settings/networks', { state: { direction: 'back' } })
-        }
-        customElement={
-          isCustomNetworkId(network.id) && (
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => removeMutation.mutate()}
-              className="text-destructive"
-            >
-              <IoTrashOutline size={20} />
-            </Button>
-          )
-        }
+        onBack={() => navigate(BACK_ROUTE, { state: { direction: 'back' } })}
       />
+      {isCustomNetworkId(network.id) && (
+        <Content name="custom-header">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => removeMutation.mutate()}
+            className="text-destructive"
+          >
+            <IoTrashOutline size={20} />
+          </Button>
+        </Content>
+      )}
 
       <div className="flex-1 space-y-4 no-scrollbar px-4 overflow-y-auto">
         <Card className="border border-border divide-none">

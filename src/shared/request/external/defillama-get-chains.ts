@@ -1,7 +1,7 @@
 import { DEFILLAMA_CHAIN_MAP } from '@/shared/chains/defillama';
 import { CHAIN_NAMESPACES } from '@/shared/chains/types';
 
-const CHAIN_ID_URL = 'https://chainid.network/chains.json';
+const CHAIN_ID_URL = 'https://chainlist.org/rpcs.json';
 const LLAMA_TVL_URL = 'https://api.llama.fi/chains';
 
 type ChainNamespace = (typeof CHAIN_NAMESPACES)[keyof typeof CHAIN_NAMESPACES];
@@ -32,6 +32,7 @@ export interface EVMChainDataResponse {
   status?: string;
   title?: string;
   network?: string;
+  infoURL?: string;
 }
 
 interface DefiLlamaChain {
@@ -184,26 +185,32 @@ function toChainResponse(chain: EVMChainDataResponse): EVMChainDataResponse {
   };
 }
 
+type RPCEntry = string | { url: string; tracking?: string };
+
+function normalizeRpcUrls(rpc: RPCEntry[]): string[] {
+  return (rpc ?? [])
+    .map((r) => (typeof r === 'string' ? r : r?.url))
+    .filter((url): url is string => Boolean(url));
+}
+
+// Wrap fetch agar selalu normalize
+async function fetchChains(): Promise<EVMChainDataResponse[]> {
+  const res = await fetch(CHAIN_ID_URL, { signal: AbortSignal.timeout(8000) });
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  const raw: any[] = await res.json();
+  return raw.map((chain) => ({
+    ...chain,
+    rpc: normalizeRpcUrls(chain.rpc ?? []),
+  }));
+}
+
 export async function fetchChainData(
   chainId: number
 ): Promise<EVMChainDataResponse | null> {
   try {
-    const [response, tvlData] = await Promise.all([
-      fetch(CHAIN_ID_URL),
-      fetchTVLData(),
-    ]);
+    const [data, tvlData] = await Promise.all([fetchChains(), fetchTVLData()]);
 
-    if (!response.ok) {
-      console.warn(
-        '[ChainRegistry] Failed to fetch registry:',
-        response.statusText
-      );
-      return null;
-    }
-
-    const data = (await response.json()) as EVMChainDataResponse[];
     const chain = data.find((c) => c.chainId === chainId);
-
     if (!chain) {
       console.warn(
         `[ChainRegistry] Chain ID ${chainId} not found in registry.`
@@ -222,20 +229,11 @@ export async function fetchAllChains(
   limit = 4000
 ): Promise<EVMChainDataResponse[]> {
   try {
-    const [response, tvlData] = await Promise.all([
-      fetch(CHAIN_ID_URL),
-      fetchTVLData(),
-    ]);
+    const [data, tvlData] = await Promise.all([fetchChains(), fetchTVLData()]);
 
-    if (!response.ok) return [];
-
-    const data = (await response.json()) as EVMChainDataResponse[];
     const activeChains = data.filter((c) => c.status !== 'deprecated');
-
     const enrichedChains = applyTVLInheritance(activeChains, tvlData);
-
-    const result = sortChains(enrichedChains).slice(0, limit);
-    return result.map(toChainResponse);
+    return sortChains(enrichedChains).slice(0, limit).map(toChainResponse);
   } catch {
     return [];
   }

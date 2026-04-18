@@ -30,6 +30,7 @@ export function CurrencyView() {
         title="Currency"
         onBack={() => navigate('/settings', { state: { direction: 'back' } })}
       />
+
       <div className="flex flex-col h-full px-4">
         <p className="text-sm text-muted-foreground mb-4">
           Select primary fiat currency to display prices and valuations.
@@ -54,3 +55,12 @@ export function CurrencyView() {
     </>
   );
 }
+
+export const CurrencyBadge = () => {
+  const { currency } = useCurrency();
+  return (
+    <span className="text-xs font-medium text-foreground/60 uppercase">
+      {currency}
+    </span>
+  );
+};

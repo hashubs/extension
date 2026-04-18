@@ -10,6 +10,7 @@ import {
   useRef,
   useState,
 } from 'react';
+import { Content } from 'react-area';
 import { LuListFilter } from 'react-icons/lu';
 import { useNavigate } from 'react-router-dom';
 import { useActionFilterParams } from './ActionFilters';
@@ -263,59 +264,51 @@ export function ActionsView() {
       ref={setScrollElement}
       className="flex flex-col h-full w-full overflow-y-auto relative"
     >
-      <Header
-        customElement={
-          <>
-            <div
-              className="relative flex-1 flex items-center justify-center overflow-hidden"
-              style={{ height: '36px' }}
-            >
-              <h1
-                className="absolute text-base font-semibold tracking-wide transition-all duration-300 ease-in-out whitespace-nowrap"
-                style={{
-                  opacity: searchPinned ? 0 : 1,
-                  transform: searchPinned
-                    ? 'translateY(-10px)'
-                    : 'translateY(0px)',
-                  pointerEvents: searchPinned ? 'none' : 'auto',
-                }}
-              >
-                History
-              </h1>
+      <Header onBack={handleBack} />
 
-              <div
-                className="absolute w-full transition-all duration-300 ease-in-out"
-                style={{
-                  opacity: searchPinned ? 1 : 0,
-                  transform: searchPinned
-                    ? 'translateY(0px)'
-                    : 'translateY(10px)',
-                  pointerEvents: searchPinned ? 'auto' : 'none',
-                }}
-              >
-                <ActionSearch
-                  value={searchQuery}
-                  onChange={setSearchQuery}
-                  searchPinned={searchPinned}
-                />
-              </div>
-            </div>
+      <Content name="custom-header">
+        <div
+          className="relative flex-1 flex items-center justify-center overflow-hidden"
+          style={{ height: '36px' }}
+        >
+          <h1
+            className="absolute text-base font-semibold tracking-wide transition-all duration-300 ease-in-out whitespace-nowrap"
+            style={{
+              opacity: searchPinned ? 0 : 1,
+              transform: searchPinned ? 'translateY(-10px)' : 'translateY(0px)',
+              pointerEvents: searchPinned ? 'none' : 'auto',
+            }}
+          >
+            History
+          </h1>
 
-            <button
-              type="button"
-              className="size-[32px] rounded-[9px] flex items-center justify-center bg-muted hover:bg-muted/80 relative"
-              onClick={handleGoToFilter}
-              aria-label="Filters"
-            >
-              <LuListFilter size={15} />
-              {hasAnyFilter && (
-                <span className="absolute top-2 right-1.5 size-2 bg-blue-500 rounded-full ring-2 ring-background transition-transform" />
-              )}
-            </button>
-          </>
-        }
-        onBack={handleBack}
-      />
+          <div
+            className="absolute w-full transition-all duration-300 ease-in-out"
+            style={{
+              opacity: searchPinned ? 1 : 0,
+              transform: searchPinned ? 'translateY(0px)' : 'translateY(10px)',
+              pointerEvents: searchPinned ? 'auto' : 'none',
+            }}
+          >
+            <ActionSearch
+              value={searchQuery}
+              onChange={setSearchQuery}
+              searchPinned={searchPinned}
+            />
+          </div>
+        </div>
+        <button
+          type="button"
+          className="size-[32px] rounded-[9px] flex items-center justify-center bg-muted hover:bg-muted/80 relative"
+          onClick={handleGoToFilter}
+          aria-label="Filters"
+        >
+          <LuListFilter size={15} />
+          {hasAnyFilter && (
+            <span className="absolute top-2 right-1.5 size-2 bg-blue-500 rounded-full ring-2 ring-background transition-transform" />
+          )}
+        </button>
+      </Content>
 
       <div
         ref={searchRef}

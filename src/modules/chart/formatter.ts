@@ -19,7 +19,6 @@ export function formatDefiLlamaPoints(
 
 /**
  * Server response shape for /asset/fungible/chart
- * (matches server/src/services/zerion/chart.ts FungibleChart)
  */
 export interface FungibleChartPoint {
   timestamp: number;
@@ -28,9 +27,6 @@ export interface FungibleChartPoint {
 }
 
 /**
- * Convert Zerion-style FungibleChart server response into the generic
- * ChartPoint format consumed by <Chart />.
- *
  * When an action is present, it is attached as the third tuple element.
  */
 export function formatFungibleChartPoints(

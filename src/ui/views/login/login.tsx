@@ -8,11 +8,12 @@ import { zeroizeAfterSubmission } from '@/shared/zeroize-submission';
 import { BlockieAddress } from '@/ui/components/blockie';
 import { Button, Input } from '@/ui/ui-kit';
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import { RiLockPasswordLine } from 'react-icons/ri';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { AnimatedBackground } from './components/AnimatedBackground';
 import { ForgotPassword } from './forgot-password';
+import { LoginPasskey } from './login-passkey';
 
 export function LoginView() {
   const [params] = useSearchParams();
@@ -36,6 +37,14 @@ export function LoginView() {
     },
   });
 
+  const handleSuccess = useCallback(() => {
+    navigate(params.get('next') || '/', {
+      // If user clicks "back" when we redirect them,
+      // we should take them to overview, not back to the login view
+      replace: true,
+    });
+  }, [navigate, params]);
+
   const loginMutation = useMutation({
     mutationFn: async ({
       user,
@@ -51,7 +60,7 @@ export function LoginView() {
       setUnlocked(true);
       await wait(100);
       queryClient.invalidateQueries({ queryKey: ['authState'] });
-      navigate(params.get('next') || '/', { replace: true });
+      handleSuccess();
     },
   });
 
@@ -109,10 +118,11 @@ export function LoginView() {
             </p>
           )}
 
-          <div className="flex flex-col space-y-2 mt-3">
+          <div className="flex flex-col mt-4">
             <Button
               onClick={handleUnlock}
               loading={loginMutation.isPending}
+              loadingText="Unlocking…"
               size="md"
               variant="primary"
               className="py-1.75"
@@ -120,10 +130,11 @@ export function LoginView() {
             >
               Unlock
             </Button>
+            <LoginPasskey user={user || undefined} onSuccess={handleSuccess} />
             <Button
               variant="blank"
               size="md"
-              className="py-1.75"
+              className="py-1.75 mt-2"
               onClick={() => setForgotPasswordOpen(true)}
             >
               Need Help?

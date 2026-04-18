@@ -9,9 +9,17 @@ import {
   isTestnet as checkIsTestnet,
 } from '@/shared/request/external/defillama-get-chains';
 import { useExternalChains } from '@/ui/hooks/request/external/use-external-chains';
+import { Image } from '@/ui/ui-kit';
+import { Button } from '@/ui/ui-kit/button';
 import { Card, CardItem } from '@/ui/ui-kit/card';
+import {
+  Drawer,
+  DrawerClose,
+  DrawerContent,
+  DrawerFooter,
+} from '@/ui/ui-kit/drawer';
 import { useVirtualizer } from '@tanstack/react-virtual';
-import { useCallback, useEffect, useRef } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { IoIosCheckmark } from 'react-icons/io';
 import { IoAddOutline } from 'react-icons/io5';
 import { useNavigate } from 'react-router-dom';
@@ -28,6 +36,10 @@ export function SearchResults({
 }) {
   const navigate = useNavigate();
   const parentRef = useRef<HTMLDivElement>(null);
+  const [reviewChain, setReviewChain] = useState<EVMChainDataResponse | null>(
+    null
+  );
+  const [isAdding, setIsAdding] = useState(false);
 
   const { setQuery, displayed, isLoading, hasMore, loadMore } =
     useExternalChains(networks, testnetMode);
@@ -38,25 +50,31 @@ export function SearchResults({
 
   const handleQuickAdd = useCallback(
     async (registryChain: EVMChainDataResponse) => {
-      const id = toCustomNetworkId(registryChain.chainId.toString());
-      await walletPort.request('addEthereumChain', {
-        values: [
-          {
-            chainName: registryChain.name,
-            rpcUrls: registryChain.rpc || [],
-            chainId: normalizeChainId(registryChain.chainId),
-            nativeCurrency: registryChain.nativeCurrency,
-            blockExplorerUrls:
-              registryChain.explorers?.map((e: any) => e.url) || [],
-            is_testnet: checkIsTestnet(registryChain),
-          },
-        ],
-        origin: INTERNAL_ORIGIN,
-        chain: id,
-        prevChain: null,
-      });
-      await updateNetworks();
-      navigate(`/networks`);
+      setIsAdding(true);
+      try {
+        const id = toCustomNetworkId(registryChain.chainId.toString());
+        await walletPort.request('addEthereumChain', {
+          values: [
+            {
+              chainName: registryChain.name,
+              rpcUrls: registryChain.rpc || [],
+              chainId: normalizeChainId(registryChain.chainId),
+              nativeCurrency: registryChain.nativeCurrency,
+              blockExplorerUrls:
+                registryChain.explorers?.map((e: any) => e.url) || [],
+              is_testnet: checkIsTestnet(registryChain),
+            },
+          ],
+          origin: INTERNAL_ORIGIN,
+          chain: id,
+          prevChain: null,
+        });
+        await updateNetworks();
+        navigate(`/settings/networks`);
+      } finally {
+        setIsAdding(false);
+        setReviewChain(null);
+      }
     },
     [navigate]
   );
@@ -69,7 +87,7 @@ export function SearchResults({
   });
 
   const handleNavigate = useCallback(
-    (id: string) => navigate(`/networks/${id}`),
+    (id: string) => navigate(`/settings/networks/${id}`),
     [navigate]
   );
 
@@ -153,8 +171,15 @@ export function SearchResults({
                         ...(item.isSaved
                           ? { onClick: () => handleNavigate(item.key) }
                           : {
+                              onClick: () => {
+                                console.log(
+                                  '[SearchResults] item.data',
+                                  item.data
+                                );
+                                if (item.data) setReviewChain(item.data);
+                              },
                               onClickIconRight: () => {
-                                if (item.data) handleQuickAdd(item.data);
+                                if (item.data) setReviewChain(item.data);
                               },
                             }),
                         className: 'border-border',
@@ -167,6 +192,94 @@ export function SearchResults({
           </div>
         )}
       </div>
+
+      <Drawer
+        open={!!reviewChain}
+        onOpenChange={(open) => !open && setReviewChain(null)}
+      >
+        <DrawerContent
+          variant="inset"
+          title="Add Network"
+          description="Add Network"
+        >
+          {reviewChain && (
+            <div className="flex flex-col gap-6 px-4 pb-6 pt-2">
+              <div className="flex items-center gap-2">
+                <Image
+                  src={getChainLogo(`eip155:${reviewChain.chainId}`)}
+                  alt={reviewChain.name}
+                  className="size-10 rounded-full object-contain"
+                />
+                <div>
+                  <h3 className="text-sm font-semibold">{reviewChain.name}</h3>
+                  {reviewChain.infoURL ? (
+                    <p className="text-xs text-muted-foreground">
+                      {reviewChain.infoURL}
+                    </p>
+                  ) : null}
+                </div>
+              </div>
+
+              <div className="flex flex-col gap-3">
+                <div className="flex flex-col gap-1.5 p-3 rounded-xl border border-border bg-muted/10">
+                  <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">
+                    Network URL
+                  </span>
+                  <span className="text-xs break-all font-medium">
+                    {reviewChain.rpc?.[0] || '-'}
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="flex flex-col gap-1.5 p-3 rounded-xl border border-border bg-muted/10">
+                    <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">
+                      Chain ID
+                    </span>
+                    <span className="text-xs font-medium">
+                      {reviewChain.chainId}
+                    </span>
+                  </div>
+                  <div className="flex flex-col gap-1.5 p-3 rounded-xl border border-border bg-muted/10">
+                    <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">
+                      Currency Symbol
+                    </span>
+                    <span className="text-xs font-medium">
+                      {reviewChain.nativeCurrency.symbol}
+                    </span>
+                  </div>
+                </div>
+
+                {reviewChain.explorers?.[0] && (
+                  <div className="flex flex-col gap-1.5 p-3 rounded-xl border border-border bg-muted/10">
+                    <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">
+                      Block Explorer
+                    </span>
+                    <span className="text-xs break-all font-medium">
+                      {reviewChain.explorers[0].url}
+                    </span>
+                  </div>
+                )}
+              </div>
+
+              <DrawerFooter className="p-0 mt-2 gap-3">
+                <Button
+                  className="w-full"
+                  variant="primary"
+                  onClick={() => handleQuickAdd(reviewChain)}
+                  disabled={isAdding}
+                >
+                  {isAdding ? 'Adding...' : 'Add Network'}
+                </Button>
+                <DrawerClose asChild>
+                  <Button className="w-full" variant="ghost">
+                    Cancel
+                  </Button>
+                </DrawerClose>
+              </DrawerFooter>
+            </div>
+          )}
+        </DrawerContent>
+      </Drawer>
     </div>
   );
 }

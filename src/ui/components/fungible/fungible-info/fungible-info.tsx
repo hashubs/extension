@@ -17,6 +17,7 @@ import { Image } from '@/ui/ui-kit';
 import { ImageStack } from '@/ui/ui-kit/image';
 import { ActionItem } from '@/ui/views/actions/ActionItem';
 import { useState } from 'react';
+import { Content } from 'react-area';
 import {
   LuArrowUpDown,
   LuDollarSign,
@@ -159,40 +160,43 @@ export function FungibleInfo({
   return (
     <div className="relative flex flex-col w-full h-full overflow-y-auto overflow-x-hidden no-scrollbar bg-background">
       <Header
-        customElement={
-          <div className="flex items-center bg-background border border-border/50 rounded-full pl-1.5 pr-1.5 py-1 overflow-hidden">
-            <Image
-              src={data.metadata?.logoUrl}
-              alt={chain?.name || ''}
-              className="size-[22px] rounded-full"
-            />
-            <span className="ml-1.5 text-[13px] font-medium text-foreground uppercase truncate max-w-[150px]">
-              {data?.symbol}
-            </span>
-            <animated.div
-              style={styles}
-              className="flex items-center overflow-hidden whitespace-nowrap"
-            >
-              {data.market && (
-                <div className="flex items-center">
-                  <span className="mx-1.5 opacity-40">•</span>
-                  <span className="text-[12px] text-muted-foreground uppercase font-medium">
-                    {formatFiat(
-                      convertUsdToFiat(displayPrice ?? 0),
-                      defaultCurrency
-                    )}
-                  </span>
-                </div>
-              )}
-            </animated.div>
-          </div>
-        }
         onBack={() => navigate('/overview', { state: { direction: 'back' } })}
       />
+      <Content name="custom-header">
+        <div className="flex items-center bg-background border border-border/50 rounded-full pl-1.5 pr-3 py-1 overflow-hidden">
+          <Image
+            src={data.metadata?.logoUrl}
+            alt={chain?.name || ''}
+            className="size-[22px] rounded-full"
+          />
+          <span className="ml-1.5 text-[13px] font-medium uppercase truncate max-w-[150px]">
+            {data?.symbol}
+          </span>
+          <animated.span
+            style={styles}
+            className="flex items-center overflow-hidden whitespace-nowrap"
+          >
+            {data.market && (
+              <>
+                <span className="mx-1.5 opacity-40">•</span>
+                <span className="text-[13px] uppercase font-medium">
+                  {formatFiat(
+                    convertUsdToFiat(displayPrice ?? 0),
+                    defaultCurrency
+                  )}
+                </span>
+              </>
+            )}
+          </animated.span>
+        </div>
+      </Content>
       <div className="flex-1">
         {!!data.market && !!data.market.price && (
-          <div ref={triggerRef} className="relative">
-            <div className="inline-flex flex-row items-end gap-1 absolute left-[15px] bg-background rounded-lg z-10">
+          <div className="relative">
+            <div
+              ref={triggerRef}
+              className="inline-flex flex-row items-end gap-1 absolute left-[15px] bg-background rounded-lg z-10"
+            >
               <span className="text-[26px] font-medium leading-none tracking-tight">
                 {formatFiat(convertUsdToFiat(displayPrice), defaultCurrency)}
               </span>

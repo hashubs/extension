@@ -121,14 +121,11 @@ browser.alarms.onAlarm.addListener(userActivity.handleAlarm);
 browser.alarms.onAlarm.addListener(ContentScriptManager.handleAlarm);
 browser.alarms.onAlarm.addListener(TransactionService.handleAlarm);
 
-console.time('bg initialize'); // eslint-disable-line no-console
-
 browser.runtime.onStartup.addListener(() => {
   runtimeStore.handleStartupEvent();
 });
 
 initialize().then((values) => {
-  console.timeEnd('bg initialize'); // eslint-disable-line no-console
   const account = values.account;
   const accountPublicRPC = values.accountPublicRPC;
   // const dnaService = values.dnaService;

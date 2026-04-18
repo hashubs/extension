@@ -5,11 +5,13 @@ import { useState } from 'react';
 import {
   LuChevronRight,
   LuDollarSign,
+  LuShield,
   LuSunMoon,
   LuTerminal,
+  LuWallet,
 } from 'react-icons/lu';
 import { useNavigate } from 'react-router-dom';
-import { CurrencyBadge } from '../tests/currency-selector';
+import { CurrencyBadge } from './currency';
 
 type navigationType = {
   title?: string;
@@ -52,22 +54,35 @@ export function SettingsView() {
         {
           icon: LuTerminal,
           iconRight: LuChevronRight,
-          label: 'Developer Tools',
-          onClick: () =>
-            navigate('/settings/developer-tools', {
-              state: { direction: 'forward' },
-            }),
+          label: 'Networks',
+          onClick: () => navigate('/settings/networks'),
           iconClassName: 'text-lime-500 bg-lime-500/10',
         },
         {
           icon: LuTerminal,
           iconRight: LuChevronRight,
-          label: 'Networks',
-          onClick: () =>
-            navigate('/settings/networks', {
-              state: { direction: 'forward' },
-            }),
+          label: 'Developer Tools',
+          onClick: () => navigate('/settings/developer-tools'),
           iconClassName: 'text-lime-500 bg-lime-500/10',
+        },
+      ],
+    },
+    {
+      title: 'Accounts & Security',
+      items: [
+        {
+          icon: LuWallet,
+          iconRight: LuChevronRight,
+          label: 'Manage Accounts',
+          onClick: () => navigate('/settings/manage-accounts'),
+          iconClassName: 'text-slate-500 bg-slate-500/10',
+        },
+        {
+          icon: LuShield,
+          iconRight: LuChevronRight,
+          label: 'Security & Privacy',
+          onClick: () => navigate('/settings/security-privacy'),
+          iconClassName: 'text-green-500 bg-green-500/10',
         },
       ],
     },

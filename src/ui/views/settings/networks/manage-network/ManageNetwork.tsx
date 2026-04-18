@@ -150,7 +150,7 @@ export function ManageNetwork() {
                 icon: IoAddOutline,
                 iconRight: IoChevronForwardOutline,
                 label: 'Add Network',
-                onClick: () => navigate('/networks/add'),
+                onClick: () => navigate('/settings/networks/add'),
                 iconClassName:
                   'bg-linear-to-br from-indigo-500/20 to-indigo-600/10 text-indigo-400 border border-indigo-500/10',
               }}
@@ -176,7 +176,7 @@ export function ManageNetwork() {
                       metadata={metadataRecord[item.id]}
                       groupKey={group.key}
                       dateFormatter={dateFormatter}
-                      onClick={() => navigate(`/networks/${item.id}`)}
+                      onClick={() => navigate(`/settings/networks/${item.id}`)}
                     />
                   ))}
                 </Card>

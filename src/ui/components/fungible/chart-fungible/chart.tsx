@@ -30,6 +30,12 @@ import type {
 
 import { useParams } from 'react-router-dom';
 import { OptimisticFungibleInfo } from '../fungible-info';
+
+import DotNegativeDark from 'data-url:@/ui/assets/chart-dot-negative-dark.svg';
+import DotNegativeLight from 'data-url:@/ui/assets/chart-dot-negative-light.svg';
+import DotPositiveDark from 'data-url:@/ui/assets/chart-dot-positive-dark.svg';
+import DotPositiveLight from 'data-url:@/ui/assets/chart-dot-positive-light.svg';
+
 import './interaction'; // registers magneticActions mode side-effect
 
 const PERIOD_OPTIONS: { label: string; value: ChartPeriod }[] = [
@@ -45,14 +51,10 @@ const DotImages = {
   out: { light: new Image(), dark: new Image() },
 };
 
-DotImages.in.light.src =
-  'https://cdn.zerion.io/images/dna-assets/chart-dot-positive-light.svg';
-DotImages.in.dark.src =
-  'https://cdn.zerion.io/images/dna-assets/chart-dot-positive-dark.svg';
-DotImages.out.light.src =
-  'https://cdn.zerion.io/images/dna-assets/chart-dot-negative-light.svg';
-DotImages.out.dark.src =
-  'https://cdn.zerion.io/images/dna-assets/chart-dot-negative-dark.svg';
+DotImages.in.light.src = DotPositiveLight;
+DotImages.in.dark.src = DotPositiveDark;
+DotImages.out.light.src = DotNegativeLight;
+DotImages.out.dark.src = DotNegativeDark;
 
 function getPointColor(
   theme: 0 | 1,

@@ -5,6 +5,7 @@ import { Networks as NetworksModule } from '@/modules/networks/networks';
 import { walletPort } from '@/shared/channel';
 import { collectData, type Parsers } from '@/shared/form-data';
 import { normalizeChainId } from '@/shared/normalize-chain-id';
+import { FormField } from '@/ui/components/form';
 import { Header } from '@/ui/components/header';
 import { usePreferences } from '@/ui/features/preferences';
 import { useNetworks } from '@/ui/hooks/request/internal/useNetworks';
@@ -16,7 +17,6 @@ import { isTruthy } from 'is-truthy-ts';
 import { useMemo, useState } from 'react';
 import { IoSearchOutline } from 'react-icons/io5';
 import { useNavigate } from 'react-router-dom';
-import { FormField } from '../_shared/FormField';
 import { updateNetworks } from '../_shared/updateNetworks';
 import { SearchResults } from './SearchResults';
 
@@ -24,6 +24,8 @@ const parsers: Parsers<any> = {
   chainId: (val: unknown) => normalizeChainId(val as string),
   'nativeCurrency.decimals': (val: unknown) => Number(val),
 };
+
+const BACK_ROUTE = '/settings/networks';
 
 export function AddNetwork() {
   const navigate = useNavigate();
@@ -51,7 +53,7 @@ export function AddNetwork() {
       await updateNetworks();
       return result;
     },
-    onSuccess: () => navigate(`/networks`),
+    onSuccess: () => navigate(BACK_ROUTE, { state: { direction: 'back' } }),
   });
 
   const restrictedChainIds = useMemo(() => {
@@ -100,9 +102,7 @@ export function AddNetwork() {
     <div className="flex flex-col h-full overflow-hidden relative">
       <Header
         title="Add Network"
-        onBack={() =>
-          navigate('/settings/networks', { state: { direction: 'back' } })
-        }
+        onBack={() => navigate(BACK_ROUTE, { state: { direction: 'back' } })}
       />
 
       <Tabs
@@ -146,11 +146,23 @@ export function AddNetwork() {
         >
           <form onSubmit={handleCustomSubmit} className="flex flex-col gap-6">
             <div className="flex flex-col gap-4">
-              <FormField label="Network Name" name="chainName" required />
-              <FormField label="RPC URL" name="rpcUrl" type="url" required />
+              <FormField
+                label="Network Name"
+                name="chainName"
+                placeholder="e.g. Ethereum Mainnet"
+                required
+              />
+              <FormField
+                label="RPC URL"
+                name="rpcUrl"
+                placeholder="https://mainnet.infura.io/v3/..."
+                type="url"
+                required
+              />
               <FormField
                 label="Chain ID"
                 name="chainId"
+                placeholder="e.g. 1"
                 required
                 error={errors.chainId}
               />
@@ -158,18 +170,21 @@ export function AddNetwork() {
                 <FormField
                   label="Symbol"
                   name="nativeCurrency.symbol"
+                  placeholder="e.g. ETH"
                   required
                 />
                 <FormField
                   label="Decimals"
                   name="nativeCurrency.decimals"
+                  placeholder="18"
                   type="number"
                   defaultValue="18"
                 />
               </div>
               <FormField
-                label="Explorer URL (Optional)"
+                label="Explorer URL"
                 name="blockExplorerUrl"
+                placeholder="https://etherscan.io"
                 type="url"
               />
             </div>

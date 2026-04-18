@@ -26,10 +26,3 @@ export function CurrencySelector() {
     </div>
   );
 }
-
-export const CurrencyBadge = () => {
-  const { currency } = useCurrency();
-  return (
-    <span className="text-xs font-medium text-foreground/60">{currency}</span>
-  );
-};

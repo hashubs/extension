@@ -1,9 +1,12 @@
 import { Header } from '@/ui/components/header';
+import { PopoverToast } from '@/ui/components/toast/PopoverToast';
 import { usePreferences } from '@/ui/features/preferences';
+import { useGlobalPreferences } from '@/ui/features/preferences/usePreferences';
 import { Card, CardItem, ItemType } from '@/ui/ui-kit/card';
 import { Switch } from '@/ui/ui-kit/switch';
-import { LuTerminal } from 'react-icons/lu';
+import { LuLoader, LuTerminal } from 'react-icons/lu';
 import { useNavigate } from 'react-router-dom';
+import { useClearPendingTransactions } from './clear-pending-transaction';
 
 type navigationType = {
   title?: string;
@@ -12,7 +15,14 @@ type navigationType = {
 
 export function DeveloperToolsView() {
   const navigate = useNavigate();
+
+  const { globalPreferences, setGlobalPreferences } = useGlobalPreferences();
   const { preferences, setPreferences } = usePreferences();
+  const {
+    clearPendingTransactions,
+    isPending,
+    toastRef: clearPendingTransactionsToastRef,
+  } = useClearPendingTransactions();
 
   const navigations: navigationType[] = [
     {
@@ -21,8 +31,12 @@ export function DeveloperToolsView() {
           icon: LuTerminal,
           label: 'Custom Nonce',
           subLabel: 'Set your own unique nonce to control transaction order',
-          badge: <Switch checked />,
-          onClick: () => {},
+          onClick: () => {
+            setPreferences({
+              configurableNonce: !preferences?.configurableNonce,
+            });
+          },
+          badge: <Switch checked={Boolean(preferences?.configurableNonce)} />,
           iconClassName: 'text-purple-500 bg-purple-500/10',
           isItemStart: true,
         },
@@ -30,8 +44,17 @@ export function DeveloperToolsView() {
           icon: LuTerminal,
           label: 'Custom Data',
           subLabel: 'Attach arbitrary data to Send transactions',
-          badge: <Switch checked />,
-          onClick: () => {},
+          onClick: () => {
+            setPreferences({
+              configurableTransactionData:
+                !preferences?.configurableTransactionData,
+            });
+          },
+          badge: (
+            <Switch
+              checked={Boolean(preferences?.configurableTransactionData)}
+            />
+          ),
           iconClassName: 'text-purple-500 bg-purple-500/10',
           isItemStart: true,
         },
@@ -40,8 +63,17 @@ export function DeveloperToolsView() {
           label: 'Recognizable Connect Buttons',
           subLabel:
             'When enabled, we add Selvo Wallet label to connect buttons in DApps so that they’re easier to spot',
-          badge: <Switch checked />,
-          onClick: () => {},
+          onClick: () => {
+            setGlobalPreferences({
+              recognizableConnectButtons:
+                !globalPreferences?.recognizableConnectButtons,
+            });
+          },
+          badge: (
+            <Switch
+              checked={Boolean(globalPreferences?.recognizableConnectButtons)}
+            />
+          ),
           iconClassName: 'text-purple-500 bg-purple-500/10',
           isItemStart: true,
         },
@@ -69,7 +101,11 @@ export function DeveloperToolsView() {
         {
           icon: LuTerminal,
           label: 'Clear Pending Transactions',
-          onClick: () => {},
+          onClick: () => {
+            clearPendingTransactions();
+          },
+          iconRight: isPending ? LuLoader : undefined,
+          iconRightClassName: 'animate-spin',
           iconClassName: 'text-lime-500 bg-lime-500/10',
         },
       ],
@@ -96,6 +132,10 @@ export function DeveloperToolsView() {
           ))}
         </div>
       </div>
+
+      <PopoverToast ref={clearPendingTransactionsToastRef} showClose>
+        Pending transactions cleared
+      </PopoverToast>
     </>
   );
 }

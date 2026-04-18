@@ -34,6 +34,7 @@ export function useWalletPortfolio({
     },
     enabled: enabled && addresses.length > 0,
     staleTime: 30_000,
+    refetchInterval: 30_000,
   });
 }
 
