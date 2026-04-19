@@ -1,14 +1,21 @@
 import { INTERNAL_ORIGIN } from '@/background/constants';
+import { isSolanaAddress } from '@/modules/solana/shared';
+import { walletPort } from '@/shared/channel';
+import { isEthereumAddress } from '@/shared/is-ethereum-address';
 import { isConnectableDapp } from '@/shared/isConnectableDapp';
 import { requestChainForOrigin } from '@/shared/request/internal/requestChainForOrigin';
 import { getAddressType } from '@/shared/wallet/classifiers';
 import { ConnectedSiteDrawer } from '@/ui/components/ConnectedSite';
 import { useAddressParams } from '@/ui/hooks/request/internal/useAddressParams';
 import { useIsConnectedToActiveTab } from '@/ui/hooks/request/internal/useIsConnectedToActiveTab';
+import { useNetworkConfig } from '@/ui/hooks/request/internal/useNetworks';
 import { cn } from '@/ui/lib/utils';
-import { Button } from '@/ui/ui-kit';
+import { Button, Image } from '@/ui/ui-kit';
 import { animated, useSpring } from '@react-spring/web';
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
+import { useCallback, useEffect } from 'react';
+import { IoChevronDown } from 'react-icons/io5';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import {
   PausedHeader,
   PauseInjectionDrawer,
@@ -29,7 +36,7 @@ export function useConnectionSite() {
   const activeTabOrigin = tabData?.tabOrigin;
   const isConnectedToActiveTab = !!(isConnected && activeTabOrigin);
 
-  const { data: siteChain } = useQuery({
+  const { data: siteChain, ...chainQuery } = useQuery({
     queryKey: ['requestChainForOrigin', activeTabOrigin, address],
     queryFn: async () => {
       if (activeTabOrigin) {
@@ -40,6 +47,45 @@ export function useConnectionSite() {
     enabled: !!activeTabOrigin,
   });
 
+  const switchChainMutation = useMutation({
+    mutationFn: ({ chain, origin }: { chain: string; origin: string }) => {
+      if (isSolanaAddress(address)) {
+        return walletPort.request('switchChainForOrigin', {
+          solanaChain: chain,
+          origin,
+        });
+      } else if (isEthereumAddress(address)) {
+        return walletPort.request('switchChainForOrigin', {
+          evmChain: chain,
+          origin,
+        });
+      } else {
+        throw new Error('Cannot determine current address type');
+      }
+    },
+    onSuccess: () => {
+      chainQuery.refetch();
+    },
+  });
+
+  const [searchParams, setSearchParams] = useSearchParams();
+  const dappChain = searchParams.get('dappChain');
+
+  useEffect(() => {
+    if (dappChain && activeTabOrigin) {
+      switchChainMutation.mutate(
+        { chain: dappChain, origin: activeTabOrigin },
+        {
+          onSuccess: () => {
+            const newParams = new URLSearchParams(searchParams);
+            newParams.delete('dappChain');
+            setSearchParams(newParams, { replace: true });
+          },
+        }
+      );
+    }
+  }, [dappChain, activeTabOrigin]);
+
   const isChainPending = !!(isConnectedToActiveTab && siteChain === undefined);
   const isDataLoading = !!(
     isConnectableSite &&
@@ -48,6 +94,10 @@ export function useConnectionSite() {
 
   const isRevealable =
     tabData === undefined || !!(isConnectableSite || showPausedHeader);
+
+  const { data: networkConfig } = useNetworkConfig(
+    siteChain?.toString() || null
+  );
 
   return {
     tabData,
@@ -58,6 +108,7 @@ export function useConnectionSite() {
     isConnectableSite,
     isConnectedToActiveTab,
     siteChain,
+    networkConfig,
     isChainPending,
     isConnected,
     isConnectionPending,
@@ -72,8 +123,24 @@ export function ConnectionSite({ isHidden }: { isHidden: boolean }) {
     isConnectableSite,
     isConnectedToActiveTab,
     siteChain,
+    networkConfig,
     showPausedHeader,
   } = useConnectionSite();
+
+  const navigate = useNavigate();
+
+  const handleNetworkSelect = useCallback(() => {
+    const nextParams = new URLSearchParams();
+    nextParams.set('next', '/overview');
+    nextParams.set('paramName', 'dappChain');
+    nextParams.set('showAll', 'false');
+
+    if (siteChain) {
+      nextParams.set('dappChain', siteChain.toString());
+    }
+
+    navigate(`/select-network?${nextParams.toString()}`);
+  }, [navigate, siteChain]);
 
   const springs = useSpring({
     to: {
@@ -115,8 +182,27 @@ export function ConnectionSite({ isHidden }: { isHidden: boolean }) {
                     </div>
                   </div>
                   {siteChain && (
-                    <Button size="sm" variant="outline" className="w-auto">
-                      Network
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="w-auto h-7 px-2.5 rounded-full"
+                      icon={IoChevronDown}
+                      iconPosition="right"
+                      iconClassName="opacity-40"
+                      onClick={handleNetworkSelect}
+                    >
+                      <div className="flex items-center gap-1.5 mr-0.5">
+                        {networkConfig?.icon_url && (
+                          <Image
+                            src={networkConfig.icon_url}
+                            alt={networkConfig.name || 'network'}
+                            className="size-3.5"
+                          />
+                        )}
+                        <span className="text-[11px] font-bold truncate max-w-[80px]">
+                          {networkConfig?.name || siteChain.toString()}
+                        </span>
+                      </div>
                     </Button>
                   )}
                 </div>

@@ -1,9 +1,6 @@
-import { setCurrentNetworkId } from '@/shared/request/internal/setCurrentNetworkId';
 import { Header } from '@/ui/components/header';
-import { useCurrentNetworkId } from '@/ui/hooks/request/internal/useCurrentNetworkId';
 import { Input } from '@/ui/ui-kit';
 import { NetworkList } from '@/ui/views/network-selector/network-list';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useCallback, useEffect, useState } from 'react';
 import { IoSearchOutline } from 'react-icons/io5';
 import { useNavigate, useSearchParams } from 'react-router-dom';
@@ -11,15 +8,12 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 export function NetworkSelectorView() {
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
-  const queryClient = useQueryClient();
-  const { networkId: storedNetworkId } = useCurrentNetworkId();
 
   const [searchQuery, setSearchQuery] = useState('');
-  const isSelectOnly = searchParams.get('selectOnly') === 'true';
+  const showAll = searchParams.get('showAll') !== 'false';
   const customParamName = searchParams.get('paramName') || 'network';
 
-  const resolvedActiveId =
-    searchParams.get(customParamName) || storedNetworkId || 'all';
+  const resolvedActiveId = searchParams.get(customParamName) || 'all';
 
   const [localActiveId, setLocalActiveId] = useState(resolvedActiveId);
 
@@ -27,21 +21,11 @@ export function NetworkSelectorView() {
     setLocalActiveId(resolvedActiveId);
   }, [resolvedActiveId]);
 
-  const { mutateAsync: updateNetwork } = useMutation({
-    mutationFn: (networkId: string | null) =>
-      setCurrentNetworkId({ networkId }),
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: ['wallet/getCurrentNetworkId'],
-      });
-    },
-  });
 
   const onSelect = useCallback(
     async (networkId: string, networkName: string) => {
       setLocalActiveId(networkId);
 
-      const idToSave = networkId === 'all' ? null : networkId;
       const next = searchParams.get('next');
       const newParams = new URLSearchParams(searchParams);
 
@@ -49,12 +33,12 @@ export function NetworkSelectorView() {
 
       // Clean up internal params before appending to 'next'
       newParams.delete('next');
-      newParams.delete('selectOnly');
       newParams.delete('paramName');
+      newParams.delete('showAll');
 
       if (networkId === 'all') {
-        newParams.delete(customParamName);
-        newParams.delete(customNameParam);
+        newParams.set(customParamName, 'all');
+        newParams.set(customNameParam, 'All Networks');
       } else {
         newParams.set(customParamName, networkId);
         newParams.set(customNameParam, networkName);
@@ -62,9 +46,6 @@ export function NetworkSelectorView() {
 
       setSearchParams(newParams, { replace: true });
 
-      if (!isSelectOnly) {
-        await updateNetwork(idToSave).catch(console.error);
-      }
 
       if (next) {
         const connector = next.includes('?') ? '&' : '?';
@@ -80,14 +61,7 @@ export function NetworkSelectorView() {
         navigate(-1);
       }
     },
-    [
-      navigate,
-      searchParams,
-      setSearchParams,
-      updateNetwork,
-      isSelectOnly,
-      customParamName,
-    ]
+    [navigate, searchParams, setSearchParams, customParamName]
   );
 
   return (
@@ -113,6 +87,7 @@ export function NetworkSelectorView() {
             activeNetworkId={localActiveId}
             onSelect={onSelect}
             searchQuery={searchQuery}
+            showAll={showAll}
           />
         </div>
       </div>

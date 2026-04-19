@@ -91,12 +91,14 @@ interface NetworkListProps {
   activeNetworkId: string;
   onSelect: (networkId: string, networkName: string) => void;
   searchQuery?: string;
+  showAll?: boolean;
 }
 
 export function NetworkList({
   activeNetworkId,
   onSelect,
   searchQuery = '',
+  showAll = true,
 }: NetworkListProps) {
   const { networks, isLoading } = useNetworks();
 
@@ -180,7 +182,8 @@ export function NetworkList({
 
   return (
     <div className="flex flex-col overflow-y-auto no-scrollbar pb-6 gap-4">
-      {(!searchQuery || 'all networks'.includes(searchQuery.toLowerCase())) && (
+      {showAll &&
+        (!searchQuery || 'all networks'.includes(searchQuery.toLowerCase())) && (
         <CardItem
           item={{
             label: 'All Networks',

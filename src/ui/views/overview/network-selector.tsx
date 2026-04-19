@@ -10,6 +10,7 @@ import { useCurrentNetworkId } from '@/ui/hooks/request/internal/useCurrentNetwo
 import { useNetworks } from '@/ui/hooks/request/internal/useNetworks';
 import { cn } from '@/ui/lib/utils';
 import { Image } from '@/ui/ui-kit/image';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useCallback, useEffect, useMemo } from 'react';
 import { IoChevronForward } from 'react-icons/io5';
 import { useNavigate, useSearchParams } from 'react-router-dom';
@@ -19,6 +20,7 @@ const AllNetworkImage =
 
 export function NetworkSelector() {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const [searchParams, setSearchParams] = useSearchParams();
   const { networks } = useNetworks();
   const { networkId: storedNetworkId } = useCurrentNetworkId();
@@ -37,6 +39,30 @@ export function NetworkSelector() {
     if (!networks || networkId === 'all') return null;
     return networks.getByNetworkId(createChain(networkId));
   }, [networks, networkId]);
+
+  const { mutate: updateNetwork } = useMutation({
+    mutationFn: (id: string | null) => setCurrentNetworkId({ networkId: id }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ['wallet/getCurrentNetworkId'],
+      });
+    },
+  });
+
+  useEffect(() => {
+    console.log('[NetworkSelector] urlNetworkId changed:', urlNetworkId);
+    if (urlNetworkId) {
+      console.log(
+        '[NetworkSelector] Triggering updateNetwork for:',
+        urlNetworkId
+      );
+      updateNetwork(urlNetworkId === 'all' ? null : urlNetworkId);
+
+      const nextParams = new URLSearchParams(searchParams);
+      nextParams.delete('network');
+      setSearchParams(nextParams, { replace: true });
+    }
+  }, [urlNetworkId, searchParams, setSearchParams, updateNetwork]);
 
   useEffect(() => {
     const isModeMismatch =
@@ -60,8 +86,9 @@ export function NetworkSelector() {
   const handleSelectNetwork = useCallback(() => {
     const currentParams = new URLSearchParams(searchParams);
     currentParams.set('next', '/overview');
+    currentParams.set('network', networkId);
     navigate(`/select-network?${currentParams.toString()}`);
-  }, [navigate, searchParams]);
+  }, [navigate, searchParams, networkId]);
 
   const networkLabel = useMemo(() => {
     if (!activeNetwork || networkId === 'all') {

@@ -219,7 +219,6 @@ export function ActionFiltersView() {
     const nextPath = `/actions/filters?${params.toString()}`;
 
     const selectorParams = new URLSearchParams();
-    selectorParams.set('selectOnly', 'true');
     selectorParams.set('paramName', 'chain');
     selectorParams.set('chain', stagedChain || 'all');
     selectorParams.set('next', nextPath);

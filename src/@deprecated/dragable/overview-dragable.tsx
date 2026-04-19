@@ -15,7 +15,7 @@ import { memo, useCallback, useEffect, useMemo } from 'react';
 import { FaWallet } from 'react-icons/fa6';
 import { LuPlus } from 'react-icons/lu';
 import { useNavigate } from 'react-router-dom';
-import { OverviewCard } from '../overview-card';
+import { OverviewCard } from '../../ui/views/overview/overview-card';
 import { ConnectionSiteDragable } from './connection-site-dragable';
 
 interface TokenHeaderProps {

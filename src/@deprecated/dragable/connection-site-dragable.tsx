@@ -14,7 +14,7 @@ import {
   PauseInjectionDrawer,
 } from 'src/ui/components/PauseInjection';
 import { Tabs } from 'webextension-polyfill';
-import { useConnectionSite } from '../connection-site';
+import { useConnectionSite } from '../../ui/views/overview/connection-site';
 
 type TabData =
   | {
