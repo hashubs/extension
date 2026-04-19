@@ -52,7 +52,12 @@ export function SearchResults({
     async (registryChain: EVMChainDataResponse) => {
       setIsAdding(true);
       try {
+        console.log(
+          '[SearchResults] handleQuickAdd registryChain',
+          registryChain
+        );
         const id = toCustomNetworkId(registryChain.chainId.toString());
+        const iconUrls = getChainLogo(registryChain.id);
         await walletPort.request('addEthereumChain', {
           values: [
             {
@@ -63,6 +68,7 @@ export function SearchResults({
               blockExplorerUrls:
                 registryChain.explorers?.map((e: any) => e.url) || [],
               is_testnet: checkIsTestnet(registryChain),
+              iconUrls: [iconUrls],
             },
           ],
           origin: INTERNAL_ORIGIN,

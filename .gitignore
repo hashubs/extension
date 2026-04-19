@@ -6,6 +6,7 @@ dist-firefox
 .parcel-cache
 .referensi
 .backup
+@deprecated
 /test-results/
 /e2e-report/
 /blob-report/

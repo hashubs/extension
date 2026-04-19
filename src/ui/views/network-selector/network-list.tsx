@@ -4,7 +4,6 @@ import { IoCheckmark } from 'react-icons/io5';
 import { isCustomNetworkId } from '@/modules/ethereum/chains/helpers';
 import { getOriginUrlFromMetaData } from '@/modules/networks/helpers';
 import { NetworkConfigMetaData, Networks } from '@/modules/networks/networks';
-import { getChainLogo } from '@/shared/chains/chain-logos';
 import { BlockchainType, getAddressType } from '@/shared/wallet/classifiers';
 import { usePreferences } from '@/ui/features/preferences';
 import { useAddressParams } from '@/ui/hooks/request/internal/useAddressParams';
@@ -41,8 +40,6 @@ const NetworkRow = React.memo(
     dateFormatter: Intl.DateTimeFormat;
     onSelect: (id: string, name: string) => void;
   }) => {
-    const caip = `${item.standard}:${item.specification.eip155?.id}`;
-    const logoUrl = groupKey === 'other' ? getChainLogo(caip) : item.icon_url;
     const isActive = activeNetworkId === item.id;
 
     let subLabel =
@@ -73,7 +70,7 @@ const NetworkRow = React.memo(
         item={{
           label: item.name,
           subLabel,
-          imgUrl: logoUrl,
+          imgUrl: item.icon_url,
           onClick: () => onSelect(item.id, item.name),
           iconRight: isActive ? IoCheckmark : undefined,
           iconRightClassName: 'text-green-500 hover:text-green-500',
@@ -183,22 +180,23 @@ export function NetworkList({
   return (
     <div className="flex flex-col overflow-y-auto no-scrollbar pb-6 gap-4">
       {showAll &&
-        (!searchQuery || 'all networks'.includes(searchQuery.toLowerCase())) && (
-        <CardItem
-          item={{
-            label: 'All Networks',
-            subLabel: 'View assets across all chains',
-            imgUrl: AllNetworkImage,
-            onClick: () => onSelect('all', 'All Networks'),
-            iconRight: activeNetworkId === 'all' ? IoCheckmark : undefined,
-            iconRightClassName: 'text-green-500 rounded-none',
-            className: cn(
-              'rounded-lg hover:rounded-lg',
-              activeNetworkId === 'all' && 'bg-black/5 dark:bg-white/5'
-            ),
-          }}
-        />
-      )}
+        (!searchQuery ||
+          'all networks'.includes(searchQuery.toLowerCase())) && (
+          <CardItem
+            item={{
+              label: 'All Networks',
+              subLabel: 'View assets across all chains',
+              imgUrl: AllNetworkImage,
+              onClick: () => onSelect('all', 'All Networks'),
+              iconRight: activeNetworkId === 'all' ? IoCheckmark : undefined,
+              iconRightClassName: 'text-green-500 rounded-none',
+              className: cn(
+                'rounded-lg hover:rounded-lg',
+                activeNetworkId === 'all' && 'bg-black/5 dark:bg-white/5'
+              ),
+            }}
+          />
+        )}
 
       {groups.map((group) => (
         <div key={group.key} className="space-y-2">

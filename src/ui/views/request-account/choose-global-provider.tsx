@@ -8,7 +8,6 @@ import {
   createInjectionPreference,
 } from 'src/ui/components/PauseInjection/actions';
 import { useGlobalPreferences } from 'src/ui/features/preferences/usePreferences';
-// import { ViewLoading } from 'src/ui/components/ViewLoading';
 
 export function ChooseGlobalProvider({
   origin,
@@ -33,7 +32,6 @@ export function ChooseGlobalProvider({
         className="grid h-full flex-1"
         style={{ gridTemplateRows: '1fr auto' }}
       >
-        {/* Main card */}
         <div className="self-center border border-gray-200 rounded-3xl p-10">
           <div className="flex flex-col gap-6">
             <h2 className="text-2xl font-bold text-center">

@@ -24,12 +24,6 @@ emitter.on('uiAccountsChanged', () => {
   });
 });
 
-emitter.on('uiNetworkChanged', () => {
-  queryClient.removeQueries({
-    queryKey: ['wallet/getCurrentNetworkId'],
-  });
-});
-
 emitter.on('sidepanel/activeTabUpdated', () => {
   queryClient.refetchQueries({ queryKey: ['activeTab/origin'] });
 });
@@ -37,7 +31,6 @@ emitter.on('sidepanel/activeTabUpdated', () => {
 emitter.on('ethereumEvent', () => {
   queryClient.refetchQueries({ queryKey: ['requestChainForOrigin'] });
 });
-
 
 emitter.on('sessionLogout', () => {
   queryClient.getMutationCache().clear();

@@ -28,11 +28,6 @@
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
 
-  // EXCLUDE FOLDER REFERENSI
-  // "search.exclude": {
-  //   "**/.referensi/**": true
-  // },
-
   // ESLINT
   "eslint.validate": [
     "javascript",

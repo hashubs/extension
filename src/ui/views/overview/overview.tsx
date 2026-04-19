@@ -4,17 +4,13 @@ import { FungibleListGroupedVirtual } from '@/ui/components/fungible/FungibleLis
 import { useDiscoveredTokens } from '@/ui/components/fungible/useDiscoveredTokens';
 import { useWalletPortfolioSummary } from '@/ui/hooks/request/external/use-wallet-portfolio-summary';
 import { useAddressParams } from '@/ui/hooks/request/internal/useAddressParams';
-import {
-  useCurrentNetworkId,
-  usePrefetchCurrentNetworkId,
-} from '@/ui/hooks/request/internal/useCurrentNetworkId';
 import { usePrefetchWalletGroups } from '@/ui/hooks/request/internal/useWalletGroups';
 import { useFiatConversion } from '@/ui/hooks/useFiatConversion';
 import { NeutralDecimals } from '@/ui/ui-kit';
 import { memo, useCallback, useMemo, useState } from 'react';
 import { FaWallet } from 'react-icons/fa6';
 import { LuPlus } from 'react-icons/lu';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { ConnectionSite } from './connection-site';
 import { OverviewCard } from './overview-card';
 
@@ -58,14 +54,14 @@ const TokenHeader = memo(function TokenHeader({
 
 export function Overview() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
 
   usePrefetchWalletGroups();
-  usePrefetchCurrentNetworkId();
 
-  const { networkId: storedNetworkId } = useCurrentNetworkId();
+  const networkId = searchParams.get('network') || 'all';
   const { singleAddress: currentAddress } = useAddressParams();
 
-  const isAllNetworks = !storedNetworkId || storedNetworkId === 'all';
+  const isAllNetworks = networkId === 'all';
 
   const [isConnectionSite, setIsConnectionSite] = useState(false);
   const [scrollElement, setScrollElement] = useState<HTMLDivElement | null>(
@@ -74,7 +70,7 @@ export function Overview() {
 
   const { data, hiddenTokens, isLoading } = useDiscoveredTokens(
     currentAddress,
-    storedNetworkId || 'all'
+    networkId
   );
 
   const { data: portfolioSummary } = useWalletPortfolioSummary({

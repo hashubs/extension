@@ -5,7 +5,7 @@ import { useAddressParams } from '@/ui/hooks/request/internal/useAddressParams';
 import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 
-export function WalletSelector() {
+export function WalletSelect() {
   const navigate = useNavigate();
 
   const { singleAddress } = useAddressParams();

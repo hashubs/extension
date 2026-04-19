@@ -1,4 +1,4 @@
-import { Ecosystem } from '@/shared/chains/types';
+type Ecosystem = 'EVM' | 'SOLANA';
 
 export interface CustomToken {
   id?: string;

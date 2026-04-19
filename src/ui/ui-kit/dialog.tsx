@@ -63,7 +63,8 @@ function DialogContent({
               <Button
                 variant="ghost"
                 className="absolute top-3 right-4"
-                size="icon"
+                iconOnly
+                iconOnlySize="md"
               >
                 <MdClose />
                 <span className="sr-only">Close</span>

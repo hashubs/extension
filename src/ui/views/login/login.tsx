@@ -5,6 +5,7 @@ import { PublicUser } from '@/shared/types/User';
 import { wait } from '@/shared/wait';
 import { zeroizeAfterSubmission } from '@/shared/zeroize-submission';
 import { BlockieAddress } from '@/ui/components/blockie';
+import { BrandLogo } from '@/ui/components/svg';
 import { Button, Input } from '@/ui/ui-kit';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { useCallback, useState } from 'react';
@@ -13,7 +14,6 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { AnimatedBackground } from './components/AnimatedBackground';
 import { ForgotPassword } from './forgot-password';
 import { LoginPasskey } from './login-passkey';
-import { BrandLogo } from '@/ui/components/svg';
 
 export function LoginView() {
   const [params] = useSearchParams();
@@ -79,12 +79,12 @@ export function LoginView() {
             {lastUsedAddress ? (
               <BlockieAddress
                 address={lastUsedAddress}
-                size={100}
+                size={95}
                 borderRadius={8}
               />
             ) : (
               <BrandLogo
-                size={100}
+                size={95}
                 className="shadow-[0_8px_32px_rgba(0,0,0,0.25)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.5)]"
               />
             )}

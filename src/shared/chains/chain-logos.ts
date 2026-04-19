@@ -1,6 +1,5 @@
-import { parseCaip19 } from '@/shared/chains/parse-caip19';
-import { CHAIN_REGISTRY } from './chain-registry';
-import { getChainRegistryByCaip } from './utils';
+import { parseCaip19 } from '@/modules/networks/helpers';
+import { CHAIN_REGISTRY, getChainRegistryByCaip } from './chain-registry';
 
 import unknownLogo from 'url:@/ui/assets/unknown.svg';
 

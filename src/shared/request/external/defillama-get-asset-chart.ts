@@ -1,10 +1,8 @@
-import { parseCaip19 } from '@/shared/chains/parse-caip19';
+import { parseCaip19 } from '@/modules/networks/helpers';
+import { getChainRegistryByCaip } from '@/shared/chains/chain-registry';
+import { getDefiLlamaPlatformKey } from '@/shared/chains/defillama';
 import { ApiContext } from '../api-bare';
 import { ClientOptions, HttpClient } from '../shared';
-import {
-  getChainRegistryByCaip,
-  getDefiLlamaPlatformKey,
-} from '@/shared/chains/utils';
 
 export interface DefiLlamaChartPoint {
   timestamp: number;

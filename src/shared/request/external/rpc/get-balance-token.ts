@@ -1,10 +1,9 @@
 import { ERC20_ABI } from '@/modules/ethereum/abi/erc20';
 import { MULTICALL_ABI } from '@/modules/ethereum/abi/multicall';
-import { getChainCaip } from '@/modules/networks/helpers';
+import { getChainCaip, parseCaip19 } from '@/modules/networks/helpers';
 import { NetworkConfig } from '@/modules/networks/network-config';
 import { Networks } from '@/modules/networks/networks';
 import { MULTICALL_ADDRESS } from '@/shared/address';
-import { getCustomTokenKey, parseCaip19 } from '@/shared/chains/parse-caip19';
 import { CustomToken } from '@/shared/fungible/types';
 import { getCachedProvider } from '@/shared/rpc/provider';
 import { getAssociatedTokenAddressSync } from '@solana/spl-token';
@@ -52,6 +51,10 @@ function withTimeout<T>(
 
 function zeroBalance(): BalanceResult {
   return { raw: '0', amount: 0 };
+}
+
+function getCustomTokenKey(token: { assetId: string }): string {
+  return token.assetId;
 }
 
 export async function rpcTokenBalancesBatch(

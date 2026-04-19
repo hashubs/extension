@@ -95,11 +95,13 @@ export function ViewTransition({
       if (!shouldAnimateRef.current) return { transform: 'translateX(0%)' };
       return {
         transform: isBackRef.current ? 'translateX(-100%)' : 'translateX(100%)',
+        opacity: 0,
       };
     },
 
     enter: () => ({
       transform: 'translateX(0%)',
+      opacity: 1,
       zIndex: 2,
     }),
 
@@ -108,6 +110,7 @@ export function ViewTransition({
         return { transform: 'translateX(0%)', zIndex: 1 };
       return {
         transform: isBackRef.current ? 'translateX(100%)' : 'translateX(-30%)',
+        opacity: 0,
         zIndex: 1,
       };
     },
@@ -136,7 +139,7 @@ export function ViewTransition({
             position: 'absolute',
             inset: 0,
             backgroundColor: 'inherit',
-            willChange: 'transform',
+            willChange: 'transform, opacity',
           }}
         >
           {children(item)}

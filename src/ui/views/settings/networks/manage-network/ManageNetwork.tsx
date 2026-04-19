@@ -3,7 +3,6 @@ import { getOriginUrlFromMetaData } from '@/modules/networks/helpers';
 import { NetworkConfig } from '@/modules/networks/network-config';
 import { NetworkConfigMetaData } from '@/modules/networks/networks';
 import { isSolanaAddress } from '@/modules/solana/shared';
-import { getChainLogo } from '@/shared/chains/chain-logos';
 import { getAddressType } from '@/shared/wallet/classifiers';
 import { Header } from '@/ui/components/header';
 import { usePreferences } from '@/ui/features/preferences';
@@ -36,9 +35,6 @@ const NetworkRow = React.memo(
     dateFormatter: Intl.DateTimeFormat;
     onClick: () => void;
   }) => {
-    const caip = `${item.standard}:${item.specification.eip155?.id}`;
-    const logoUrl = groupKey === 'other' ? getChainLogo(caip) : item.icon_url;
-
     let subLabel =
       item.native_asset?.symbol || (isTestnetMode ? 'Testnet' : 'Mainnet');
 
@@ -65,7 +61,7 @@ const NetworkRow = React.memo(
       <CardItem
         key={item.id}
         item={{
-          imgUrl: logoUrl,
+          imgUrl: item.icon_url,
           label: item.name,
           subLabel,
           iconRight: IoChevronForwardOutline,

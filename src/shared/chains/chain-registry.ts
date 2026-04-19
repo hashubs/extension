@@ -1,5 +1,22 @@
 import unknownLogo from 'url:@/ui/assets/unknown.svg';
-import { ChainRegistry } from './types';
+
+export const CHAIN_NAMESPACES = {
+  EVM: 'eip155',
+  SOLANA: 'solana',
+} as const;
+
+export type ChainNamespace =
+  (typeof CHAIN_NAMESPACES)[keyof typeof CHAIN_NAMESPACES];
+
+export type ChainRegistry = {
+  caip: string | null;
+  namespace: ChainNamespace;
+  chain_identifier: number | null;
+  name: string;
+  native_coin_id: string | null;
+  image: string;
+  gecko_id: string | null;
+};
 
 export const CHAIN_REGISTRY: ChainRegistry[] = [
   {
@@ -2598,3 +2615,12 @@ export const CHAIN_REGISTRY: ChainRegistry[] = [
     gecko_id: null,
   },
 ];
+
+/**
+ * Gets the chain registry entry by CAIP-style ID.
+ * @param id The CAIP-style CAIP string (e.g., "eip155:1")
+ * @returns The chain registry entry or null if not found
+ */
+export function getChainRegistryByCaip(id: string) {
+  return CHAIN_REGISTRY.find((p) => p.caip === id) ?? null;
+}

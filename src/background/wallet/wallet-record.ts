@@ -572,15 +572,6 @@ export class WalletRecordModel {
     });
   }
 
-  static setCurrentNetworkId(
-    record: WalletRecord,
-    { networkId }: { networkId: string | null }
-  ) {
-    return produce(record, (draft) => {
-      draft.walletManager.currentNetworkId = networkId;
-    });
-  }
-
   static renameWalletGroup(
     record: WalletRecord,
     { groupId, name }: { groupId: string; name: string }

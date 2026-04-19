@@ -1,12 +1,12 @@
-import { RenderArea } from 'react-area';
 import { LuChevronLeft } from 'react-icons/lu';
 
 interface Props {
   title?: string;
   onBack: () => void;
+  renderElement?: React.ReactNode;
 }
 
-export function Header({ title, onBack }: Props) {
+export function Header({ title, onBack, renderElement }: Props) {
   return (
     <div className="flex items-center justify-between sticky top-0 bg-background/80 backdrop-blur-md p-[16px] shrink-0 z-20 gap-2">
       <button
@@ -20,7 +20,7 @@ export function Header({ title, onBack }: Props) {
       {title && (
         <h1 className="text-base font-medium tracking-wide">{title}</h1>
       )}
-      <RenderArea name="custom-header" />
+      {renderElement}
     </div>
   );
 }

@@ -42,7 +42,8 @@ export function PageLayout({
                   icon={backIconType === 'close' ? MdClose : IoArrowBackOutline}
                   onClick={onBack}
                   disabled={!onBack}
-                  size="icon"
+                  iconOnly
+                  iconOnlySize="md"
                   className="text-on-surface-variant rounded-md bg-surface-container-highest"
                 />
               )}

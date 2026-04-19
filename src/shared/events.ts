@@ -9,7 +9,6 @@ type EthersSignMethod = 'sendTransaction' | '_signTypedData' | 'signMessage';
 
 export const emitter = createNanoEvents<{
   uiAccountsChanged: () => void;
-  uiNetworkChanged: () => void;
   hotkeydown: (combination: string) => void;
   sessionLogout: () => void;
   error: (error: Error) => void;

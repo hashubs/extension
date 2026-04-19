@@ -1,5 +1,5 @@
+import { parseCaip19 } from '@/modules/networks/helpers';
 import { getChainLogo } from '@/shared/chains/chain-logos';
-import { parseCaip19 } from '@/shared/chains/parse-caip19';
 import { cn } from '@/ui/lib/utils';
 import { memo } from 'react';
 

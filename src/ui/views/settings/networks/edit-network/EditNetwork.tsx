@@ -15,7 +15,6 @@ import { Switch } from '@/ui/ui-kit/switch';
 import { useMutation } from '@tanstack/react-query';
 import { isEqual } from 'lodash';
 import { useEffect, useMemo, useState } from 'react';
-import { Content } from 'react-area';
 import { IoTrashOutline } from 'react-icons/io5';
 import { useNavigate, useParams } from 'react-router-dom';
 import { updateNetworks } from '../_shared/updateNetworks';
@@ -101,20 +100,20 @@ export function EditNetwork() {
       <Header
         title={network.name}
         onBack={() => navigate(BACK_ROUTE, { state: { direction: 'back' } })}
+        renderElement={
+          isCustomNetworkId(network.id) && (
+            <Button
+              iconOnly
+              iconOnlySize="md"
+              variant="ghost"
+              onClick={() => removeMutation.mutate()}
+              className="text-destructive"
+            >
+              <IoTrashOutline size={20} />
+            </Button>
+          )
+        }
       />
-      {isCustomNetworkId(network.id) && (
-        <Content name="custom-header">
-          <Button
-            iconOnly
-            iconOnlySize="md"
-            variant="ghost"
-            onClick={() => removeMutation.mutate()}
-            className="text-destructive"
-          >
-            <IoTrashOutline size={20} />
-          </Button>
-        </Content>
-      )}
 
       <div className="flex-1 space-y-4 no-scrollbar px-4 overflow-y-auto">
         <Card className="border border-border divide-none">

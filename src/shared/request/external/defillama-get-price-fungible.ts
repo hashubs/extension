@@ -1,8 +1,6 @@
-import { parseCaip19 } from '@/shared/chains/parse-caip19';
-import {
-  getChainRegistryByCaip,
-  getDefiLlamaPlatformKey,
-} from '@/shared/chains/utils';
+import { parseCaip19 } from '@/modules/networks/helpers';
+import { getChainRegistryByCaip } from '@/shared/chains/chain-registry';
+import { getDefiLlamaPlatformKey } from '@/shared/chains/defillama';
 import { ApiContext } from '../api-bare';
 import { ClientOptions, HttpClient } from '../shared';
 

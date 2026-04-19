@@ -18,7 +18,7 @@ export const BrandLogo = ({ size = 163.84, ...props }: Props) => (
     viewBox="0 0 1706.66 1706.66"
     style={
       {
-        '--logo-background': '#00A755',
+        '--logo-background': '#266868',
         '--logo-fill': '#fff',
       } as React.CSSProperties
     }

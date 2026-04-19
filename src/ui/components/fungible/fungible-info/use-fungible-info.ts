@@ -1,4 +1,4 @@
-import { parseCaip19 } from '@/shared/chains/parse-caip19';
+import { parseCaip19 } from '@/modules/networks/helpers';
 import { FungibleInfo } from '@/shared/request/external/asset-get-fungible-info';
 import { useIsTestnetMode } from '@/ui/features/preferences';
 import { useFungibleInfo as useFungibleInfoRequest } from '@/ui/hooks/request/external/use-fungible-info';

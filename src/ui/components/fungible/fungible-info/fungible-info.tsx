@@ -1,6 +1,6 @@
 import { AnyAddressAction } from '@/modules/ethereum/transactions/addressAction';
+import { parseCaip19 } from '@/modules/networks/helpers';
 import { NetworkConfig } from '@/modules/networks/network-config';
-import { parseCaip19 } from '@/shared/chains/parse-caip19';
 import { getR2TokenUrl } from '@/shared/get-r2-url';
 import { ChainInfo } from '@/shared/request/external/asset-get-fungible-info';
 import { formatFiat } from '@/shared/units/format-fiat';
@@ -17,7 +17,6 @@ import { Image } from '@/ui/ui-kit';
 import { ImageStack } from '@/ui/ui-kit/image';
 import { ActionItem } from '@/ui/views/actions/ActionItem';
 import { useState } from 'react';
-import { Content } from 'react-area';
 import {
   LuArrowUpDown,
   LuDollarSign,
@@ -161,35 +160,35 @@ export function FungibleInfo({
     <div className="relative flex flex-col w-full h-full overflow-y-auto overflow-x-hidden no-scrollbar bg-background">
       <Header
         onBack={() => navigate('/overview', { state: { direction: 'back' } })}
+        renderElement={
+          <div className="flex items-center bg-background border border-border/50 rounded-full pl-1.5 pr-3 py-1 overflow-hidden">
+            <Image
+              src={data.metadata?.logoUrl}
+              alt={chain?.name || ''}
+              className="size-[22px] rounded-full"
+            />
+            <span className="ml-1.5 text-[13px] font-medium uppercase truncate max-w-[150px]">
+              {data?.symbol}
+            </span>
+            <animated.span
+              style={styles}
+              className="flex items-center overflow-hidden whitespace-nowrap"
+            >
+              {data.market && (
+                <>
+                  <span className="mx-1.5 opacity-40">•</span>
+                  <span className="text-[13px] uppercase font-medium">
+                    {formatFiat(
+                      convertUsdToFiat(displayPrice ?? 0),
+                      defaultCurrency
+                    )}
+                  </span>
+                </>
+              )}
+            </animated.span>
+          </div>
+        }
       />
-      <Content name="custom-header">
-        <div className="flex items-center bg-background border border-border/50 rounded-full pl-1.5 pr-3 py-1 overflow-hidden">
-          <Image
-            src={data.metadata?.logoUrl}
-            alt={chain?.name || ''}
-            className="size-[22px] rounded-full"
-          />
-          <span className="ml-1.5 text-[13px] font-medium uppercase truncate max-w-[150px]">
-            {data?.symbol}
-          </span>
-          <animated.span
-            style={styles}
-            className="flex items-center overflow-hidden whitespace-nowrap"
-          >
-            {data.market && (
-              <>
-                <span className="mx-1.5 opacity-40">•</span>
-                <span className="text-[13px] uppercase font-medium">
-                  {formatFiat(
-                    convertUsdToFiat(displayPrice ?? 0),
-                    defaultCurrency
-                  )}
-                </span>
-              </>
-            )}
-          </animated.span>
-        </div>
-      </Content>
       <div className="flex-1">
         {!!data.market && !!data.market.price && (
           <div className="relative">

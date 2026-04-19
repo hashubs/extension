@@ -9,8 +9,7 @@ import {
 import { Button } from '@/ui/ui-kit';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { useEffect, useRef } from 'react';
-import { LuLoader } from 'react-icons/lu';
-import { SiMonkeytie } from 'react-icons/si';
+import { LuFingerprint, LuLoader } from 'react-icons/lu';
 import { useNavigationType } from 'react-router-dom';
 
 export function LoginPasskey({
@@ -33,6 +32,7 @@ export function LoginPasskey({
     mutationFn: async () => {
       if (!passkeyEnabled) {
         toastPasskeyNotEnabledRef.current?.showToast();
+        return;
       }
       invariant(user, 'user is required');
       const password = await getPasswordWithPasskey();
@@ -49,8 +49,8 @@ export function LoginPasskey({
   const isLoading = loginMutation.isPending;
 
   useEffect(() => {
-    // Automatically trigger passkey login if the user navigated here via a replace action
-    // This happens when user is redirected to the login page when opening the extension popup
+    // Automatically trigger passkey login if the user navigated here via a
+    // replace action — this happens when redirected to login on popup open.
     const showSuggestPasskey = navigationType === 'REPLACE';
     if (showSuggestPasskey && passkeyEnabled && !autologinRef.current) {
       autologinRef.current = true;
@@ -65,10 +65,11 @@ export function LoginPasskey({
         <span className="text-xs text-muted-foreground">or</span>
         <div className="flex-1 h-px bg-muted-foreground/10" />
       </div>
+
       <Button
         variant="outline"
         size="md"
-        icon={isLoading ? LuLoader : SiMonkeytie}
+        icon={isLoading ? LuLoader : LuFingerprint}
         iconClassName={isLoading ? 'animate-spin' : ''}
         iconPosition="left"
         aria-label={`Login with ${passkeyTitle}`}
@@ -77,8 +78,16 @@ export function LoginPasskey({
         autoFocus={true}
         shimmer
       >
-        {`Unlock with ${passkeyTitle}`}
+        Unlock with {passkeyTitle}
       </Button>
+
+      {loginMutation.isError && (
+        <p className="text-xs text-destructive text-center mt-2">
+          {loginMutation.error instanceof Error
+            ? loginMutation.error.message
+            : 'Authentication failed. Please try again.'}
+        </p>
+      )}
 
       <PopoverToast ref={toastPasskeyNotEnabledRef}>
         Passkey is not enabled

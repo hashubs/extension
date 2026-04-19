@@ -5,7 +5,6 @@ import { isEthereumAddress } from '@/shared/is-ethereum-address';
 import { isConnectableDapp } from '@/shared/isConnectableDapp';
 import { requestChainForOrigin } from '@/shared/request/internal/requestChainForOrigin';
 import { getAddressType } from '@/shared/wallet/classifiers';
-import { ConnectedSiteDrawer } from '@/ui/components/ConnectedSite';
 import { useAddressParams } from '@/ui/hooks/request/internal/useAddressParams';
 import { useIsConnectedToActiveTab } from '@/ui/hooks/request/internal/useIsConnectedToActiveTab';
 import { useNetworkConfig } from '@/ui/hooks/request/internal/useNetworks';
@@ -21,6 +20,7 @@ import {
   PauseInjectionDrawer,
   usePausedData,
 } from 'src/ui/components/PauseInjection';
+import { ConnectedSiteDrawer } from './connected-site-drawer';
 
 export function useConnectionSite() {
   const { isPaused, globalPreferences, tabData } = usePausedData();

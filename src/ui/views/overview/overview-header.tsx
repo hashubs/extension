@@ -1,8 +1,8 @@
 import { cn } from '@/ui/lib/utils';
 import { GoGlobe } from 'react-icons/go';
 import { HiOutlineViewGrid } from 'react-icons/hi';
-import { useConnectionSite } from './connection-site';
-import { WalletSelector } from './wallet-selector';
+import { useConnectionSite } from './connection-site/connection-site';
+import { WalletSelect } from './wallet-select';
 
 interface Props {
   onMenuOpen?: () => void;
@@ -13,7 +13,7 @@ export function OverviewHeader({ onMenuOpen, onConnectionSite }: Props) {
   const { isRevealable, isConnectedToActiveTab } = useConnectionSite();
   return (
     <div className="flex items-center justify-between border-b border-muted pb-2 mb-4">
-      <WalletSelector />
+      <WalletSelect />
 
       <div className="flex items-center gap-0.5">
         {isRevealable && (

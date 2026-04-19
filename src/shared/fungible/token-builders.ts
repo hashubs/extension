@@ -1,7 +1,6 @@
-import { getChainCaip } from '@/modules/networks/helpers';
+import { getChainCaip, parseCaip19 } from '@/modules/networks/helpers';
 import { NetworkConfig } from '@/modules/networks/network-config';
 import { getNativeTokenLogo } from '@/shared/chains/chain-logos';
-import { parseCaip19 } from '@/shared/chains/parse-caip19';
 import { DEFAULT_EVM_SLIP44, SYMBOL_TO_SLIP44 } from '@/shared/chains/slip44';
 import { PriceResult } from '@/shared/request/external/defillama-get-price-fungible';
 import { getR2TokenUrl } from '../get-r2-url';

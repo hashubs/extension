@@ -20,8 +20,8 @@ import {
 import { Switch } from '@/ui/ui-kit/switch';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useCallback, useRef, useState } from 'react';
+import { LuFingerprint } from 'react-icons/lu';
 import { MdLock, MdWarning } from 'react-icons/md';
-import { SiMonkeytie } from 'react-icons/si';
 
 export function PasskeyItem() {
   const queryClient = useQueryClient();
@@ -123,7 +123,7 @@ export function PasskeyItem() {
       <CardItem
         item={{
           label: passkeyTitle,
-          icon: SiMonkeytie,
+          icon: LuFingerprint,
           onClick: handleToggle,
           disabled: isLoading,
           badge: <Switch checked={checked} disabled={isLoading} />,

@@ -7,7 +7,47 @@ import {
   utf8ToUint8Array,
 } from '@/modules/crypto';
 import { accountPublicRPCPort } from '@/shared/channel';
-import { isMacOS } from '@/shared/isMacos';
+
+// ---------------------------------------------------------------------------
+// Platform detection
+// ---------------------------------------------------------------------------
+
+type Platform = 'macos' | 'windows' | 'linux' | 'android' | 'ios' | 'unknown';
+
+function detectPlatform(): Platform {
+  const ua = navigator.userAgent;
+  // Check order matters: iOS must come before macOS (iPad UA contains "Mac")
+  if (/iPhone|iPad|iPod/i.test(ua)) return 'ios';
+  if (/Android/i.test(ua)) return 'android';
+  if (/Macintosh|MacIntel|MacPPC|Mac68K/i.test(ua)) return 'macos';
+  if (/Win32|Win64|Windows|WinCE/i.test(ua)) return 'windows';
+  if (/Linux/i.test(ua)) return 'linux';
+  return 'unknown';
+}
+
+/**
+ * Human-readable label for the platform authenticator.
+ * Shown in buttons/UI — e.g. "Unlock with Touch ID" vs "Unlock with Windows Hello".
+ */
+export function getPasskeyTitle(): string {
+  switch (detectPlatform()) {
+    case 'macos':
+      return 'Touch ID';
+    case 'ios':
+      return 'Face ID / Touch ID';
+    case 'windows':
+      return 'Windows Hello';
+    case 'android':
+      return 'Biometric Unlock';
+    case 'linux':
+    default:
+      return 'Passkey Unlock';
+  }
+}
+
+// ---------------------------------------------------------------------------
+// PRF support detection
+// ---------------------------------------------------------------------------
 
 interface PRFExtensionResult {
   prf?: {
@@ -19,40 +59,48 @@ interface PRFExtensionResult {
 }
 
 /**
- * Gets the platform-specific title for passkey unlock
+ * Checks whether the browser + platform authenticator combination can
+ * actually complete a PRF-backed passkey flow.
+ *
+ * Strategy:
+ *  1. Bail early if WebAuthn API is absent.
+ *  2. Check platform authenticator availability (covers Windows Hello, Touch ID,
+ *     Android biometrics, and most Linux setups with a TPM/PIN fallback).
+ *  3. On Linux we do an extra capability probe via getClientCapabilities()
+ *     (Chrome 133+) because many Linux setups have UVPAA = true but no PRF.
  */
-export function getPasskeyTitle(): string {
-  return isMacOS() ? 'Touch ID' : 'Passkey Unlock';
-}
-
-/**
- * Checks if the current browser and authenticator support the PRF extension.
- * This is critical for passkey-based password encryption.
- */
-async function checkPRFSupport(): Promise<boolean> {
+export async function checkPRFSupport(): Promise<boolean> {
   if (process.env.NODE_ENV === 'development') return true;
-  try {
-    // Check if WebAuthn is available
-    if (!window.PublicKeyCredential) {
-      return false;
-    }
 
-    // Check if platform authenticator is available
+  try {
+    if (!window.PublicKeyCredential) return false;
+
     const available =
       await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable();
-    if (!available) {
-      return false;
+    if (!available) return false;
+
+    // On Linux, do a deeper probe if getClientCapabilities is available
+    // (Chrome 133+). PRF support on Linux is inconsistent across distros.
+    const platform = detectPlatform();
+    if (platform === 'linux') {
+      if (typeof PublicKeyCredential.getClientCapabilities === 'function') {
+        const caps = await PublicKeyCredential.getClientCapabilities();
+        // If the browser explicitly says PRF isn't supported, bail out early
+        if (caps['extension:prf'] === false) return false;
+      }
+      // If the API is absent we proceed optimistically — the PRF call itself
+      // will fail gracefully and show a proper error to the user.
     }
 
-    // PRF extension support cannot be directly detected, but we can verify
-    // the browser supports the necessary WebAuthn features
     return true;
-  } catch (error) {
-    // PRF support check failed, return false without logging
-    // Error will be shown to user if they attempt to set up passkey
+  } catch {
     return false;
   }
 }
+
+// ---------------------------------------------------------------------------
+// PRF result helpers
+// ---------------------------------------------------------------------------
 
 /**
  * Type guard to validate PRF extension results
@@ -60,13 +108,11 @@ async function checkPRFSupport(): Promise<boolean> {
 function isPRFResultValid(
   result: unknown
 ): result is { prf: { results: { first: ArrayBuffer } } } {
-  if (!result || typeof result !== 'object') {
-    return false;
-  }
-  const prfResult = result as PRFExtensionResult;
+  if (!result || typeof result !== 'object') return false;
+  const r = result as PRFExtensionResult;
   return !!(
-    prfResult.prf?.results?.first instanceof ArrayBuffer &&
-    prfResult.prf.results.first.byteLength > 0
+    r.prf?.results?.first instanceof ArrayBuffer &&
+    r.prf.results.first.byteLength > 0
   );
 }
 
@@ -96,24 +142,102 @@ function extractPRFResult(cred: unknown): ArrayBuffer {
       );
       return new Uint8Array(32).buffer;
     }
+
+    const platform = detectPlatform();
+    const hint =
+      platform === 'linux'
+        ? 'Make sure Chrome 116+ is used and your device has a PIN or biometric set up.'
+        : platform === 'windows'
+        ? 'Ensure Windows Hello is configured in Settings → Accounts → Sign-in options.'
+        : 'This feature requires a compatible device with biometric authentication.';
+
     throw new Error(
-      'PRF extension is not supported by your authenticator. ' +
-        'This feature requires a compatible device with biometric authentication (Touch ID, Face ID, etc.). ' +
-        'Please try a different device or use password login instead.'
+      `PRF extension is not supported by your authenticator. ${hint} ` +
+        'Alternatively, use password login instead.'
     );
   }
 
-  // Type guard ensures this is safe
   return result.prf.results.first;
 }
 
+// ---------------------------------------------------------------------------
+// Platform-specific error messages
+// ---------------------------------------------------------------------------
+
+function formatCreationError(error: unknown): Error {
+  if (!(error instanceof Error)) {
+    return new Error('Failed to create passkey due to an unknown error');
+  }
+
+  if (error.name === 'NotAllowedError' || error.message.includes('cancelled')) {
+    return new Error('Passkey setup was cancelled by user');
+  }
+
+  // Windows Hello: user skipped PIN/biometric setup
+  if (error.name === 'NotSupportedError') {
+    const platform = detectPlatform();
+    if (platform === 'windows') {
+      return new Error(
+        'Windows Hello is not configured. ' +
+          'Please set up a PIN or biometric in Settings → Accounts → Sign-in options, then try again.'
+      );
+    }
+  }
+
+  // Linux: common when no platform authenticator is registered
+  if (error.name === 'InvalidStateError') {
+    return new Error(
+      'A passkey already exists for this account. ' +
+        'If you want to reset it, please remove the existing passkey first.'
+    );
+  }
+
+  return new Error(`Failed to create passkey: ${error.message}`);
+}
+
+function formatAuthError(error: unknown): Error {
+  if (!(error instanceof Error)) {
+    return new Error('Authentication failed due to an unknown error');
+  }
+
+  if (error.name === 'NotAllowedError' || error.message.includes('cancelled')) {
+    return new Error('Authentication was cancelled by user');
+  }
+
+  if (error.name === 'InvalidStateError') {
+    return new Error(
+      'Passkey not found on this device. Please use password login or set up passkey again.'
+    );
+  }
+
+  // Windows: credential was deleted from Windows Hello but still in wallet DB
+  if (error.name === 'UnknownError' && detectPlatform() === 'windows') {
+    return new Error(
+      'Passkey could not be found in Windows Hello. ' +
+        'It may have been removed. Please log in with your password and re-enable passkey.'
+    );
+  }
+
+  return new Error(`Authentication failed: ${error.message}`);
+}
+
+// ---------------------------------------------------------------------------
+// Public API
+// ---------------------------------------------------------------------------
+
 export async function setupAccountPasskey(password: string) {
-  // Check PRF support before attempting setup
   const prfSupported = await checkPRFSupport();
   if (!prfSupported) {
+    const platform = detectPlatform();
+    const detail =
+      platform === 'windows'
+        ? 'Please configure Windows Hello (PIN or biometrics) in Settings → Accounts → Sign-in options.'
+        : platform === 'linux'
+        ? 'Please ensure you are using Chrome 116+ and have a device PIN configured.'
+        : 'Please ensure you have platform authentication (Touch ID / Face ID) enabled.';
+
     throw new Error(
-      'Your device does not support passkey-based password encryption. ' +
-        'Please ensure you are using a compatible browser and have platform authentication (Touch ID) enabled.'
+      `Your device does not support passkey-based password encryption. ${detail}`
     );
   }
 
@@ -131,7 +255,6 @@ export async function setupAccountPasskey(password: string) {
         },
         pubKeyCredParams: [{ alg: -7, type: 'public-key' }],
         challenge: getRandomUint8Array(32),
-        // Use platform authenticator (Apple Keychain on macOS, Windows Hello on Windows, etc.)
         authenticatorSelection: {
           authenticatorAttachment: 'platform' as AuthenticatorAttachment,
           userVerification: 'required' as UserVerificationRequirement,
@@ -146,17 +269,7 @@ export async function setupAccountPasskey(password: string) {
       },
     });
   } catch (error) {
-    // Handle user cancellation or other creation errors
-    if (error instanceof Error) {
-      if (
-        error.name === 'NotAllowedError' ||
-        error.message.includes('cancelled')
-      ) {
-        throw new Error('Passkey setup was cancelled by user');
-      }
-      throw new Error(`Failed to create passkey: ${error.message}`);
-    }
-    throw new Error('Failed to create passkey due to an unknown error');
+    throw formatCreationError(error);
   }
 
   if (!cred) {
@@ -169,12 +282,7 @@ export async function setupAccountPasskey(password: string) {
     throw new Error('Failed to get passkey ID from credential');
   }
 
-  // Use the safe PRF extraction with proper type guards
   const prf = extractPRFResult(cred);
-
-  // Derive encryption key using HKDF for defense-in-depth
-  // This ensures that even if the salt is compromised, the attacker still needs
-  // the PRF output from the authenticator to derive the encryption key
   const encryptionKey = await deriveEncryptionKeyFromPRF(prf, salt);
 
   return accountPublicRPCPort.request('setPasskey', {
@@ -204,6 +312,7 @@ export async function getPasswordWithPasskey() {
             type: 'public-key',
           },
         ],
+        userVerification: 'required',
         extensions: {
           prf: {
             eval: {
@@ -214,32 +323,14 @@ export async function getPasswordWithPasskey() {
       },
     });
   } catch (error) {
-    // Handle user cancellation or authentication errors
-    if (error instanceof Error) {
-      if (
-        error.name === 'NotAllowedError' ||
-        error.message.includes('cancelled')
-      ) {
-        throw new Error('Authentication was cancelled by user');
-      }
-      if (error.name === 'InvalidStateError') {
-        throw new Error(
-          'Passkey not found on this device. Please use password login or set up passkey again.'
-        );
-      }
-      throw new Error(`Authentication failed: ${error.message}`);
-    }
-    throw new Error('Authentication failed due to an unknown error');
+    throw formatAuthError(error);
   }
 
   if (!cred) {
     throw new Error('Authentication failed: No credential returned');
   }
 
-  // Use the safe PRF extraction with proper type guards
   const prf = extractPRFResult(cred);
-
-  // Derive encryption key using HKDF (same method as setup)
   const encryptionKey = await deriveEncryptionKeyFromPRF(prf, salt);
 
   return accountPublicRPCPort.request('getPassword', { encryptionKey });

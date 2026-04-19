@@ -1,7 +1,6 @@
-import { getChainCaip } from '@/modules/networks/helpers';
+import { getChainCaip, parseCaip19 } from '@/modules/networks/helpers';
 import { NetworkConfig } from '@/modules/networks/network-config';
 import { Networks } from '@/modules/networks/networks';
-import { parseCaip19 } from '@/shared/chains/parse-caip19';
 import { SanitizedPortfolio } from '@/shared/fungible/sanitize-portfolio';
 import {
   buildCustomToken,

@@ -1,10 +1,8 @@
+import { ChainNamespace } from '@/shared/chains/chain-registry';
 import { DEFILLAMA_CHAIN_MAP } from '@/shared/chains/defillama';
-import { CHAIN_NAMESPACES } from '@/shared/chains/types';
 
 const CHAIN_ID_URL = 'https://chainlist.org/rpcs.json';
 const LLAMA_TVL_URL = 'https://api.llama.fi/chains';
-
-type ChainNamespace = (typeof CHAIN_NAMESPACES)[keyof typeof CHAIN_NAMESPACES];
 
 interface NativeCurrency {
   name: string;

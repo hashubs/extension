@@ -4,19 +4,19 @@ import { normalizeAddress } from '@/shared/normalize-address';
 import { queryClient } from '@/shared/query-client/queryClient';
 import { getPermissionsWithWallets } from '@/shared/request/internal/getPermissionsWithWallets';
 import { ExternallyOwnedAccount } from '@/shared/types/externally-owned-account';
+import { MetamaskMode } from '@/ui/components/ConnectedSite/MetamaskMode';
 import { SiteFaviconImg } from '@/ui/components/SiteFaviconImg';
+import { useRemovePermissionMutation } from '@/ui/hooks/request/internal/useRemovePermission';
 import { cn } from '@/ui/lib/utils';
 import { Button, Drawer, DrawerContent, DrawerTrigger } from '@/ui/ui-kit';
 import { useQuery } from '@tanstack/react-query';
-import SettingsIcon from 'jsx:src/ui/assets/filters.svg';
 import { useMemo, useState } from 'react';
 import { BsGlobe } from 'react-icons/bs';
 import { FaArrowRight } from 'react-icons/fa';
+import { RiListSettingsLine } from 'react-icons/ri';
 import { useNavigate } from 'react-router-dom';
 import { getNameFromOrigin } from 'src/shared/dapps';
 import { invariant } from 'src/shared/invariant';
-import { useRemovePermissionMutation } from '../../hooks/request/internal/useRemovePermission';
-import { MetamaskMode } from './MetamaskMode';
 
 export function ConnectedSiteDrawer({
   originName,
@@ -86,10 +86,11 @@ export function ConnectedSiteDrawer({
     <Drawer open={open} onOpenChange={setOpen}>
       <DrawerTrigger asChild>
         <Button
-          size="sm"
+          iconOnly
+          iconOnlySize="md"
           variant="outline"
-          icon={SettingsIcon}
-          className="w-auto px-1.75 rounded-md"
+          icon={RiListSettingsLine}
+          className="rounded-md"
         />
       </DrawerTrigger>
       <DrawerContent

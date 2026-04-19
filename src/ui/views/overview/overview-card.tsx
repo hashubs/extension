@@ -8,7 +8,7 @@ import {
 } from 'react-icons/fi';
 import { LuHistory } from 'react-icons/lu';
 import { useNavigate } from 'react-router-dom';
-import { NetworkSelector } from './network-selector';
+import { NetworkSelect } from './network-select';
 import { OverviewHeader } from './overview-header';
 
 type ActionKey = 'send' | 'receive' | 'swap' | 'buy' | 'actions';
@@ -63,7 +63,7 @@ export function OverviewCard({
             </p>
           </div>
 
-          <NetworkSelector />
+          <NetworkSelect />
         </div>
 
         <div className="grid grid-cols-5 gap-1 px-1 pt-2.5 pb-1">
