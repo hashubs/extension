@@ -61,6 +61,13 @@ export function SettingsView() {
         {
           icon: LuTerminal,
           iconRight: LuChevronRight,
+          label: 'Connected Sites',
+          onClick: () => navigate('/settings/connected-sites'),
+          iconClassName: 'text-lime-500 bg-lime-500/10',
+        },
+        {
+          icon: LuTerminal,
+          iconRight: LuChevronRight,
           label: 'Developer Tools',
           onClick: () => navigate('/settings/developer-tools'),
           iconClassName: 'text-lime-500 bg-lime-500/10',

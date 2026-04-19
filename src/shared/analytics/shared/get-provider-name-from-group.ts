@@ -1,4 +1,3 @@
-import { EXTENSION } from '@/app/constants';
 import type { Brand } from '@/shared/type-utils/brand';
 import { isAccountContainer } from '@/shared/types/validators';
 import type { WalletGroup } from '@/shared/types/wallet-group';
@@ -31,7 +30,7 @@ export function getProviderForApiV4(
       return 'viewer_not_added';
     }
     case AccountProvider.selvoExtension: {
-      return `${EXTENSION.name}-extension`;
+      return `selvo-extension`;
     }
     case AccountProvider.readOnly: {
       return 'Read Only';
@@ -50,7 +49,7 @@ export function getProviderForMetabase(
       return 'viewer_not_added';
     }
     case AccountProvider.selvoExtension: {
-      return `${EXTENSION.name} Wallet'`;
+      return 'Selvo Wallet';
     }
     case AccountProvider.readOnly: {
       return 'Read only'; // matching with ios event

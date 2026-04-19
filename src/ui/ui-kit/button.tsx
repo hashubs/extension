@@ -5,7 +5,12 @@ import type { IconType } from 'react-icons';
 import { AiOutlineLoading3Quarters } from 'react-icons/ai';
 
 const buttonVariants = cva(
-  'group relative w-full overflow-hidden rounded-xl disabled:opacity-50 disabled:cursor-not-allowed outline-none',
+  [
+    'group relative overflow-hidden rounded-lg w-full',
+    'inline-flex items-center justify-center',
+    'font-base select-none outline-none',
+    'disabled:opacity-50 disabled:cursor-not-allowed',
+  ].join(' '),
   {
     variants: {
       variant: {
@@ -19,19 +24,23 @@ const buttonVariants = cva(
         outline: 'border border-muted-foreground/10',
         ghost: 'bg-transparent hover:enabled:bg-accent/80',
         'gradient-teal':
-          'bg-gradient-to-r from-teal-600 to-teal-700 text-white shadow-lg shadow-teal-500/25 hover:enabled:bg-teal-600/80',
+          'bg-gradient-to-r from-teal-600 to-teal-700 text-white shadow-lg shadow-teal-500/25 hover:enabled:brightness-110',
         'gradient-blue':
-          'bg-gradient-to-r from-blue-600 to-cyan-700 text-white shadow-lg shadow-blue-500/25 hover:enabled:bg-blue-600/80',
-
+          'bg-gradient-to-r from-blue-600 to-cyan-700 text-white shadow-lg shadow-blue-500/25 hover:enabled:brightness-110',
         blank: '',
       },
       size: {
-        sm: 'h-8 px-4 text-sm',
-        md: 'h-9 md:h-10 px-6 text-sm',
-        lg: 'h-10 md:h-12 px-8 text-sm md:text-base',
-        xl: 'h-12 md:h-14 px-10 text-base md:text-lg',
-        icon: 'h-8 w-8',
+        sm: 'h-8 px-3 text-xs gap-1.5',
+        md: 'h-9 md:h-10 px-5 text-sm gap-2',
+        lg: 'h-10 md:h-12 px-7 text-sm md:text-base gap-2',
+        xl: 'h-12 md:h-14 px-9 text-base md:text-lg gap-2.5',
         zero: '',
+      },
+      iconSize: {
+        sm: 'h-7 w-7',
+        md: 'h-8 w-8',
+        lg: 'h-9 w-9',
+        xl: 'h-10 w-10',
       },
       transition: {
         none: '',
@@ -41,15 +50,23 @@ const buttonVariants = cva(
     },
     defaultVariants: {
       variant: 'default',
-      size: 'md',
       transition: 'slow',
     },
   }
 );
 
+const iconSizeMap: Record<string, string> = {
+  sm: 'h-3.5 w-3.5',
+  md: 'h-4 w-4',
+  lg: 'h-4 w-4',
+  xl: 'h-5 w-5',
+};
+
 interface ButtonProps
   extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'disabled'>,
-    VariantProps<typeof buttonVariants> {
+    Omit<VariantProps<typeof buttonVariants>, 'iconSize'> {
+  iconOnly?: boolean;
+  iconOnlySize?: 'sm' | 'md' | 'lg' | 'xl';
   icon?: IconType;
   iconPosition?: 'left' | 'right';
   shimmer?: boolean;
@@ -69,12 +86,14 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       transition,
       children,
       icon: Icon,
+      iconOnly = false,
+      iconOnlySize = 'md',
       iconPosition = 'right',
       shimmer = false,
       shimmerClassName,
       iconClassName,
       loading = false,
-      loadingText = 'Loading...',
+      loadingText,
       disabled = false,
       ...props
     },
@@ -82,42 +101,93 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
   ) => {
     const isDisabled = disabled || loading;
 
+    if (iconOnly) {
+      return (
+        <button
+          ref={ref}
+          className={cn(
+            buttonVariants({
+              variant,
+              size: undefined,
+              iconSize: iconOnlySize,
+              transition: 'none',
+            }),
+            'rounded-lg p-0',
+            className
+          )}
+          disabled={isDisabled}
+          aria-label={props['aria-label'] ?? 'button'}
+          {...props}
+        >
+          {shimmer && !loading && (
+            <ShimmerOverlay className={shimmerClassName} />
+          )}
+          {loading ? (
+            <AiOutlineLoading3Quarters className="animate-spin h-4 w-4" />
+          ) : Icon ? (
+            <Icon
+              className={cn(
+                iconSizeMap[iconOnlySize] ?? 'h-4 w-4',
+                iconClassName
+              )}
+            />
+          ) : null}
+        </button>
+      );
+    }
+
+    const resolvedSize = size ?? 'md';
+    const sizeKey = resolvedSize as string;
+    const resolvedIconClass = cn(
+      iconSizeMap[sizeKey] ?? 'h-4 w-4',
+      iconClassName
+    );
+
     return (
       <button
         ref={ref}
-        className={cn(buttonVariants({ variant, size, transition }), className)}
+        className={cn(
+          buttonVariants({ variant, size: resolvedSize, transition }),
+          className
+        )}
         disabled={isDisabled}
         {...props}
       >
-        {shimmer && !loading && (
-          <div
-            className={cn(
-              'absolute inset-0 bg-linear-to-r from-background/0 via-white/10 to-background/0 -translate-x-full group-hover:translate-x-full transition-transform duration-700',
-              shimmerClassName
+        {shimmer && !loading && <ShimmerOverlay className={shimmerClassName} />}
+
+        {loading ? (
+          <>
+            <AiOutlineLoading3Quarters className="animate-spin h-4 w-4 shrink-0" />
+            {loadingText ?? children}
+          </>
+        ) : (
+          <>
+            {Icon && iconPosition === 'left' && (
+              <Icon className={resolvedIconClass} />
             )}
-          />
+            {children}
+            {Icon && iconPosition === 'right' && (
+              <Icon className={resolvedIconClass} />
+            )}
+          </>
         )}
-        <span className="relative font-medium flex items-center justify-center gap-2">
-          {loading ? (
-            <>
-              <AiOutlineLoading3Quarters className="animate-spin h-4 w-4" />
-              {loadingText}
-            </>
-          ) : (
-            <>
-              {Icon && iconPosition === 'left' && (
-                <Icon className={cn('w-4 h-4', iconClassName)} />
-              )}
-              {children}
-              {Icon && iconPosition === 'right' && (
-                <Icon className={cn('w-4 h-4', iconClassName)} />
-              )}
-            </>
-          )}
-        </span>
       </button>
     );
   }
 );
 
 Button.displayName = 'Button';
+
+function ShimmerOverlay({ className }: { className?: string }) {
+  return (
+    <div
+      aria-hidden
+      className={cn(
+        'pointer-events-none absolute inset-0',
+        'bg-linear-to-r from-background/0 via-white/10 to-background/0',
+        '-translate-x-full group-hover:translate-x-full transition-transform duration-700',
+        className
+      )}
+    />
+  );
+}

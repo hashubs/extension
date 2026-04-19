@@ -18,6 +18,7 @@ const MIN_WALLETS_FOR_SEARCH = 5;
 
 export function WalletSelectorView() {
   const [searchParams] = useSearchParams();
+  console.log('[WalletSelectorView] searchParams', searchParams.toString());
   const navigate = useNavigate();
 
   const ecosystem = searchParams.get('ecosystem') as BlockchainType;
@@ -59,6 +60,23 @@ export function WalletSelectorView() {
     [navigate, searchParams, updateCurrentAddress]
   );
 
+  const handleBack = useCallback(() => {
+    const next = searchParams.get('next');
+    if (next) {
+      const newParams = new URLSearchParams(searchParams);
+      newParams.delete('next');
+      const target = `${next}${
+        newParams.toString() ? `?${newParams.toString()}` : ''
+      }`;
+      navigate(target, {
+        replace: true,
+        state: { direction: 'back' },
+      });
+    } else {
+      navigate('/overview', { state: { direction: 'back' } });
+    }
+  }, [navigate, searchParams]);
+
   const activeAddress =
     searchParams.get('selectedAddress') || currentAddress || '';
 
@@ -84,10 +102,7 @@ export function WalletSelectorView() {
 
   return (
     <div className="flex flex-col h-full overflow-hidden bg-background">
-      <Header
-        title="Select Wallet"
-        onBack={() => navigate('/overview', { state: { direction: 'back' } })}
-      />
+      <Header title="Select Wallet" onBack={handleBack} />
 
       <div className="px-4 pb-3 pt-0.5 border-b border-muted-foreground/10">
         <Input

@@ -3,7 +3,6 @@ import React, {
   useCallback,
   useEffect,
   useImperativeHandle,
-  useRef,
   useState,
 } from 'react';
 
@@ -29,18 +28,19 @@ function DebouncedInputComponent(
   ref: React.Ref<InputHandle>
 ) {
   const [innerValue, setInnerValue] = useState(value);
-  const onChangeRef = useRef(onChange);
-  useEffect(() => {
-    onChangeRef.current = onChange;
-  }, [onChange]);
 
   useImperativeHandle(ref, () => ({
     setValue: setInnerValue,
   }));
 
   const debouncedSetValue = useDebouncedCallback((inputValue: string) => {
-    onChangeRef.current(inputValue);
+    onChange(inputValue);
   }, delay);
+
+  useEffect(() => {
+    debouncedSetValue.cancel();
+    setInnerValue(value);
+  }, [value, debouncedSetValue]);
 
   const handleChange = useCallback(
     (newValue: string) => {

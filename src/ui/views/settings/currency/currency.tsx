@@ -10,7 +10,6 @@ const CURRENCIES = [
   { id: 'idr', name: 'Indonesian Rupiah', symbol: 'IDR' },
   { id: 'eur', name: 'Euro', symbol: 'EUR' },
   { id: 'gbp', name: 'British Pound', symbol: 'GBP' },
-  { id: 'jpy', name: 'Japanese Yen', symbol: 'JPY' },
 ];
 
 export function CurrencyView() {
@@ -25,13 +24,13 @@ export function CurrencyView() {
   };
 
   return (
-    <>
+    <div className="flex flex-col h-full">
       <Header
         title="Currency"
         onBack={() => navigate('/settings', { state: { direction: 'back' } })}
       />
 
-      <div className="flex flex-col h-full px-4">
+      <div className="flex-1 p-4 pt-0 space-y-4 no-scrollbar overflow-y-auto">
         <p className="text-sm text-muted-foreground mb-4">
           Select primary fiat currency to display prices and valuations.
         </p>
@@ -52,7 +51,7 @@ export function CurrencyView() {
           ))}
         </Card>
       </div>
-    </>
+    </div>
   );
 }
 

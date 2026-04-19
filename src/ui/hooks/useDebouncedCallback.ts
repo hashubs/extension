@@ -1,16 +1,26 @@
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import debounce from 'lodash/debounce';
 
-export function useDebouncedCallback<T, K>(
-  callback: (...args: T[]) => K,
+export function useDebouncedCallback<T extends any[], K>(
+  callback: (...args: T) => K,
   delay: number
 ) {
-  const debouncedCallback = useMemo(
-    () => debounce(callback, delay),
-    [callback, delay]
-  );
+  const callbackRef = useRef(callback);
+
   useEffect(() => {
-    return debouncedCallback.cancel;
-  }, [debouncedCallback.cancel]);
+    callbackRef.current = callback;
+  }, [callback]);
+
+  const debouncedCallback = useMemo(
+    () => debounce((...args: T) => callbackRef.current(...args), delay),
+    [delay]
+  );
+
+  useEffect(() => {
+    return () => {
+      debouncedCallback.cancel();
+    };
+  }, [debouncedCallback]);
+
   return debouncedCallback;
 }

@@ -1,4 +1,3 @@
-import { EXTENSION } from '@/app/constants';
 import { formatJsonRpcRequestPatched } from '@/shared/custom-rpc/format-json-rpc-request-patched';
 import { invariant } from '@/shared/invariant';
 import type {
@@ -20,7 +19,7 @@ import type { Ghost } from './solana-wallet-standard';
 import { solFromBase64, solToBase64 } from './transactions/create';
 
 export class SolanaProvider extends EventEmitter implements Ghost {
-  name = EXTENSION.name;
+  name = 'Selvo';
   icon = icon;
   connection: Connection;
   publicKey: PublicKey | null;

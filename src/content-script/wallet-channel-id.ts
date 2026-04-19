@@ -1,8 +1,7 @@
-import { EXTENSION } from '@/app/constants';
 import { nanoid } from 'nanoid';
 import { invariant } from '../shared/invariant';
 
-const CHANNEL_ID_SCRIPT_ID = `${EXTENSION.slug}-extension-channel`;
+const CHANNEL_ID_SCRIPT_ID = `selvo-extension-channel`;
 
 export function setChannelIdInDom(): string {
   const scriptWithId = document.getElementById(CHANNEL_ID_SCRIPT_ID);

@@ -105,8 +105,9 @@ export function EditNetwork() {
       {isCustomNetworkId(network.id) && (
         <Content name="custom-header">
           <Button
+            iconOnly
+            iconOnlySize="md"
             variant="ghost"
-            size="icon"
             onClick={() => removeMutation.mutate()}
             className="text-destructive"
           >

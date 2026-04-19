@@ -1,4 +1,3 @@
-import { EXTENSION } from '@/app/constants';
 import type { EthereumProvider } from '@/modules/ethereum/provider';
 
 let didHandleWindowAccess = false;
@@ -22,7 +21,7 @@ export function onChange(listener: (value: typeof state) => void) {
 }
 
 function trackSelvoFlagAccess(ourProvider: EthereumProvider) {
-  Object.defineProperty(ourProvider, EXTENSION.flag, {
+  Object.defineProperty(ourProvider, 'isSelvo', {
     get() {
       state.dappIsSelvoAware = true;
       notify();

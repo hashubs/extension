@@ -102,7 +102,7 @@ export function Card({
               }
             />
           )}
-          <h2 className="text-[11px] font-bold text-muted-foreground uppercase tracking-widest">
+          <h2 className="text-[11px] font-semibold text-muted-foreground uppercase tracking-widest">
             {title}
           </h2>
         </div>

@@ -1,4 +1,3 @@
-import { BrandLogo } from '@/app/logo';
 import { accountPublicRPCPort, walletPort } from '@/shared/channel';
 import { invariant } from '@/shared/invariant';
 import { queryClient } from '@/shared/query-client/queryClient';
@@ -14,6 +13,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { AnimatedBackground } from './components/AnimatedBackground';
 import { ForgotPassword } from './forgot-password';
 import { LoginPasskey } from './login-passkey';
+import { BrandLogo } from '@/ui/components/svg';
 
 export function LoginView() {
   const [params] = useSearchParams();

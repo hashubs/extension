@@ -102,7 +102,7 @@ export function CardItem({ item }: { item: ItemType }) {
         <div className="flex flex-col">
           <span
             className={cn(
-              'flex items-center gap-2 text-sm font-medium transition-colors',
+              'flex items-center gap-2 text-sm transition-colors',
               isDanger ? 'text-red-400' : 'text-foreground/90',
               !disabled &&
                 (isDanger

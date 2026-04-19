@@ -1,4 +1,3 @@
-import { EXTENSION } from '@/app/constants';
 import { difference } from '@/shared/difference';
 import { produce } from 'immer';
 import { isTruthy } from 'is-truthy-ts';
@@ -182,13 +181,9 @@ export class ContentScriptManager {
     }
 
     const registered = await chrome.scripting.getRegisteredContentScripts();
-    if (
-      registered.some(
-        (s) => s.id === `${EXTENSION.slug}-extension-content-script`
-      )
-    ) {
+    if (registered.some((s) => s.id === `selvo-extension-content-script`)) {
       await chrome.scripting.unregisterContentScripts({
-        ids: [`${EXTENSION.slug}-extension-content-script`],
+        ids: [`selvo-extension-content-script`],
       });
     }
 
@@ -201,7 +196,7 @@ export class ContentScriptManager {
     // See: https://developer.chrome.com/docs/extensions/mv3/content_scripts/#isolated_world
     await chrome.scripting.registerContentScripts([
       {
-        id: `${EXTENSION.slug}-extension-content-script`,
+        id: `selvo-extension-content-script`,
         allFrames: true,
         js: inPageScriptLocation.resources,
         excludeMatches,

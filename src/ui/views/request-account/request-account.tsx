@@ -1,4 +1,3 @@
-import { EXTENSION } from '@/app/constants';
 import { Permission } from '@/background/wallet/model/types';
 import { walletPort, windowPort } from '@/shared/channel';
 import { focusNode } from '@/shared/focus-node';
@@ -129,7 +128,7 @@ function Permissions({
     <Drawer>
       <DrawerTrigger asChild>
         <span className="flex items-center gap-1 text-muted-foreground">
-          <p className="text-sm">Wants to connect to {EXTENSION.name}</p>
+          <p className="text-sm">Wants to connect to Selvo</p>
           <LuInfo className="w-4 h-4" />
         </span>
       </DrawerTrigger>
@@ -288,7 +287,7 @@ function RequestAccountsView({
   const handleWalletSelect = useCallback(() => {
     const newParams = new URLSearchParams(params.toString());
     newParams.set('next', '/requestAccounts');
-    navigate(`/requestAccounts/select-wallet?${newParams.toString()}`);
+    navigate(`/select-wallet?${newParams.toString()}`);
   }, [navigate, params]);
 
   const handleConnect = useCallback(() => {

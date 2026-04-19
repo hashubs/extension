@@ -1,5 +1,3 @@
-import { EXTENSION } from '@/app/constants';
-import { BrandLogo } from '@/app/logo';
 import { naiveFormDataToObject } from '@/shared/form-data';
 import { cn } from '@/ui/lib/utils';
 import { Button, Drawer, DrawerContent, DrawerTrigger } from '@/ui/ui-kit';
@@ -7,6 +5,7 @@ import { useEffect, useRef, useState } from 'react';
 import { invariant } from 'src/shared/invariant';
 import { reloadActiveTab } from 'src/shared/reloadActiveTab';
 import { SiteFaviconImg } from '../SiteFaviconImg';
+import { BrandLogo } from '../svg';
 import type { SubmitData } from './actions';
 import { createInjectionPreference, TESTING, TurnOffDuration } from './actions';
 import { usePausedData } from './usePausedData';
@@ -67,7 +66,7 @@ function PauseInjectionControl({
     <div className="flex flex-col items-center w-full px-4 mx-auto">
       <div className="text-center mb-5">
         <span className="font-medium mb-1 text-muted-foreground text-[10px] uppercase tracking-wider">
-          Disable {EXTENSION.name} for
+          Disable Selvo for
         </span>
         <div className="flex items-center justify-center gap-2">
           <SiteFaviconImg size={18} url={activeTabUrl.origin} />

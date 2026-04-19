@@ -1,4 +1,3 @@
-import { EXTENSION } from '@/app/constants';
 import { Header } from '@/ui/components/header';
 import { Button, Sheet, SheetContent } from '@/ui/ui-kit';
 import { LuLoader } from 'react-icons/lu';
@@ -24,7 +23,7 @@ export function ForgotPassword({
         <div className="space-y-2">
           <p className="text-muted-foreground">
             If you forget your password, you need to delete all wallets in
-            {EXTENSION.name}, and then you can reset your password.
+            Selvo, and then you can reset your password.
           </p>
 
           <p className="text-muted-foreground">

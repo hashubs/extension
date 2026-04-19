@@ -1,5 +1,4 @@
-import { EXTENSION } from '@/app/constants';
-import logo from 'data-url:@/app/selvo-logo-teal.svg';
+import logo from 'data-url:@/ui/assets/selvo-logo-teal.svg';
 
 function visitTextNodes(node: Element, cb: (node: Node) => boolean) {
   const walker = document.createTreeWalker(node, NodeFilter.SHOW_TEXT);
@@ -24,7 +23,7 @@ const injectedRegexes: Record<string, RegExp> = {
 const labelsInjectedRe =
   injectedRegexes[window.location.origin] || injectedRegexes.default;
 const labelsMetamaskRe = /\bMeta[mM]ask\b/;
-const matcher = EXTENSION.matcher;
+const matcher = /selvo/i;
 
 function isReplacementMatch(textNode: Node, regex: RegExp) {
   const { textContent } = textNode;
@@ -34,7 +33,7 @@ function isReplacementMatch(textNode: Node, regex: RegExp) {
 function replaceButtonLabel(textNode: Node, regex: RegExp) {
   const { textContent } = textNode;
   if (textContent) {
-    textNode.textContent = textContent.replace(regex, EXTENSION.name);
+    textNode.textContent = textContent.replace(regex, 'Selvo');
   }
 }
 

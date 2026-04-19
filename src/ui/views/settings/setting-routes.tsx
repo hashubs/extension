@@ -1,5 +1,6 @@
 import { Route, Routes } from 'react-router-dom';
 
+import { ConnectedSitesRoutes } from './connected-sites';
 import { CurrencyView } from './currency';
 import { DeveloperToolsView } from './developer-tools';
 import { NetworksRoutes } from './networks';
@@ -14,6 +15,7 @@ export function SettingsRoutes() {
       <Route path="/networks/*" element={<NetworksRoutes />} />
       <Route path="/currency" element={<CurrencyView />} />
       <Route path="/security-privacy/*" element={<SecurityPrivacyRoutes />} />
+      <Route path="/connected-sites/*" element={<ConnectedSitesRoutes />} />
     </Routes>
   );
 }

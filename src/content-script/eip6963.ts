@@ -1,6 +1,5 @@
-import { EXTENSION } from '@/app/constants';
 import type { EthereumProvider } from '@/modules/ethereum/provider';
-import logo from 'data-url:@/app/selvo-logo-teal.svg';
+import logo from 'data-url:@/ui/assets/selvo-logo-teal.svg';
 
 interface EIP6963ProviderInfo {
   uuid: string;
@@ -11,9 +10,9 @@ interface EIP6963ProviderInfo {
 
 const info = {
   uuid: crypto.randomUUID(),
-  name: EXTENSION.name,
+  name: 'Selvo',
   icon: logo,
-  rdns: `io.${EXTENSION.slug}.wallet`,
+  rdns: `io.selvo.wallet`,
 } satisfies EIP6963ProviderInfo;
 
 type Options = {

@@ -1,8 +1,8 @@
 // @ts-ignore parcel syntax for bundle url
-import workerPath from 'url:./getFirstNMnemonicWallets.worker';
-import type { Params, Result } from './getFirstNMnemonicWallets.worker';
+import workerPath from 'url:./mnemonic-n-derivation.worker';
+import type { Params, Result } from './mnemonic-n-derivation.worker';
 
-export async function getFirstNMnemonicWallets(params: Params) {
+export async function mnemonicNDerivation(params: Params) {
   return new Promise<Result>((resolve, reject) => {
     const worker = new Worker(workerPath);
     worker.postMessage(params);

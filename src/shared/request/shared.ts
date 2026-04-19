@@ -1,4 +1,3 @@
-import { EXTENSION } from '@/app/constants';
 import {
   API_URL,
   CRAWLER_API_URL,
@@ -35,8 +34,8 @@ export const CLIENT_DEFAULTS: ClientOptions = { source: 'mainnet' };
 export function createHeaders(options: Options) {
   return {
     'X-Request-Id': crypto.randomUUID(),
-    [`${EXTENSION.slug}-client-type`]: platform,
-    [`${EXTENSION.slug}-client-version`]: version,
+    ['selvo-client-type']: platform,
+    ['selvo-client-version']: version,
     'Content-Type': 'application/json',
     ...options.headers,
   };

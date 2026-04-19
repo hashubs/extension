@@ -136,7 +136,7 @@ export function ManageNetwork() {
   );
 
   return (
-    <div className="flex flex-col h-full no-scrollbar">
+    <div className="flex flex-col h-full">
       <Header
         title="Network"
         onBack={() => navigate('/settings', { state: { direction: 'back' } })}

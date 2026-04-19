@@ -50,7 +50,7 @@ function fromHDNode(hdNode: HDNode): MaskedBareWallet {
 }
 
 /** Ethereum keypairs */
-function getFirstNMnemonicWalletsEcdsa({ phrase, n }: Omit<Params, 'curve'>) {
+function mnemonicNDerivationEcdsa({ phrase, n }: Omit<Params, 'curve'>) {
   const result: Result = [];
   // NOTE:
   // ethers.utils.HDNode is _much_ faster at generating wallets
@@ -65,7 +65,7 @@ function getFirstNMnemonicWalletsEcdsa({ phrase, n }: Omit<Params, 'curve'>) {
 }
 
 /** Solana keypairs */
-function getFirstNMnemonicWalletsEd25519({
+function mnemonicNDerivationEd25519({
   phrase: phraseEncoded,
   n,
   pathType = 'solanaBip44Change',
@@ -86,9 +86,9 @@ function getFirstNMnemonicWalletsEd25519({
 function main(params: Params) {
   if (params.curve === 'ed25519') {
     // TODO: measure performance time
-    return getFirstNMnemonicWalletsEd25519(params);
+    return mnemonicNDerivationEd25519(params);
   } else if (params.curve === 'ecdsa') {
-    return getFirstNMnemonicWalletsEcdsa(params);
+    return mnemonicNDerivationEcdsa(params);
   } else {
     throw new Error(`Must pass known curve type: ${params.curve}`);
   }

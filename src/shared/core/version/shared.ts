@@ -1,7 +1,7 @@
 import { BrowserStorage } from '@/background/webapis/storage';
 import browser from 'webextension-polyfill';
 
-export const STORAGE_VERSION = 0.1;
+export const STORAGE_VERSION = 0.4;
 
 export async function getCurrentVersion() {
   const saved = await BrowserStorage.get<number | string>('STORAGE_VERSION');

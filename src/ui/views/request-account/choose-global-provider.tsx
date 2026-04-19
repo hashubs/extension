@@ -1,6 +1,5 @@
-import { EXTENSION } from '@/app/constants';
-import { BrandLogo } from '@/app/logo';
 import { windowPort } from '@/shared/channel';
+import { BrandLogo } from '@/ui/components/svg';
 import React from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { invariant } from 'src/shared/invariant';
@@ -49,7 +48,7 @@ export function ChooseGlobalProvider({
                 className="flex items-center justify-center gap-2 w-full py-3 rounded-xl bg-blue-600 text-white text-sm font-semibold hover:bg-blue-700 transition-colors"
               >
                 <BrandLogo style={{ width: 20, height: 20 }} />
-                <span>Continue with {EXTENSION.name}</span>
+                <span>Continue with Selvo</span>
               </button>
 
               <button

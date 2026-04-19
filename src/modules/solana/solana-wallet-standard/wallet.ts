@@ -1,4 +1,3 @@
-import { EXTENSION } from '@/app/constants';
 import {
   SolanaSignAndSendTransactionFeature,
   SolanaSignAndSendTransactionMethod,
@@ -34,7 +33,7 @@ export class SolanaWalletStandard implements Wallet {
   readonly #implementation: SolanaImplementation;
 
   constructor(implementation: SolanaImplementation) {
-    this.#name = implementation.name || EXTENSION.name;
+    this.#name = implementation.name || 'Selvo';
     this.#icon = implementation.icon as WalletIcon;
     this.#implementation = implementation;
 

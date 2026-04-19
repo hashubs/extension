@@ -7,7 +7,7 @@ import type { MaskedBareWallet } from 'src/shared/types/bare-wallet';
 import type { BlockchainType } from 'src/shared/wallet/classifiers';
 import type { DerivationPathType } from 'src/shared/wallet/derivation-paths';
 import type { LocallyEncoded } from 'src/shared/wallet/encode-locally';
-import { getFirstNMnemonicWallets } from './getFirstNMnemonicWallets';
+import { mnemonicNDerivation } from './mnemonic-n-derivation';
 
 export type DerivedWallets = Array<{
   curve: 'ecdsa' | 'ed25519';
@@ -19,7 +19,7 @@ export async function prepareWalletsToImport(phrase: LocallyEncoded): Promise<{
   derivedWallets: DerivedWallets;
   addressesToCheck: string[];
 } | void> {
-  const fn = getFirstNMnemonicWallets;
+  const fn = mnemonicNDerivation;
   const solanaEnabled = FEATURE_SOLANA === 'on';
   const [eth, sol1, sol2, sol3] = await Promise.all([
     fn({ phrase, n: 30, curve: 'ecdsa' }),
@@ -81,7 +81,9 @@ export function suggestInitialWallets({
     (w) => !existingAddressesSet.has(normalizeAddress(w.address))
   );
   const grouped = groupBy(newOnes, ({ address }) =>
-    (activeWallets[normalizeAddress(address)]?.totalValue ?? 0) > 0 ? 'active' : 'rest'
+    (activeWallets[normalizeAddress(address)]?.totalValue ?? 0) > 0
+      ? 'active'
+      : 'rest'
   );
   const { active, rest } = grouped as Record<
     'active' | 'rest',

@@ -1,11 +1,14 @@
 import { accountPublicRPCPort } from '@/shared/channel';
+import { Button } from '@/ui/ui-kit';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import React, { useState } from 'react';
+import { BsDatabaseFillGear } from 'react-icons/bs';
+import { LuLoader } from 'react-icons/lu';
 import { eraseAndUpdateToLatestVersion } from 'src/shared/core/version/shared';
 import { checkVersion } from 'src/shared/core/version/version.client';
 
 export function VersionUpgrade({ children }: React.PropsWithChildren) {
-  const { data, isLoading, refetch } = useQuery({
+  const { data, refetch } = useQuery({
     queryKey: ['checkVersion'],
     queryFn: () => checkVersion(),
     retry: false,
@@ -27,10 +30,6 @@ export function VersionUpgrade({ children }: React.PropsWithChildren) {
     },
   });
 
-  if (isLoading) {
-    return null;
-  }
-
   if (
     !ignoreWarning &&
     data?.storageVersion.mismatch &&
@@ -39,11 +38,11 @@ export function VersionUpgrade({ children }: React.PropsWithChildren) {
     const CAN_LOGIN_TO_OLD_VERSION = false;
 
     return (
-      <div className="min-h-screen bg-neutral-100 flex flex-col items-center justify-center px-4 py-8">
+      <div className="flex flex-col h-full items-center justify-center px-4 py-8">
         <div className="w-full max-w-sm flex flex-col gap-6">
           <div className="flex flex-col items-start gap-3">
-            <div className="w-13 h-13 rounded-xl border border-neutral-200 bg-white flex items-center justify-center text-2xl select-none">
-              ⚙️
+            <div className="w-13 h-13 rounded-xl border border-muted-foreground/20 bg-muted-foreground/5 flex items-center justify-center text-2xl select-none">
+              <BsDatabaseFillGear />
             </div>
             <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-amber-50 border border-amber-200">
               <span className="w-1.5 h-1.5 rounded-full bg-amber-600 shrink-0" />
@@ -54,61 +53,54 @@ export function VersionUpgrade({ children }: React.PropsWithChildren) {
           </div>
 
           <div className="flex flex-col gap-2">
-            <h2 className="text-xl font-medium text-neutral-900 leading-snug">
+            <h2 className="text-xl font-medium leading-snug">
               Data migration needed before you continue
             </h2>
-            <p className="text-sm text-neutral-500 leading-relaxed">
+            <p className="text-sm text-muted-foreground leading-relaxed">
               We've updated how data is stored internally. Your current storage
               format is no longer compatible — a one-time reset is required to
               proceed.
             </p>
           </div>
 
-          <div className="bg-neutral-50 border border-neutral-200 rounded-lg px-4 py-3.5 flex flex-col gap-2.5">
+          <div className="bg-item border border-muted-foreground/20 rounded-lg px-4 py-3.5 flex flex-col gap-2.5">
             <div className="flex items-start gap-2.5">
               <span className="text-sm mt-0.5">🗂️</span>
-              <p className="text-sm text-neutral-500 leading-relaxed">
+              <p className="text-sm text-muted-foreground leading-relaxed">
                 Your existing data will be permanently removed. Make sure you
                 have your seed phrase or backup ready before continuing.
               </p>
             </div>
             <div className="flex items-start gap-2.5">
               <span className="text-sm mt-0.5">🔑</span>
-              <p className="text-sm text-neutral-500 leading-relaxed">
+              <p className="text-sm text-muted-foreground leading-relaxed">
                 You will need to re-import your wallet after the reset.
               </p>
             </div>
           </div>
 
           <div className="flex flex-col gap-2">
-            <button
+            <Button
+              variant="primary"
               disabled={eraseMutation.isPending}
               onClick={() => eraseMutation.mutate()}
-              className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg border border-neutral-300 bg-transparent text-neutral-900 text-sm font-medium hover:bg-neutral-100 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+              loading={eraseMutation.isPending}
+              loadingText="Clearing storage..."
+              icon={eraseMutation.isPending ? LuLoader : undefined}
             >
-              <span>
-                {eraseMutation.isPending
-                  ? 'Clearing storage...'
-                  : 'Reset and continue'}
-              </span>
-              <span className="text-base">
-                {eraseMutation.isPending ? '⏳' : '→'}
-              </span>
-            </button>
+              Reset and continue
+            </Button>
 
             {CAN_LOGIN_TO_OLD_VERSION ? (
-              <button
-                onClick={() => setIgnoreWarning(true)}
-                className="w-full px-4 py-2.5 rounded-lg border-none bg-transparent text-neutral-400 text-sm hover:bg-neutral-100 transition-colors"
-              >
+              <Button variant="outline" onClick={() => setIgnoreWarning(true)}>
                 Use old storage to make backups first
-              </button>
+              </Button>
             ) : null}
           </div>
         </div>
       </div>
     );
+  } else {
+    return children as JSX.Element;
   }
-
-  return children as JSX.Element;
 }
