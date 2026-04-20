@@ -1,6 +1,7 @@
 import { cn } from '@/ui/lib/utils';
 import { Image } from '@/ui/ui-kit/image';
 import type { IconType } from 'react-icons';
+import { useAnimationPreference } from '@/ui/features/appearance';
 
 type ItemBase = {
   id?: string;
@@ -50,6 +51,7 @@ export type ItemType =
   | ItemWithNeither;
 
 export function CardItem({ item }: { item: ItemType }) {
+  const { enableAnimation } = useAnimationPreference();
   const IconRight = item.iconRight;
   const isDanger = item.variant === 'danger';
   const disabled = item.disabled;
@@ -61,7 +63,8 @@ export function CardItem({ item }: { item: ItemType }) {
       tabIndex={0}
       onClick={item.onClick}
       className={cn(
-        'w-full px-2.5 py-2.5 flex items-center justify-between transition-all group text-left outline-none focus:outline-none',
+        'w-full px-2.5 py-2.5 flex items-center justify-between group text-left outline-none focus:outline-none',
+        enableAnimation ? 'transition-all' : 'transition-none',
         disabled ? 'opacity-40 cursor-not-allowed' : 'cursor-pointer',
         !disabled &&
           (isDanger
@@ -90,7 +93,8 @@ export function CardItem({ item }: { item: ItemType }) {
         ) : 'icon' in item && item.icon ? (
           <div
             className={cn(
-              'w-8 h-8 rounded-lg flex items-center justify-center transition-colors',
+              'w-8 h-8 rounded-lg flex items-center justify-center',
+              enableAnimation ? 'transition-colors' : 'transition-none',
               item.iconClassName ??
                 (isDanger
                   ? 'bg-linear-to-br from-red-500/20 to-red-600/10 text-red-400 border border-red-500/10'
@@ -104,7 +108,8 @@ export function CardItem({ item }: { item: ItemType }) {
         <div className="flex flex-col">
           <span
             className={cn(
-              'flex items-center gap-2 text-sm transition-colors',
+              'flex items-center gap-2 text-sm',
+              enableAnimation ? 'transition-colors' : 'transition-none',
               isDanger ? 'text-red-400' : 'text-foreground/90',
               !disabled &&
                 (isDanger
@@ -136,7 +141,7 @@ export function CardItem({ item }: { item: ItemType }) {
             size={15}
             className={cn(
               !disabled && 'group-hover:text-foreground',
-              item.transition !== false && !disabled
+              item.transition !== false && !disabled && enableAnimation
                 ? 'group-hover:translate-x-0.5 transition-all'
                 : 'transition-none',
               item.iconRightClassName

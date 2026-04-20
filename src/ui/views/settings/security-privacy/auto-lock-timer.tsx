@@ -50,12 +50,12 @@ export function AutoLockTimerView() {
   }, [mutation.isSuccess, navigate]);
 
   return (
-    <>
+    <div className="flex flex-col h-full">
       <Header
         title="Auto-Lock Timer"
         onBack={() => navigate(BACK_ROUTE, { state: { direction: 'back' } })}
       />
-      <div className="flex flex-col w-full p-4 pt-0!">
+      <div className="flex-1 p-4 pt-0 space-y-4 no-scrollbar overflow-y-auto">
         <Card title="Choose timer">
           {AUTO_LOCK_TIMER_OPTIONS.map((option) => (
             <CardItem
@@ -73,7 +73,7 @@ export function AutoLockTimerView() {
           ))}
         </Card>
       </div>
-    </>
+    </div>
   );
 }
 

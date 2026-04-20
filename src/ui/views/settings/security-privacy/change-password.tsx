@@ -156,7 +156,7 @@ export function ChangePasswordView() {
     passwordsMatch;
 
   return (
-    <>
+    <div className="flex flex-col h-full">
       <Header
         title="Change Password"
         onBack={() =>
@@ -165,7 +165,7 @@ export function ChangePasswordView() {
           })
         }
       />
-      <div className="flex flex-col w-full p-4 pt-0! space-y-4">
+      <div className="flex-1 p-4 pt-0 space-y-4 no-scrollbar overflow-y-auto">
         <div className="space-y-1">
           <h1 className="text-xl font-semibold text-foreground">
             Change Password
@@ -282,6 +282,6 @@ export function ChangePasswordView() {
       </Drawer>
 
       <PopoverToast ref={toastRef}>Password changed successfully.</PopoverToast>
-    </>
+    </div>
   );
 }

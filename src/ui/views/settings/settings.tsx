@@ -105,29 +105,27 @@ export function SettingsView() {
   ];
 
   return (
-    <>
+    <div className="flex flex-col h-full">
       <Header
         title="Settings"
         onBack={() => navigate('/overview', { state: { direction: 'back' } })}
       />
 
-      <div className="flex flex-col h-full px-4">
-        <div className="flex-1 overflow-y-auto no-scrollbar space-y-6">
-          {navigations.map((section, i) => (
-            <div key={i}>
-              <Card title={section.title}>
-                {section.items.map((item, j) => (
-                  <CardItem key={j} item={item} />
-                ))}
-              </Card>
-            </div>
-          ))}
+      <div className="flex-1 p-4 pt-0 space-y-6 no-scrollbar overflow-y-auto">
+        {navigations.map((section, i) => (
+          <div key={i}>
+            <Card title={section.title}>
+              {section.items.map((item, j) => (
+                <CardItem key={j} item={item} />
+              ))}
+            </Card>
+          </div>
+        ))}
 
-          <p className="text-center text-[10px] text-gray-600 mt-4 font-mono pb-4">
-            v1.0.0 (Build 001)
-          </p>
-        </div>
+        <p className="text-center text-[10px] text-gray-600 mt-4 font-mono pb-4">
+          v1.0.0 (Build 001)
+        </p>
       </div>
-    </>
+    </div>
   );
 }

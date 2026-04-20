@@ -113,7 +113,7 @@ export function DeveloperToolsView() {
   ];
 
   return (
-    <>
+    <div className="flex flex-col h-full">
       <Header
         title="Developer Tools"
         onBack={() => navigate('/settings', { state: { direction: 'back' } })}
@@ -134,6 +134,6 @@ export function DeveloperToolsView() {
       <PopoverToast ref={clearPendingTransactionsToastRef} showClose>
         Pending transactions cleared
       </PopoverToast>
-    </>
+    </div>
   );
 }

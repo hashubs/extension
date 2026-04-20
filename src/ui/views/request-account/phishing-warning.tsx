@@ -28,7 +28,7 @@ export function PhishingWarning({ url, onClose }: Props) {
   };
 
   return (
-    <div className="flex flex-col h-full bg-[#0F0F0F] text-white animate-fade-in overflow-hidden">
+    <div className="flex flex-col h-full bg-[#0F0F0F] text-white overflow-hidden">
       <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none opacity-20">
         <div className="absolute top-[-10%] right-[-10%] w-[60%] h-[60%] bg-red-600 rounded-full blur-[120px]" />
         <div className="absolute bottom-[-10%] left-[-10%] w-[50%] h-[50%] bg-red-900 rounded-full blur-[100px]" />

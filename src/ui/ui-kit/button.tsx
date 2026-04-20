@@ -3,6 +3,7 @@ import { cva, type VariantProps } from 'class-variance-authority';
 import { type ButtonHTMLAttributes, forwardRef } from 'react';
 import type { IconType } from 'react-icons';
 import { AiOutlineLoading3Quarters } from 'react-icons/ai';
+import { useAnimationPreference } from '@/ui/features/appearance';
 
 const buttonVariants = cva(
   [
@@ -99,6 +100,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     },
     ref
   ) => {
+    const { enableAnimation } = useAnimationPreference();
     const isDisabled = disabled || loading;
 
     if (iconOnly) {
@@ -119,7 +121,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
           aria-label={props['aria-label'] ?? 'button'}
           {...props}
         >
-          {shimmer && !loading && (
+          {shimmer && enableAnimation && !loading && (
             <ShimmerOverlay className={shimmerClassName} />
           )}
           {loading ? (
@@ -147,13 +149,19 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       <button
         ref={ref}
         className={cn(
-          buttonVariants({ variant, size: resolvedSize, transition }),
+          buttonVariants({
+            variant,
+            size: resolvedSize,
+            transition: enableAnimation ? transition : 'none',
+          }),
           className
         )}
         disabled={isDisabled}
         {...props}
       >
-        {shimmer && !loading && <ShimmerOverlay className={shimmerClassName} />}
+        {shimmer && enableAnimation && !loading && (
+          <ShimmerOverlay className={shimmerClassName} />
+        )}
 
         {loading ? (
           <>

@@ -295,7 +295,7 @@ function RequestAccountsView({
   }, [wallet, origin, onConfirm]);
 
   return (
-    <div className="relative flex flex-col h-full overflow-hidden animate-fade-in bg-[#f6f6f8] dark:bg-[#1f1f1f]">
+    <div className="relative flex flex-col h-full overflow-hidden bg-[#f6f6f8] dark:bg-[#1f1f1f]">
       <RequestAccountsHeader origin={origin} isPhishing={isPhishing} />
 
       <div className="flex flex-1 flex-col overflow-hidden rounded-t-3xl shadow-2xl bg-background outline-none">

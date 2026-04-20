@@ -60,12 +60,12 @@ export function SecurityPrivacyView() {
   ];
 
   return (
-    <>
+    <div className="flex flex-col h-full">
       <Header
         title="Security & Privacy"
         onBack={() => navigate('/settings', { state: { direction: 'back' } })}
       />
-      <div className="flex-1 p-4 pt-0! space-y-4 no-scrollbar overflow-y-auto">
+      <div className="flex-1 p-4 pt-0 space-y-4 no-scrollbar overflow-y-auto">
         {navigations.map((section, i) => (
           <section key={i}>
             <Card title={section.title}>
@@ -80,6 +80,6 @@ export function SecurityPrivacyView() {
           </section>
         ))}
       </div>
-    </>
+    </div>
   );
 }
