@@ -1,3 +1,5 @@
+import fiatData from '@/ui/views/settings/currency/fiat.json';
+
 type FiatFormatOptions = {
   locale?: string;
   isTokenPrice?: boolean;
@@ -46,16 +48,25 @@ function formatFiatInternal(
   } = options;
 
   const value = normalizeInput(input);
+  const currencyUpper = currency.toUpperCase();
+  const lowerCode = currency.toLowerCase();
+  const fiatConfig = (fiatData as Record<string, any>)[lowerCode];
+  const overrideSymbol = fiatConfig ? fiatConfig.symbol : undefined;
 
   if (value === 0) {
-    const formatter = buildFormatter(locale, currency, 2, 2);
-    return toParts ? formatter.formatToParts(0) : formatter.format(0);
+    const formatter = buildFormatter(locale, currencyUpper, 2, 2);
+    let parts = formatter.formatToParts(0);
+    if (overrideSymbol) {
+      parts = parts.map((p) =>
+        p.type === 'currency' ? { ...p, value: overrideSymbol } : p
+      );
+    }
+    return toParts ? parts : parts.map((p) => p.value).join('');
   }
 
   const abs = Math.abs(value);
   const sign = value < 0 ? "-" : "";
-  const currencyUpper = currency.toUpperCase();
-  const currencySymbol = getCurrencySymbol(locale, currencyUpper);
+  const currencySymbol = overrideSymbol || getCurrencySymbol(locale, currencyUpper);
 
   // =====================================================
   // SMART AUTO COMPACT (Magnitude Based)
@@ -127,7 +138,14 @@ function formatFiatInternal(
     dynamicMax,
   );
 
-  return toParts ? formatter.formatToParts(value) : formatter.format(value);
+  let parts = formatter.formatToParts(value);
+  if (overrideSymbol) {
+    parts = parts.map((p) =>
+      p.type === 'currency' ? { ...p, value: overrideSymbol } : p
+    );
+  }
+
+  return toParts ? parts : parts.map((p) => p.value).join('');
 }
 
 function parseSimplePriceToParts(price: string): Intl.NumberFormatPart[] {

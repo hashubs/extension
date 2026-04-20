@@ -3,6 +3,7 @@ import { Image } from '@/ui/ui-kit/image';
 import type { IconType } from 'react-icons';
 
 type ItemBase = {
+  id?: string;
   iconRight?: IconType;
   label: string;
   subLabel?: string;
@@ -55,11 +56,12 @@ export function CardItem({ item }: { item: ItemType }) {
 
   return (
     <div
+      id={item.id}
       role="button"
       tabIndex={0}
       onClick={item.onClick}
       className={cn(
-        'w-full px-2.5 py-2.5 flex items-center justify-between transition-all group text-left',
+        'w-full px-2.5 py-2.5 flex items-center justify-between transition-all group text-left outline-none focus:outline-none',
         disabled ? 'opacity-40 cursor-not-allowed' : 'cursor-pointer',
         !disabled &&
           (isDanger
@@ -92,7 +94,7 @@ export function CardItem({ item }: { item: ItemType }) {
               item.iconClassName ??
                 (isDanger
                   ? 'bg-linear-to-br from-red-500/20 to-red-600/10 text-red-400 border border-red-500/10'
-                  : 'border border-indigo-500/10')
+                  : 'border border-muted-foreground/10')
             )}
           >
             <item.icon size={15} />

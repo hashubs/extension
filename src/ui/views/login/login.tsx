@@ -4,7 +4,7 @@ import { queryClient } from '@/shared/query-client/queryClient';
 import { PublicUser } from '@/shared/types/User';
 import { wait } from '@/shared/wait';
 import { zeroizeAfterSubmission } from '@/shared/zeroize-submission';
-import { BlockieAddress } from '@/ui/components/blockie';
+import { BlockieAddress } from '@/ui/components/Blockie';
 import { BrandLogo } from '@/ui/components/svg';
 import { Button, Input } from '@/ui/ui-kit';
 import { useMutation, useQuery } from '@tanstack/react-query';

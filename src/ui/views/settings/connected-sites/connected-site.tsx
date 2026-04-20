@@ -4,9 +4,10 @@ import { invariant } from '@/shared/invariant';
 import { prepareForHref } from '@/shared/prepare-for-href';
 import { getPermissionsWithWallets } from '@/shared/request/internal/getPermissionsWithWallets';
 import { ExternallyOwnedAccount } from '@/shared/types/externally-owned-account';
-import { BlockieAddress } from '@/ui/components/blockie';
+import { BlockieAddress } from '@/ui/components/Blockie';
 import { MetamaskMode } from '@/ui/components/ConnectedSite/MetamaskMode';
 import { Header } from '@/ui/components/header';
+import { ViewNotFound } from '@/ui/components/view-not-found';
 import { WalletDisplayName } from '@/ui/components/wallet';
 import { useRemovePermissionMutation } from '@/ui/hooks/request/internal/useRemovePermission';
 import { truncateAddress } from '@/ui/lib/utils';
@@ -20,7 +21,7 @@ import {
 import { useQuery } from '@tanstack/react-query';
 import { useCallback, useMemo, useState } from 'react';
 import { AiOutlineDisconnect } from 'react-icons/ai';
-import { LuArrowUpRight, LuGlobe, LuWifi } from 'react-icons/lu';
+import { LuArrowUpRight, LuGlobe } from 'react-icons/lu';
 import { useNavigate, useParams } from 'react-router-dom';
 
 function ConfirmDrawer({
@@ -178,7 +179,11 @@ export function ConnectedSiteView() {
   const singleRemoveMutation = useRemovePermissionMutation({
     onSuccess: () => {
       refetch();
-      if (connectedSite?.addresses.length === 1) navigate(-1);
+      if (connectedSite?.addresses.length === 1) {
+        navigate('/settings/connected-sites', {
+          state: { direction: 'back' },
+        });
+      }
     },
   });
 
@@ -187,31 +192,19 @@ export function ConnectedSiteView() {
   const allRemoveMutation = useRemovePermissionMutation({
     onSuccess: () => {
       refetch();
-      navigate(-1);
+      navigate('/settings/connected-sites', {
+        state: { direction: 'back' },
+      });
     },
   });
 
-  const handleBack = useCallback(() => navigate(-1), [navigate]);
+  const handleBack = useCallback(
+    () => navigate('/settings', { state: { direction: 'back' } }),
+    [navigate]
+  );
 
   if (!connectedSite) {
-    return (
-      <div className="flex flex-col items-center justify-center h-full gap-3 px-8 text-center bg-background">
-        <div className="size-12 rounded-full bg-muted/30 flex items-center justify-center">
-          <LuWifi className="size-5 text-muted-foreground/50" />
-        </div>
-        <p className="text-sm font-medium text-foreground">Site not found</p>
-        <p className="text-xs text-muted-foreground max-w-[200px] leading-relaxed">
-          This site's data is unavailable or has already been disconnected.
-        </p>
-        <Button
-          variant="secondary"
-          className="mt-2 px-6 py-4 rounded-xl text-sm font-medium"
-          onClick={handleBack}
-        >
-          Go back
-        </Button>
-      </div>
-    );
+    return <ViewNotFound onBack={handleBack} />;
   }
 
   const title = getNameFromOrigin(connectedSite.origin);

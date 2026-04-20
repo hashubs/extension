@@ -3,7 +3,7 @@ import { middot } from '@/shared/typography';
 import { formatFiatToParts } from '@/shared/units/format-fiat';
 import { getAddressType } from '@/shared/wallet/classifiers';
 import { getWalletId } from '@/shared/wallet/wallet-list';
-import { BlockieAddress } from '@/ui/components/blockie';
+import { BlockieAddress } from '@/ui/components/Blockie';
 import { WalletDisplayName } from '@/ui/components/wallet';
 import { usePortfolioValues } from '@/ui/hooks/request/external/usePortfolioValues';
 import { WalletNameType } from '@/ui/hooks/request/internal/useProfileName';

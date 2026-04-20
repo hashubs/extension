@@ -18,7 +18,6 @@ const MIN_WALLETS_FOR_SEARCH = 5;
 
 export function WalletSelectorView() {
   const [searchParams] = useSearchParams();
-  console.log('[WalletSelectorView] searchParams', searchParams.toString());
   const navigate = useNavigate();
 
   const ecosystem = searchParams.get('ecosystem') as BlockchainType;

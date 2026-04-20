@@ -1,7 +1,5 @@
 import { Header } from '@/ui/components/header';
 import { Card, CardItem, ItemType } from '@/ui/ui-kit/card';
-import { DarkModeSelector } from '@/ui/views/settings/dark-mode-selector';
-import { useState } from 'react';
 import {
   LuChevronRight,
   LuDollarSign,
@@ -12,6 +10,7 @@ import {
 } from 'react-icons/lu';
 import { useNavigate } from 'react-router-dom';
 import { CurrencyBadge } from './currency';
+import { ThemeBadge } from './theme';
 
 type navigationType = {
   title?: string;
@@ -20,7 +19,6 @@ type navigationType = {
 
 export function SettingsView() {
   const navigate = useNavigate();
-  const [openDarkMode, setOpenDarkMode] = useState(false);
 
   const navigations: navigationType[] = [
     {
@@ -36,14 +34,10 @@ export function SettingsView() {
         },
         {
           icon: LuSunMoon,
+          iconRight: LuChevronRight,
           label: 'Theme',
-          badge: (
-            <DarkModeSelector
-              open={openDarkMode}
-              onOpenChange={setOpenDarkMode}
-            />
-          ),
-          onClick: () => setOpenDarkMode(!openDarkMode),
+          badge: <ThemeBadge />,
+          onClick: () => navigate('/settings/theme'),
           iconClassName: 'text-lime-500 bg-lime-500/10',
         },
       ],

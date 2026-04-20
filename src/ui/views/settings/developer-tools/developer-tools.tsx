@@ -119,18 +119,16 @@ export function DeveloperToolsView() {
         onBack={() => navigate('/settings', { state: { direction: 'back' } })}
       />
 
-      <div className="flex flex-col h-full px-4">
-        <div className="flex-1 overflow-y-auto no-scrollbar space-y-6">
-          {navigations.map((section, i) => (
-            <div key={i}>
-              <Card title={section.title}>
-                {section.items.map((item, j) => (
-                  <CardItem key={j} item={item} />
-                ))}
-              </Card>
-            </div>
-          ))}
-        </div>
+      <div className="flex-1 p-4 pt-0 space-y-4 no-scrollbar overflow-y-auto">
+        {navigations.map((section, i) => (
+          <div key={i}>
+            <Card title={section.title}>
+              {section.items.map((item, j) => (
+                <CardItem key={j} item={item} />
+              ))}
+            </Card>
+          </div>
+        ))}
       </div>
 
       <PopoverToast ref={clearPendingTransactionsToastRef} showClose>

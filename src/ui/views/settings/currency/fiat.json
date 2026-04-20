@@ -1,0 +1,374 @@
+{
+  "usd": {
+    "name": "US Dollar",
+    "ticker": "usd",
+    "symbol": "$",
+    "currencyType": "fiat"
+  },
+  "aed": {
+    "name": "United Arab Emirates Dirham",
+    "ticker": "aed",
+    "symbol": "د.إ",
+    "currencyType": "fiat"
+  },
+  "ars": {
+    "name": "Argentine Peso",
+    "ticker": "ars",
+    "symbol": "$",
+    "currencyType": "fiat"
+  },
+  "aud": {
+    "name": "Australian Dollar",
+    "ticker": "aud",
+    "symbol": "A$",
+    "currencyType": "fiat"
+  },
+  "bdt": {
+    "name": "Bangladeshi Taka",
+    "ticker": "bdt",
+    "symbol": "৳",
+    "currencyType": "fiat"
+  },
+  "bhd": {
+    "name": "Bahraini Dinar",
+    "ticker": "bhd",
+    "symbol": "BD",
+    "currencyType": "fiat"
+  },
+  "bmd": {
+    "name": "Bermudian Dollar",
+    "ticker": "bmd",
+    "symbol": "$",
+    "currencyType": "fiat"
+  },
+  "brl": {
+    "name": "Brazil Real",
+    "ticker": "brl",
+    "symbol": "R$",
+    "currencyType": "fiat"
+  },
+  "cad": {
+    "name": "Canadian Dollar",
+    "ticker": "cad",
+    "symbol": "CA$",
+    "currencyType": "fiat"
+  },
+  "chf": {
+    "name": "Swiss Franc",
+    "ticker": "chf",
+    "symbol": "Fr",
+    "currencyType": "fiat"
+  },
+  "clp": {
+    "name": "Chilean Peso",
+    "ticker": "clp",
+    "symbol": "CLP$",
+    "currencyType": "fiat"
+  },
+  "cny": {
+    "name": "Chinese Yuan",
+    "ticker": "cny",
+    "symbol": "¥",
+    "currencyType": "fiat"
+  },
+  "czk": {
+    "name": "Czech Koruna",
+    "ticker": "czk",
+    "symbol": "Kč",
+    "currencyType": "fiat"
+  },
+  "dkk": {
+    "name": "Danish Krone",
+    "ticker": "dkk",
+    "symbol": "kr",
+    "currencyType": "fiat"
+  },
+  "eur": {
+    "name": "Euro",
+    "ticker": "eur",
+    "symbol": "€",
+    "currencyType": "fiat"
+  },
+  "gbp": {
+    "name": "British Pound Sterling",
+    "ticker": "gbp",
+    "symbol": "£",
+    "currencyType": "fiat"
+  },
+  "gel": {
+    "name": "Georgian Lari",
+    "ticker": "gel",
+    "symbol": "₾",
+    "currencyType": "fiat"
+  },
+  "hkd": {
+    "name": "Hong Kong Dollar",
+    "ticker": "hkd",
+    "symbol": "HK$",
+    "currencyType": "fiat"
+  },
+  "huf": {
+    "name": "Hungarian Forint",
+    "ticker": "huf",
+    "symbol": "Ft",
+    "currencyType": "fiat"
+  },
+  "idr": {
+    "name": "Indonesian Rupiah",
+    "ticker": "idr",
+    "symbol": "Rp",
+    "currencyType": "fiat"
+  },
+  "ils": {
+    "name": "Israeli New Shekel",
+    "ticker": "ils",
+    "symbol": "₪",
+    "currencyType": "fiat"
+  },
+  "inr": {
+    "name": "Indian Rupee",
+    "ticker": "inr",
+    "symbol": "₹",
+    "currencyType": "fiat"
+  },
+  "jpy": {
+    "name": "Japanese Yen",
+    "ticker": "jpy",
+    "symbol": "¥",
+    "currencyType": "fiat"
+  },
+  "krw": {
+    "name": "South Korean Won",
+    "ticker": "krw",
+    "symbol": "₩",
+    "currencyType": "fiat"
+  },
+  "kwd": {
+    "name": "Kuwaiti Dinar",
+    "ticker": "kwd",
+    "symbol": "KD",
+    "currencyType": "fiat"
+  },
+  "lkr": {
+    "name": "Sri Lankan Rupee",
+    "ticker": "lkr",
+    "symbol": "Rs",
+    "currencyType": "fiat"
+  },
+  "mmk": {
+    "name": "Burmese Kyat",
+    "ticker": "mmk",
+    "symbol": "K",
+    "currencyType": "fiat"
+  },
+  "mxn": {
+    "name": "Mexican Peso",
+    "ticker": "mxn",
+    "symbol": "MX$",
+    "currencyType": "fiat"
+  },
+  "myr": {
+    "name": "Malaysian Ringgit",
+    "ticker": "myr",
+    "symbol": "RM",
+    "currencyType": "fiat"
+  },
+  "ngn": {
+    "name": "Nigerian Naira",
+    "ticker": "ngn",
+    "symbol": "₦",
+    "currencyType": "fiat"
+  },
+  "nok": {
+    "name": "Norwegian Krone",
+    "ticker": "nok",
+    "symbol": "kr",
+    "currencyType": "fiat"
+  },
+  "nzd": {
+    "name": "New Zealand Dollar",
+    "ticker": "nzd",
+    "symbol": "NZ$",
+    "currencyType": "fiat"
+  },
+  "php": {
+    "name": "Philippine Peso",
+    "ticker": "php",
+    "symbol": "₱",
+    "currencyType": "fiat"
+  },
+  "pkr": {
+    "name": "Pakistani Rupee",
+    "ticker": "pkr",
+    "symbol": "₨",
+    "currencyType": "fiat"
+  },
+  "pln": {
+    "name": "Polish Zloty",
+    "ticker": "pln",
+    "symbol": "zł",
+    "currencyType": "fiat"
+  },
+  "rub": {
+    "name": "Russian Ruble",
+    "ticker": "rub",
+    "symbol": "₽",
+    "currencyType": "fiat"
+  },
+  "sar": {
+    "name": "Saudi Riyal",
+    "ticker": "sar",
+    "symbol": "﷼",
+    "currencyType": "fiat"
+  },
+  "sek": {
+    "name": "Swedish Krona",
+    "ticker": "sek",
+    "symbol": "kr",
+    "currencyType": "fiat"
+  },
+  "sgd": {
+    "name": "Singapore Dollar",
+    "ticker": "sgd",
+    "symbol": "S$",
+    "currencyType": "fiat"
+  },
+  "thb": {
+    "name": "Thai Baht",
+    "ticker": "thb",
+    "symbol": "฿",
+    "currencyType": "fiat"
+  },
+  "try": {
+    "name": "Turkish Lira",
+    "ticker": "try",
+    "symbol": "₺",
+    "currencyType": "fiat"
+  },
+  "twd": {
+    "name": "New Taiwan Dollar",
+    "ticker": "twd",
+    "symbol": "NT$",
+    "currencyType": "fiat"
+  },
+  "uah": {
+    "name": "Ukrainian hryvnia",
+    "ticker": "uah",
+    "symbol": "₴",
+    "currencyType": "fiat"
+  },
+  "vef": {
+    "name": "Venezuelan bolívar fuerte",
+    "ticker": "vef",
+    "symbol": "Bs.F",
+    "currencyType": "fiat"
+  },
+  "vnd": {
+    "name": "Vietnamese đồng",
+    "ticker": "vnd",
+    "symbol": "₫",
+    "currencyType": "fiat"
+  },
+  "zar": {
+    "name": "South African Rand",
+    "ticker": "zar",
+    "symbol": "R",
+    "currencyType": "fiat"
+  },
+  "xdr": {
+    "name": "IMF Special Drawing Rights",
+    "ticker": "xdr",
+    "symbol": "SDR",
+    "currencyType": "fiat"
+  },
+  "xag": {
+    "name": "Silver - Troy Ounce",
+    "ticker": "xag",
+    "symbol": "XAG",
+    "currencyType": "commodity"
+  },
+  "xau": {
+    "name": "Gold - Troy Ounce",
+    "ticker": "xau",
+    "symbol": "XAU",
+    "currencyType": "commodity"
+  },
+  "cop": {
+    "name": "Colombian Peso",
+    "ticker": "cop",
+    "symbol": "COL$",
+    "currencyType": "fiat"
+  },
+  "kes": {
+    "name": "Kenyan Shilling",
+    "ticker": "kes",
+    "symbol": "KSh",
+    "currencyType": "fiat"
+  },
+  "ron": {
+    "name": "Romanian Leu",
+    "ticker": "ron",
+    "symbol": "lei",
+    "currencyType": "fiat"
+  },
+  "dop": {
+    "name": "Dominican Peso",
+    "ticker": "dop",
+    "symbol": "RD$",
+    "currencyType": "fiat"
+  },
+  "crc": {
+    "name": "Costa Rican Colón",
+    "ticker": "crc",
+    "symbol": "₡",
+    "currencyType": "fiat"
+  },
+  "hnl": {
+    "name": "Honduran Lempira",
+    "ticker": "hnl",
+    "symbol": "L",
+    "currencyType": "fiat"
+  },
+  "zmw": {
+    "name": "Zambian Kwacha",
+    "ticker": "zmw",
+    "symbol": "ZK",
+    "currencyType": "fiat"
+  },
+  "svc": {
+    "name": "Salvadoran Colón",
+    "ticker": "svc",
+    "symbol": "₡",
+    "currencyType": "fiat"
+  },
+  "bam": {
+    "name": "Bosnia and Herzegovina Convertible Mark",
+    "ticker": "bam",
+    "symbol": "KM",
+    "currencyType": "fiat"
+  },
+  "pen": {
+    "name": "Peruvian Sol",
+    "ticker": "pen",
+    "symbol": "S/",
+    "currencyType": "fiat"
+  },
+  "gtq": {
+    "name": "Guatemalan Quetzal",
+    "ticker": "gtq",
+    "symbol": "Q",
+    "currencyType": "fiat"
+  },
+  "lbp": {
+    "name": "Lebanese Pound",
+    "ticker": "lbp",
+    "symbol": "ل.ل",
+    "currencyType": "fiat"
+  },
+  "amd": {
+    "name": "Armenian Dram",
+    "ticker": "amd",
+    "symbol": "֏",
+    "currencyType": "fiat"
+  }
+}

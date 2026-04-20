@@ -3,7 +3,7 @@ import { walletPort, windowPort } from '@/shared/channel';
 import { focusNode } from '@/shared/focus-node';
 import { ExternallyOwnedAccount } from '@/shared/types/externally-owned-account';
 import type { BlockchainType } from '@/shared/wallet/classifiers';
-import { BlockieAddress } from '@/ui/components/blockie';
+import { BlockieAddress } from '@/ui/components/Blockie';
 import { DappSecurityCheck } from '@/ui/components/DappSecurityCheck/DappSecurityCheck';
 import { SiteFaviconImg } from '@/ui/components/SiteFaviconImg';
 import { WalletDisplayName } from '@/ui/components/wallet';

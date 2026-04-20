@@ -4,7 +4,7 @@ import { useExchangeRates } from './request/external/use-exchange-rates';
 
 export function useFiatConversion() {
   const { data: exchangeRates } = useExchangeRates();
-  const { currency: defaultCurrency } = useCurrency();
+  const { currency: defaultCurrency, symbol, ticker } = useCurrency();
 
   const convertUsdToFiat = useCallback(
     (usdValue: number): number => {
@@ -20,6 +20,8 @@ export function useFiatConversion() {
   return {
     convertUsdToFiat,
     defaultCurrency,
+    symbol,
+    ticker,
     isLoading: !exchangeRates,
   };
 }

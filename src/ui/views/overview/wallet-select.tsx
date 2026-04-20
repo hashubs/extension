@@ -1,5 +1,5 @@
 import { walletPort } from '@/shared/channel';
-import { BlockieAddress } from '@/ui/components/blockie';
+import { BlockieAddress } from '@/ui/components/Blockie';
 import { WalletDisplayName } from '@/ui/components/wallet';
 import { useAddressParams } from '@/ui/hooks/request/internal/useAddressParams';
 import { useQuery } from '@tanstack/react-query';

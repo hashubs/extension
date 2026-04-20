@@ -53,7 +53,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
 
     if (isPassword) {
       return (
-        <div className={cn('relative')}>
+        <div className="relative">
           {LeftIcon && (
             <span className="absolute left-3 top-1/2 -translate-y-1/2 flex items-center justify-center text-muted-foreground pointer-events-none">
               <LeftIcon size={16} />

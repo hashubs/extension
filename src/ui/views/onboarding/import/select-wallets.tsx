@@ -1,4 +1,4 @@
-import { BlockieAddress } from '@/ui/components/blockie';
+import { BlockieAddress } from '@/ui/components/Blockie';
 import { Processing as ScanningWallet } from '@/ui/components/processing';
 import { usePortfolioValues } from '@/ui/hooks/request/external/usePortfolioValues';
 import {
