@@ -55,7 +55,7 @@ export function SettingsView() {
           icon: LuTerminal,
           iconRight: LuChevronRight,
           label: 'Networks',
-          onClick: () => navigate('/settings/networks'),
+          onClick: () => navigate('/settings/manage-networks'),
           iconClassName: 'text-lime-500 bg-lime-500/10',
         },
         {
@@ -81,7 +81,7 @@ export function SettingsView() {
           icon: LuWallet,
           iconRight: LuChevronRight,
           label: 'Manage Accounts',
-          onClick: () => navigate('/settings/manage-accounts'),
+          onClick: () => navigate('/settings/manage-wallets'),
           iconClassName: 'text-slate-500 bg-slate-500/10',
         },
         {

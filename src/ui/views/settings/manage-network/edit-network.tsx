@@ -17,9 +17,9 @@ import { isEqual } from 'lodash';
 import { useEffect, useMemo, useState } from 'react';
 import { IoTrashOutline } from 'react-icons/io5';
 import { useNavigate, useParams } from 'react-router-dom';
-import { updateNetworks } from '../_shared/updateNetworks';
+import { updateNetworks } from './_shared/updateNetworks';
 
-const BACK_ROUTE = '/settings/networks';
+const BACK_ROUTE = '/settings/manage-networks';
 
 export function EditNetwork() {
   const { id: chainStr } = useParams();

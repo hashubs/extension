@@ -18,14 +18,14 @@ import { useMemo, useState } from 'react';
 import { IoSearchOutline } from 'react-icons/io5';
 import { useNavigate } from 'react-router-dom';
 import { updateNetworks } from '../_shared/updateNetworks';
-import { SearchResults } from './SearchResults';
+import { SearchResults } from './search-results';
 
 const parsers: Parsers<any> = {
   chainId: (val: unknown) => normalizeChainId(val as string),
   'nativeCurrency.decimals': (val: unknown) => Number(val),
 };
 
-const BACK_ROUTE = '/settings/networks';
+const BACK_ROUTE = '/settings/manage-networks';
 
 export function AddNetwork() {
   const navigate = useNavigate();

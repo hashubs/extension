@@ -52,10 +52,6 @@ export function SearchResults({
     async (registryChain: EVMChainDataResponse) => {
       setIsAdding(true);
       try {
-        console.log(
-          '[SearchResults] handleQuickAdd registryChain',
-          registryChain
-        );
         const id = toCustomNetworkId(registryChain.chainId.toString());
         const iconUrls = getChainLogo(registryChain.id);
         await walletPort.request('addEthereumChain', {
@@ -76,7 +72,7 @@ export function SearchResults({
           prevChain: null,
         });
         await updateNetworks();
-        navigate(`/settings/networks`);
+        navigate(`/settings/manage-networks`);
       } finally {
         setIsAdding(false);
         setReviewChain(null);
@@ -93,7 +89,7 @@ export function SearchResults({
   });
 
   const handleNavigate = useCallback(
-    (id: string) => navigate(`/settings/networks/${id}`),
+    (id: string) => navigate(`/settings/manage-networks/${id}`),
     [navigate]
   );
 

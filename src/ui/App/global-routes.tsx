@@ -114,7 +114,7 @@ export function GlobalRoutes({ initialRoute }: { initialRoute?: string }) {
               }
             />
             <Route
-              path="/requestAccounts"
+              path="/request-accounts"
               element={
                 <RequireAuth>
                   <ChooseGlobalProviderGuard>

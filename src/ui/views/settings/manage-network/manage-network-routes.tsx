@@ -1,9 +1,9 @@
 import { Route, Routes } from 'react-router-dom';
-import { AddNetwork } from './add-network/AddNetwork';
-import { EditNetwork } from './edit-network/EditNetwork';
-import { ManageNetwork } from './manage-network/ManageNetwork';
+import { AddNetwork } from './add-network';
+import { EditNetwork } from './edit-network';
+import { ManageNetwork } from './manage-network';
 
-export function NetworksRoutes() {
+export function ManageNetworksRoutes() {
   return (
     <Routes>
       <Route path="/" element={<ManageNetwork />} />

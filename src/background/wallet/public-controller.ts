@@ -376,7 +376,7 @@ export class PublicController {
     const { origin } = context;
     return new Promise((resolve, reject) => {
       this.safeOpenDialogWindow(origin, {
-        route: '/requestAccounts',
+        route: '/request-accounts',
         search: `?origin=${origin}&nonEip6963Request=${String(
           params?.[0]?.nonEip6963Request ? 'yes' : 'no'
         )}&ecosystem=${opts.ecosystem}`,

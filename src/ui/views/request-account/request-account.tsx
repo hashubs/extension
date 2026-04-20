@@ -286,7 +286,7 @@ function RequestAccountsView({
 
   const handleWalletSelect = useCallback(() => {
     const newParams = new URLSearchParams(params.toString());
-    newParams.set('next', '/requestAccounts');
+    newParams.set('next', '/request-accounts');
     navigate(`/select-wallet?${newParams.toString()}`);
   }, [navigate, params]);
 

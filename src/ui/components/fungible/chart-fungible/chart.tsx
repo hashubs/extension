@@ -341,11 +341,11 @@ export function FungibleChart({
         )}
       >
         {showSkeleton ? (
-          <div className="h-[160px] flex items-center justify-center">
+          <div className="h-[205px] flex items-center justify-center">
             <div className="w-full h-[2px] bg-muted/40 rounded animate-pulse" />
           </div>
         ) : chartPoints.length === 0 ? (
-          <div className="h-[160px] flex items-center justify-center text-muted-foreground/50 text-sm">
+          <div className="h-[205px] flex items-center justify-center text-muted-foreground/50 text-sm">
             No chart data
           </div>
         ) : (

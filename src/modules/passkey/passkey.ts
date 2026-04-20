@@ -8,6 +8,8 @@ import {
 } from '@/modules/crypto';
 import { accountPublicRPCPort } from '@/shared/channel';
 
+const isDev = process.env.NODE_ENV === 'development';
+
 // ---------------------------------------------------------------------------
 // Platform detection
 // ---------------------------------------------------------------------------
@@ -16,7 +18,7 @@ type Platform = 'macos' | 'windows' | 'linux' | 'android' | 'ios' | 'unknown';
 
 function detectPlatform(): Platform {
   const ua = navigator.userAgent;
-  // Check order matters: iOS must come before macOS (iPad UA contains "Mac")
+  // iOS must be checked before macOS — iPadOS 13+ sends a "Macintosh" UA
   if (/iPhone|iPad|iPod/i.test(ua)) return 'ios';
   if (/Android/i.test(ua)) return 'android';
   if (/Macintosh|MacIntel|MacPPC|Mac68K/i.test(ua)) return 'macos';
@@ -46,6 +48,22 @@ export function getPasskeyTitle(): string {
 }
 
 // ---------------------------------------------------------------------------
+// Dev-mode dummy PRF
+// ---------------------------------------------------------------------------
+
+/**
+ * Derives a deterministic 32-byte dummy PRF output from a credential's rawId.
+ * Used only in development when the authenticator returns prf.enabled = false.
+ *
+ * Determinism is critical: setup and get must produce the same key for the
+ * same credential, otherwise decryption will always fail in dev mode.
+ */
+async function devDummyPRF(rawId: ArrayBuffer): Promise<ArrayBuffer> {
+  // SHA-256 of the rawId gives a stable 32-byte value tied to that credential
+  return crypto.subtle.digest('SHA-256', rawId);
+}
+
+// ---------------------------------------------------------------------------
 // PRF support detection
 // ---------------------------------------------------------------------------
 
@@ -62,15 +80,12 @@ interface PRFExtensionResult {
  * Checks whether the browser + platform authenticator combination can
  * actually complete a PRF-backed passkey flow.
  *
- * Strategy:
- *  1. Bail early if WebAuthn API is absent.
- *  2. Check platform authenticator availability (covers Windows Hello, Touch ID,
- *     Android biometrics, and most Linux setups with a TPM/PIN fallback).
- *  3. On Linux we do an extra capability probe via getClientCapabilities()
- *     (Chrome 133+) because many Linux setups have UVPAA = true but no PRF.
+ * On Linux, PRF support is inconsistent — UVPAA can return true while PRF
+ * is still not available. We do an extra probe via getClientCapabilities()
+ * (Chrome 133+) to detect this early.
  */
 export async function checkPRFSupport(): Promise<boolean> {
-  if (process.env.NODE_ENV === 'development') return true;
+  if (isDev) return true;
 
   try {
     if (!window.PublicKeyCredential) return false;
@@ -79,17 +94,11 @@ export async function checkPRFSupport(): Promise<boolean> {
       await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable();
     if (!available) return false;
 
-    // On Linux, do a deeper probe if getClientCapabilities is available
-    // (Chrome 133+). PRF support on Linux is inconsistent across distros.
-    const platform = detectPlatform();
-    if (platform === 'linux') {
+    if (detectPlatform() === 'linux') {
       if (typeof PublicKeyCredential.getClientCapabilities === 'function') {
         const caps = await PublicKeyCredential.getClientCapabilities();
-        // If the browser explicitly says PRF isn't supported, bail out early
         if (caps['extension:prf'] === false) return false;
       }
-      // If the API is absent we proceed optimistically — the PRF call itself
-      // will fail gracefully and show a proper error to the user.
     }
 
     return true;
@@ -102,9 +111,6 @@ export async function checkPRFSupport(): Promise<boolean> {
 // PRF result helpers
 // ---------------------------------------------------------------------------
 
-/**
- * Type guard to validate PRF extension results
- */
 function isPRFResultValid(
   result: unknown
 ): result is { prf: { results: { first: ArrayBuffer } } } {
@@ -117,81 +123,68 @@ function isPRFResultValid(
 }
 
 /**
- * Safely extracts PRF result from credential extension results
+ * Extracts the PRF output from a WebAuthn credential.
+ *
+ * In development, if the authenticator does not support PRF (prf.enabled = false),
+ * we fall back to SHA-256(rawId) as a deterministic dummy. This ensures setup
+ * and get always derive the same encryption key for the same credential in dev.
  */
-function extractPRFResult(cred: unknown): ArrayBuffer {
-  if (!cred || typeof cred !== 'object') {
-    throw new Error(
-      'Invalid credential object. Passkey authentication failed.'
-    );
-  }
-
-  const credential = cred as PublicKeyCredential;
-  if (typeof credential.getClientExtensionResults !== 'function') {
+async function extractPRFResult(
+  cred: PublicKeyCredential
+): Promise<ArrayBuffer> {
+  if (typeof cred.getClientExtensionResults !== 'function') {
     throw new Error(
       'Browser does not support WebAuthn extensions. Please update your browser.'
     );
   }
 
-  const result = credential.getClientExtensionResults();
+  const result = cred.getClientExtensionResults();
 
-  if (!isPRFResultValid(result)) {
-    if (process.env.NODE_ENV === 'development') {
-      console.warn(
-        'PRF extension failed, using dummy data for development testing'
-      );
-      return new Uint8Array(32).buffer;
-    }
-
-    const platform = detectPlatform();
-    const hint =
-      platform === 'linux'
-        ? 'Make sure Chrome 116+ is used and your device has a PIN or biometric set up.'
-        : platform === 'windows'
-        ? 'Ensure Windows Hello is configured in Settings → Accounts → Sign-in options.'
-        : 'This feature requires a compatible device with biometric authentication.';
-
-    throw new Error(
-      `PRF extension is not supported by your authenticator. ${hint} ` +
-        'Alternatively, use password login instead.'
-    );
+  if (isPRFResultValid(result)) {
+    return result.prf.results.first;
   }
 
-  return result.prf.results.first;
+  if (isDev) {
+    return devDummyPRF(cred.rawId);
+  }
+
+  const platform = detectPlatform();
+  const hint =
+    platform === 'linux'
+      ? 'Make sure you are using Chrome 116+ and your device has a PIN or biometric configured.'
+      : platform === 'windows'
+      ? 'Ensure Windows Hello is configured in Settings → Accounts → Sign-in options.'
+      : 'This feature requires a compatible device with biometric authentication (Touch ID, Face ID, etc.).';
+
+  throw new Error(
+    `PRF extension is not supported by your authenticator. ${hint} ` +
+      'Alternatively, use password login instead.'
+  );
 }
 
 // ---------------------------------------------------------------------------
-// Platform-specific error messages
+// Platform-specific error formatting
 // ---------------------------------------------------------------------------
 
 function formatCreationError(error: unknown): Error {
   if (!(error instanceof Error)) {
     return new Error('Failed to create passkey due to an unknown error');
   }
-
   if (error.name === 'NotAllowedError' || error.message.includes('cancelled')) {
-    return new Error('Passkey setup was cancelled by user');
+    return new Error('Passkey setup was cancelled');
   }
-
-  // Windows Hello: user skipped PIN/biometric setup
-  if (error.name === 'NotSupportedError') {
-    const platform = detectPlatform();
-    if (platform === 'windows') {
-      return new Error(
-        'Windows Hello is not configured. ' +
-          'Please set up a PIN or biometric in Settings → Accounts → Sign-in options, then try again.'
-      );
-    }
+  if (error.name === 'NotSupportedError' && detectPlatform() === 'windows') {
+    return new Error(
+      'Windows Hello is not configured. ' +
+        'Please set up a PIN or biometric in Settings → Accounts → Sign-in options, then try again.'
+    );
   }
-
-  // Linux: common when no platform authenticator is registered
   if (error.name === 'InvalidStateError') {
     return new Error(
       'A passkey already exists for this account. ' +
-        'If you want to reset it, please remove the existing passkey first.'
+        'Remove the existing passkey first if you want to reset it.'
     );
   }
-
   return new Error(`Failed to create passkey: ${error.message}`);
 }
 
@@ -199,25 +192,20 @@ function formatAuthError(error: unknown): Error {
   if (!(error instanceof Error)) {
     return new Error('Authentication failed due to an unknown error');
   }
-
   if (error.name === 'NotAllowedError' || error.message.includes('cancelled')) {
-    return new Error('Authentication was cancelled by user');
+    return new Error('Authentication was cancelled');
   }
-
   if (error.name === 'InvalidStateError') {
     return new Error(
       'Passkey not found on this device. Please use password login or set up passkey again.'
     );
   }
-
-  // Windows: credential was deleted from Windows Hello but still in wallet DB
   if (error.name === 'UnknownError' && detectPlatform() === 'windows') {
     return new Error(
       'Passkey could not be found in Windows Hello. ' +
         'It may have been removed. Please log in with your password and re-enable passkey.'
     );
   }
-
   return new Error(`Authentication failed: ${error.message}`);
 }
 
@@ -253,7 +241,11 @@ export async function setupAccountPasskey(password: string) {
           name: 'zerion',
           displayName: 'Zerion Wallet',
         },
-        pubKeyCredParams: [{ alg: -7, type: 'public-key' }],
+        // ES256 (-7) + RS256 (-257) for broader authenticator compatibility
+        pubKeyCredParams: [
+          { alg: -7, type: 'public-key' },
+          { alg: -257, type: 'public-key' },
+        ],
         challenge: getRandomUint8Array(32),
         authenticatorSelection: {
           authenticatorAttachment: 'platform' as AuthenticatorAttachment,
@@ -276,13 +268,13 @@ export async function setupAccountPasskey(password: string) {
     throw new Error('Failed to create passkey: No credential returned');
   }
 
-  const rawId = (cred as PublicKeyCredential | undefined)?.rawId;
-  const passkeyId = rawId ? arrayBufferToBase64(rawId) : null;
+  const pkCred = cred as PublicKeyCredential;
+  const passkeyId = pkCred.rawId ? arrayBufferToBase64(pkCred.rawId) : null;
   if (!passkeyId) {
     throw new Error('Failed to get passkey ID from credential');
   }
 
-  const prf = extractPRFResult(cred);
+  const prf = await extractPRFResult(pkCred);
   const encryptionKey = await deriveEncryptionKeyFromPRF(prf, salt);
 
   return accountPublicRPCPort.request('setPasskey', {
@@ -330,7 +322,8 @@ export async function getPasswordWithPasskey() {
     throw new Error('Authentication failed: No credential returned');
   }
 
-  const prf = extractPRFResult(cred);
+  const pkCred = cred as PublicKeyCredential;
+  const prf = await extractPRFResult(pkCred);
   const encryptionKey = await deriveEncryptionKeyFromPRF(prf, salt);
 
   return accountPublicRPCPort.request('getPassword', { encryptionKey });
