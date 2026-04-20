@@ -1,5 +1,5 @@
-import { preferenceStore } from './preference-store';
 import type { State } from './preference-store';
+import { preferenceStore } from './preference-store';
 
 const key = 'color-scheme-2022-12-26';
 

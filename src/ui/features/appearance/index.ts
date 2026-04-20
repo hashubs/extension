@@ -8,6 +8,9 @@ export * from './Theme';
 export * from './ThemeState';
 export * from './ThemeStore';
 
+export * from './useAnimation';
+export * from './useCurrency';
+
 export function initialize() {
   followTheme();
   persist();

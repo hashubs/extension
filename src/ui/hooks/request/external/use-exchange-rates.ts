@@ -1,5 +1,5 @@
-import { useCurrency } from '@/modules/currency/useCurrency';
 import { currencyPort } from '@/shared/channel';
+import { useCurrency } from '@/ui/features/appearance';
 import { useQuery } from '@tanstack/react-query';
 
 export function useExchangeRates() {

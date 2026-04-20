@@ -11,12 +11,14 @@ export interface State {
   mode: ThemePreference;
   currency: string;
   hideBalances: boolean;
+  enableAnimation: boolean;
 }
 
 const initialState = {
   mode: ThemePreference.system,
   currency: 'usd',
   hideBalances: false,
+  enableAnimation: true,
 };
 
 export const preferenceStore = new Store<State>({

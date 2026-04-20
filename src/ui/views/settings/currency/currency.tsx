@@ -1,6 +1,5 @@
-import { useCurrency } from '@/modules/currency/useCurrency';
 import { Header } from '@/ui/components/header';
-import { preferenceStore } from '@/ui/features/appearance';
+import { preferenceStore, useCurrency } from '@/ui/features/appearance';
 import { Card, CardItem, Input } from '@/ui/ui-kit';
 import { useVirtualizer } from '@tanstack/react-virtual';
 import { useRef, useState } from 'react';

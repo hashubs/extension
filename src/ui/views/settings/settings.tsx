@@ -1,5 +1,7 @@
 import { Header } from '@/ui/components/header';
+import { useAnimationPreference } from '@/ui/features/appearance';
 import { Card, CardItem, ItemType } from '@/ui/ui-kit/card';
+import { Switch } from '@/ui/ui-kit/switch';
 import {
   LuChevronRight,
   LuDollarSign,
@@ -20,6 +22,9 @@ type navigationType = {
 export function SettingsView() {
   const navigate = useNavigate();
 
+  const { enableAnimation, toggleAnimation, setAnimation } =
+    useAnimationPreference();
+
   const navigations: navigationType[] = [
     {
       title: 'Preferences',
@@ -38,6 +43,16 @@ export function SettingsView() {
           label: 'Theme',
           badge: <ThemeBadge />,
           onClick: () => navigate('/settings/theme'),
+          iconClassName: 'text-lime-500 bg-lime-500/10',
+        },
+        {
+          icon: LuSunMoon,
+          label: 'Animation',
+          subLabel: 'Enable or disable animations',
+          badge: (
+            <Switch checked={enableAnimation} onCheckedChange={setAnimation} />
+          ),
+          onClick: toggleAnimation,
           iconClassName: 'text-lime-500 bg-lime-500/10',
         },
       ],

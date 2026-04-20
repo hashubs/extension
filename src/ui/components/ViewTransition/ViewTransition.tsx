@@ -1,3 +1,4 @@
+import { useAnimationPreference } from '@/ui/features/appearance';
 import { animated, useTransition } from '@react-spring/web';
 import React, { useRef } from 'react';
 import {
@@ -17,6 +18,7 @@ export function ViewTransition({
   animatedRoutes = [],
   excludedTransitions = [],
 }: ViewTransitionProps) {
+  const { enableAnimation } = useAnimationPreference();
   const location = useLocation();
   const navigationType = useNavigationType();
 
@@ -71,6 +73,7 @@ export function ViewTransition({
   const isBack = computeDirection() === 'back';
 
   const shouldAnimate =
+    enableAnimation &&
     isMountedRef.current &&
     prevPath !== location.pathname &&
     !isExcludedTransition(prevPath, location.pathname) &&
@@ -116,7 +119,7 @@ export function ViewTransition({
     },
 
     config: { tension: 280, friction: 26 },
-    immediate: (key) => key === 'zIndex',
+    immediate: (key) => key === 'zIndex' || !enableAnimation,
     exitBeforeEnter: false,
   });
 

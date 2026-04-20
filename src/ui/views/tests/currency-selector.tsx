@@ -1,5 +1,4 @@
-import { useCurrency } from '@/modules/currency/useCurrency';
-import { preferenceStore } from '@/ui/features/appearance';
+import { preferenceStore, useCurrency } from '@/ui/features/appearance';
 import { Button } from '@/ui/ui-kit';
 
 export function CurrencySelector() {

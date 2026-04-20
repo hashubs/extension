@@ -1,4 +1,4 @@
-import { useCurrency } from '@/modules/currency/useCurrency';
+import { useCurrency } from '@/ui/features/appearance';
 import { useCallback } from 'react';
 import { useExchangeRates } from './request/external/use-exchange-rates';
 
