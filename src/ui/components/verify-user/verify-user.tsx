@@ -14,7 +14,7 @@ export function VerifyUser({
   buttonTitle?: React.ReactNode;
   onSuccess: () => void;
 }) {
-  const { data: user, isLoading } = useQuery({
+  const { data: user } = useQuery({
     queryKey: ['account/getExistingUser'],
     queryFn: () => accountPublicRPCPort.request('getExistingUser'),
   });
@@ -36,8 +36,6 @@ export function VerifyUser({
     if (!password || !user) return;
     loginMutation.mutate({ user, password });
   };
-
-  if (isLoading) return null;
 
   return (
     <div className="flex-1 flex flex-col h-full p-4 pt-0 space-y-4">

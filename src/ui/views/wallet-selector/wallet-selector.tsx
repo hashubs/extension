@@ -1,3 +1,4 @@
+import { queryClient } from '@/shared/query-client/queryClient';
 import { setCurrentAddress } from '@/shared/request/internal/setCurrentAddress';
 import type { BareWallet } from '@/shared/types/bare-wallet';
 import { DeviceAccount } from '@/shared/types/device';
@@ -8,7 +9,7 @@ import { WalletList } from '@/ui/components/wallet/wallet-list/wallet-list';
 import { useAddressParams } from '@/ui/hooks/request/internal/useAddressParams';
 import { useWalletGroups } from '@/ui/hooks/request/internal/useWalletGroups';
 import { Input } from '@/ui/ui-kit';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation } from '@tanstack/react-query';
 import { useCallback, useMemo, useState } from 'react';
 import { IoSearchOutline } from 'react-icons/io5';
 import { useNavigate, useSearchParams } from 'react-router-dom';
@@ -26,7 +27,6 @@ export function WalletSelectorView() {
   const { singleAddress: currentAddress } = useAddressParams();
 
   const [searchQuery, setSearchQuery] = useState('');
-  const queryClient = useQueryClient();
 
   const { mutateAsync: updateCurrentAddress } = useMutation({
     mutationFn: (address: string) => setCurrentAddress({ address }),

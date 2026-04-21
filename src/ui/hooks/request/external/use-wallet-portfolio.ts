@@ -3,8 +3,9 @@ import {
   sanitizePortfolio,
 } from '@/shared/fungible/sanitize-portfolio';
 import { buildFromServerBalance } from '@/shared/fungible/token-builders';
+import { queryClient } from '@/shared/query-client/queryClient';
 import { ApiClient } from '@/shared/request/api.client';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { useEffect } from 'react';
 import { useWalletAddresses } from '../internal/useWalletAddresses';
 
@@ -39,7 +40,6 @@ export function useWalletPortfolio({
 }
 
 export function usePrefetchWalletPortfolio() {
-  const queryClient = useQueryClient();
   const { data: addresses } = useWalletAddresses();
 
   useEffect(() => {

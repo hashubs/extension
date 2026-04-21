@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { useStore } from '@store-unit/react';
 import { preferenceStore } from './preference-store';
 
@@ -23,4 +24,16 @@ export function useAnimationPreference() {
     toggleAnimation,
     setAnimation,
   };
+}
+
+export function useApplyGlobalAnimationClass() {
+  const { enableAnimation } = useAnimationPreference();
+
+  useEffect(() => {
+    if (!enableAnimation) {
+      document.body.classList.add('disable-animations');
+    } else {
+      document.body.classList.remove('disable-animations');
+    }
+  }, [enableAnimation]);
 }

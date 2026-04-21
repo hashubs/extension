@@ -1,11 +1,8 @@
+import { queryClient } from '@/shared/query-client/queryClient';
 import { ApiClient } from '@/shared/request/api.client';
 import { Response } from '@/shared/request/external/wallet-get-actions';
 import { ActionType } from '@/shared/request/types/wallet-get-actions';
-import {
-  keepPreviousData,
-  useInfiniteQuery,
-  useQueryClient,
-} from '@tanstack/react-query';
+import { keepPreviousData, useInfiniteQuery } from '@tanstack/react-query';
 import React from 'react';
 
 interface UseWalletActivityParams {
@@ -29,7 +26,6 @@ export function useWalletActions({
   initialCursor,
   enabled = true,
 }: UseWalletActivityParams) {
-  const queryClient = useQueryClient();
   const queryKey = [
     'wallet/actions',
     addresses,

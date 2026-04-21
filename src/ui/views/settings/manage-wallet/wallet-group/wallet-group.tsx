@@ -18,6 +18,8 @@ import { getGroupDisplayName } from '@/ui/components/wallet/WalletDisplayName/ge
 import {
   useWalletGroupByGroupId,
   useWalletGroupsByGroupId,
+  WALLET_GROUP_QUERY_KEY,
+  WALLET_GROUPS_QUERY_KEY,
 } from '@/ui/hooks/request/internal/useWalletGroups';
 import { useDebouncedCallback } from '@/ui/hooks/useDebouncedCallback';
 import { useFiatConversion } from '@/ui/hooks/useFiatConversion';
@@ -37,6 +39,7 @@ import {
 import { PiSpinnerLight } from 'react-icons/pi';
 import { useNavigate, useParams } from 'react-router-dom';
 import { groupByEcosystem } from '../_shared/groupByEcosystem';
+import { queryClient } from '@/shared/query-client/queryClient';
 
 function EditableWalletGroupName({
   id,
@@ -185,6 +188,12 @@ export function WalletGroupView() {
     onSuccess() {
       refetch();
       navigate('/settings/manage-wallets');
+      queryClient.invalidateQueries({
+        queryKey: WALLET_GROUPS_QUERY_KEY,
+      });
+      queryClient.invalidateQueries({
+        queryKey: WALLET_GROUP_QUERY_KEY,
+      });
     },
   });
 

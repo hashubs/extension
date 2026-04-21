@@ -5,3 +5,6 @@
 3. System EROR notification window masalah close masih bimbang cek logika di
    - notification-window.ts
    - notification-window-message-handler.ts
+4. Passkey belum di Test
+5. Animation belum semua di disable saat user pilih disable animation
+6. Merapihkan Query dan Mutation ke dalam folder terpisah

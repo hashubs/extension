@@ -2,6 +2,21 @@ import { accountPublicRPCPort, walletPort } from '@/shared/channel';
 import { useQuery } from '@tanstack/react-query';
 import { Navigate, useLocation } from 'react-router-dom';
 
+import { usePrefetchNetworks } from '@/ui/hooks/request/internal/useNetworks';
+import { usePrefetchWalletGroups } from '@/ui/hooks/request/internal/useWalletGroups';
+import { useEffect } from 'react';
+
+function AuthenticatedDataWrapper({ children }: { children: JSX.Element }) {
+  usePrefetchWalletGroups();
+
+  const prefetchNetworks = usePrefetchNetworks();
+  useEffect(() => {
+    prefetchNetworks();
+  }, [prefetchNetworks]);
+
+  return children;
+}
+
 export const useAuthState = () => {
   const { data, isFetching } = useQuery({
     queryKey: ['authState'],
@@ -46,5 +61,5 @@ export function RequireAuth({ children }: { children: JSX.Element }) {
     );
   }
 
-  return children;
+  return <AuthenticatedDataWrapper>{children}</AuthenticatedDataWrapper>;
 }

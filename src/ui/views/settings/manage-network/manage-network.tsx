@@ -94,8 +94,6 @@ export function ManageNetwork() {
       .getNetworks()
       .filter((n) => Boolean(n.is_testnet) === isTestnetMode);
 
-    console.log('[LOG MANAGE NETWORK] allInternal', allInternal);
-
     const custom = allInternal
       .filter((n) => isCustomNetworkId(n.id))
       .sort(compareNetworks);

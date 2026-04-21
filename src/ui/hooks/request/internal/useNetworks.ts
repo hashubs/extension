@@ -80,6 +80,24 @@ export function useNetworks(chains?: string[]) {
   };
 }
 
+export function usePrefetchNetworks() {
+  const networksStore = useNetworksStore();
+
+  return useCallback(
+    (chains?: string[]) => {
+      if (!networksStore) return;
+
+      queryClient.prefetchQuery({
+        queryKey: ['loadNetworks', chains, networksStore],
+        queryKeyHashFn,
+        queryFn: () => networksStore.load(chains ? { chains } : undefined),
+        staleTime: 1000 * 60 * 5,
+      });
+    },
+    [queryClient, networksStore]
+  );
+}
+
 export function useNetworkConfig(
   id: string | null,
   {

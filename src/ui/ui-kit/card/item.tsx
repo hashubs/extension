@@ -1,7 +1,7 @@
+import { useAnimationPreference } from '@/ui/features/appearance';
 import { cn } from '@/ui/lib/utils';
 import { Image } from '@/ui/ui-kit/image';
 import type { IconType } from 'react-icons';
-import { useAnimationPreference } from '@/ui/features/appearance';
 
 type ItemBase = {
   id?: string;
@@ -10,6 +10,7 @@ type ItemBase = {
   subLabel?: string;
   subLabelElement?: React.ReactNode;
   onClick?: () => void;
+  onMouseEnter?: () => void;
   onClickIconRight?: () => void;
   badge?: React.ReactNode;
   iconClassName?: string;
@@ -62,6 +63,7 @@ export function CardItem({ item }: { item: ItemType }) {
       role="button"
       tabIndex={0}
       onClick={item.onClick}
+      onMouseEnter={item.onMouseEnter}
       className={cn(
         'w-full px-2.5 py-2.5 flex items-center justify-between group text-left outline-none focus:outline-none',
         enableAnimation ? 'transition-all' : 'transition-none',

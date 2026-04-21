@@ -6,7 +6,10 @@ import { InactivityDetector } from '@/ui/components/Session/InactivityDetector';
 import { SessionResetHandler } from '@/ui/components/Session/SessionResetHandler';
 
 import { VersionUpgrade } from '@/ui/components/version-upgrade';
-import { initialize as initializeApperance } from '@/ui/features/appearance';
+import {
+  initialize as initializeApperance,
+  useApplyGlobalAnimationClass,
+} from '@/ui/features/appearance';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { AreaProvider } from 'react-area';
 import { Route, HashRouter as Router, Routes } from 'react-router-dom';
@@ -50,6 +53,8 @@ export function App({ inspect, initialView }: AppProps) {
 
     return result;
   }, [windowType]);
+
+  useApplyGlobalAnimationClass();
 
   return (
     <AreaProvider>

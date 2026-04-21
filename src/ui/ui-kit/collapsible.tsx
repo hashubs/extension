@@ -2,6 +2,7 @@
 
 import { cn } from '@/ui/lib/utils';
 import { Collapsible as CollapsiblePrimitive } from '@base-ui/react/collapsible';
+import { useAnimationPreference } from '../features/appearance';
 
 function Collapsible({ ...props }: CollapsiblePrimitive.Root.Props) {
   return <CollapsiblePrimitive.Root data-slot="collapsible" {...props} />;
@@ -17,9 +18,10 @@ function CollapsibleContent({
   className,
   ...props
 }: CollapsiblePrimitive.Panel.Props) {
+  const { enableAnimation } = useAnimationPreference();
   return (
     <CollapsiblePrimitive.Panel
-      keepMounted
+      keepMounted={enableAnimation}
       data-slot="collapsible-content"
       className={cn(
         'data-closed:animate-collapsible-up data-starting-style:animate-collapsible-down data-open:animate-collapsible-down data-ending-style:animate-collapsible-up [--radix-collapsible-content-height:var(--collapsible-panel-height)]',

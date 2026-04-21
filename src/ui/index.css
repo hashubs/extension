@@ -470,3 +470,17 @@
     scrollbar-width: none;
   }
 }
+
+.disable-animations *,
+.disable-animations *::before,
+.disable-animations *::after {
+  transition: none !important;
+  animation: none !important;
+}
+
+/* .disable-animations *:not([data-slot='collapsible-content']),
+.disable-animations *:not([data-slot='collapsible-content'])::before,
+.disable-animations *:not([data-slot='collapsible-content'])::after {
+  transition: none !important;
+  animation: none !important;
+} */

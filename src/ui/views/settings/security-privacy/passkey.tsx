@@ -1,6 +1,7 @@
 import { getPasskeyTitle, setupAccountPasskey } from '@/modules/passkey';
 import { accountPublicRPCPort, walletPort } from '@/shared/channel';
 import { invariant } from '@/shared/invariant';
+import { queryClient } from '@/shared/query-client/queryClient';
 import { zeroizeAfterSubmission } from '@/shared/zeroize-submission';
 import { FormField } from '@/ui/components/form';
 import {
@@ -18,13 +19,12 @@ import {
   DrawerTitle,
 } from '@/ui/ui-kit';
 import { Switch } from '@/ui/ui-kit/switch';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { useCallback, useRef, useState } from 'react';
 import { LuFingerprint } from 'react-icons/lu';
 import { MdLock, MdWarning } from 'react-icons/md';
 
 export function PasskeyItem() {
-  const queryClient = useQueryClient();
   const toastRef = useRef<PopoverToastHandle>(null);
   const [userValue, setUserValue] = useState<boolean | null>(null);
   const [openEnable, setOpenEnable] = useState(false);

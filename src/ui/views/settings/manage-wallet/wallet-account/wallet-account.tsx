@@ -1,16 +1,18 @@
 import { walletPort } from '@/shared/channel';
 import { invariant } from '@/shared/invariant';
-import { getWalletGroupByAddress } from '@/shared/request/internal/getWalletGroupByAddress';
+import { queryClient } from '@/shared/query-client/queryClient';
 import { ExternallyOwnedAccount } from '@/shared/types/externally-owned-account';
 import { isBareWallet, isDeviceAccount } from '@/shared/types/validators';
 import { formatFiatToParts } from '@/shared/units/format-fiat';
 import { BlockieAddress } from '@/ui/components/Blockie';
 import { ConfirmationSheet } from '@/ui/components/Confirmation/confirmation-sheet';
 import { Header } from '@/ui/components/header';
-import { ViewLoading } from '@/ui/components/view-loading';
-import { ViewNotFound } from '@/ui/components/view-not-found';
 import { useProfileName } from '@/ui/hooks/request/internal/useProfileName';
-import { useWalletGroupByGroupId } from '@/ui/hooks/request/internal/useWalletGroups';
+import {
+  useWalletGroupByGroupId,
+  WALLET_GROUP_QUERY_KEY,
+  WALLET_GROUPS_QUERY_KEY,
+} from '@/ui/hooks/request/internal/useWalletGroups';
 import { useCopyToClipboard } from '@/ui/hooks/useCopyToClipboard';
 import { useDebouncedCallback } from '@/ui/hooks/useDebouncedCallback';
 import { useFiatConversion } from '@/ui/hooks/useFiatConversion';
@@ -19,7 +21,7 @@ import { NeutralDecimals } from '@/ui/ui-kit';
 import { Card, CardItem, ItemType } from '@/ui/ui-kit/card';
 import { InputDecorator } from '@/ui/ui-kit/input/Input-decorator';
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { useCallback, useId, useState } from 'react';
+import { useCallback, useEffect, useId, useState } from 'react';
 import { FiCopy } from 'react-icons/fi';
 import { IoKeyOutline, IoLogoUsd } from 'react-icons/io5';
 import { LuChevronRight, LuKey, LuTrash } from 'react-icons/lu';
@@ -33,14 +35,14 @@ function EditableWalletName({
   onRename,
 }: {
   id: string;
-  wallet: ExternallyOwnedAccount;
+  wallet: ExternallyOwnedAccount | null;
   onRename?: () => void;
 }) {
-  const [value, setValue] = useState(wallet.name || '');
+  const [value, setValue] = useState(wallet?.name || '');
   const { mutate, ...renameMutation } = useMutation({
     mutationFn: (value: string) =>
       walletPort.request('renameAddress', {
-        address: wallet.address,
+        address: wallet?.address || '',
         name: value,
       }),
     onSuccess() {
@@ -56,9 +58,10 @@ function EditableWalletName({
       <div className="grid grid-cols-[1fr_auto] items-center gap-1">
         <input
           id={id}
-          placeholder={truncateAddress(wallet.address)}
+          placeholder={truncateAddress(wallet?.address || '')}
           type="text"
           value={value}
+          disabled={wallet?.name === undefined}
           onChange={(event) => {
             const name = event.target.value;
             debouncedRenameRequest(name);
@@ -79,15 +82,34 @@ function EditableWalletName({
   );
 }
 
+function AnimatedDerivationPath() {
+  const [path, setPath] = useState("m/44'/60'/x'/x/x");
+
+  useEffect(() => {
+    const chars = '0123456789';
+    const interval = setInterval(() => {
+      const r = () => chars[Math.floor(Math.random() * chars.length)];
+      setPath(`m/44'/60'/${r()}'/0/${r()}`);
+    }, 60);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  return (
+    <span className="text-xs text-muted-foreground">
+      Derivation path: {path}
+    </span>
+  );
+}
+
 export function WalletAccountView() {
-  const { address } = useParams();
+  const { address } = useParams() as { address: string };
   const [params] = useSearchParams();
   const groupId = params.get('groupId');
   invariant(
     groupId,
     'groupId is a required search-param for WalletAccount view'
   );
-  invariant(address, 'Address param is required for WalletAccount view');
 
   const navigate = useNavigate();
   const { convertUsdToFiat, defaultCurrency } = useFiatConversion();
@@ -98,11 +120,7 @@ export function WalletAccountView() {
 
   const [openConfirm, setOpenConfirm] = useState(false);
 
-  const {
-    data: wallet,
-    isLoading,
-    refetch: refetchWallet,
-  } = useQuery({
+  const { data: wallet, refetch: refetchWallet } = useQuery({
     queryKey: ['wallet/uiGetWalletByAddress', address, groupId],
     queryFn: () =>
       walletPort.request('uiGetWalletByAddress', { address, groupId }),
@@ -110,11 +128,6 @@ export function WalletAccountView() {
 
   const { data: walletGroupByGroupId } = useWalletGroupByGroupId({
     groupId,
-  });
-
-  const { data: walletGroup, isLoading: walletGroupIsLoading } = useQuery({
-    queryKey: ['getWalletGroupByAddress', address],
-    queryFn: () => getWalletGroupByAddress(address),
   });
 
   const walletName = wallet?.name || null;
@@ -128,6 +141,12 @@ export function WalletAccountView() {
       navigate(`/settings/manage-wallets/groups/${groupId}`, {
         state: { direction: 'back' },
       });
+      queryClient.invalidateQueries({
+        queryKey: WALLET_GROUPS_QUERY_KEY,
+      });
+      queryClient.invalidateQueries({
+        queryKey: WALLET_GROUP_QUERY_KEY,
+      });
     },
   });
 
@@ -137,27 +156,6 @@ export function WalletAccountView() {
     removeAddressMutation.mutate();
     setOpenConfirm(false);
   };
-
-  if (isLoading || walletGroupIsLoading) {
-    return (
-      <ViewLoading
-        onBack={() =>
-          navigate(`/settings/manage-wallets/groups/${groupId}`, {
-            state: { direction: 'back' },
-          })
-        }
-      />
-    );
-  }
-
-  if (!wallet || !walletGroup) {
-    return (
-      <ViewNotFound
-        title="Wallet Account Not Found"
-        onBack={() => navigate('/settings/manage-wallets')}
-      />
-    );
-  }
 
   const disableRemove =
     walletGroupByGroupId?.walletContainer.wallets.length === 1;
@@ -196,7 +194,7 @@ export function WalletAccountView() {
 
       <div className="flex-1 p-4 pt-0! space-y-4 overflow-y-auto no-scrollbar">
         <div className="flex items-center gap-2">
-          <BlockieAddress address={wallet.address} size={52} borderRadius={6} />
+          <BlockieAddress address={address} size={52} borderRadius={6} />
           <div className="flex flex-col">
             <span className="text-sm font-medium">
               <NeutralDecimals
@@ -211,19 +209,24 @@ export function WalletAccountView() {
               onClick={handleCopyAddress}
               className="flex items-center gap-1 text-xs text-muted-foreground cursor-pointer"
             >
-              {isAddressCopied ? 'Copied!' : truncateAddress(wallet.address)}
+              {isAddressCopied ? 'Copied!' : truncateAddress(address)}
               <FiCopy size={10} />
             </div>
-            {isBareWallet(wallet) && wallet.mnemonic ? (
-              <span className="text-xs text-muted-foreground">
-                Derivation path: {wallet.mnemonic?.path}
-              </span>
-            ) : null}
-            {isDeviceAccount(wallet) ? (
-              <span className="text-xs text-muted-foreground">
-                HW Derivation path: {wallet.derivationPath}
-              </span>
-            ) : null}
+            {wallet ? (
+              isBareWallet(wallet) && wallet.mnemonic ? (
+                <span className="text-xs text-muted-foreground">
+                  Derivation path: {wallet.mnemonic?.path}
+                </span>
+              ) : (
+                isDeviceAccount(wallet) && (
+                  <span className="text-xs text-muted-foreground">
+                    HW Derivation path: {wallet.derivationPath}
+                  </span>
+                )
+              )
+            ) : (
+              <AnimatedDerivationPath />
+            )}
           </div>
         </div>
 
@@ -233,7 +236,7 @@ export function WalletAccountView() {
           input={
             <EditableWalletName
               id={nameInputId}
-              wallet={wallet}
+              wallet={wallet || null}
               onRename={refetchWallet}
             />
           }

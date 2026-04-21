@@ -1,12 +1,15 @@
 import type { WalletGroup } from '@/background/wallet/model/types';
-import { walletPort } from '@/shared/channel';
 import { ContainerType, getContainerType } from '@/shared/types/validators';
 import { BlockieAddress } from '@/ui/components/Blockie';
 import { Header } from '@/ui/components/header';
+import { ViewLoading } from '@/ui/components/view-loading';
 import { getWalletDisplayName } from '@/ui/components/wallet/WalletDisplayName/getWalletDisplayName';
+import {
+  usePrefetchWalletGroupDetails,
+  useWalletGroups,
+} from '@/ui/hooks/request/internal/useWalletGroups';
 import { Button, Card, CardItem } from '@/ui/ui-kit';
 import { ItemType } from '@/ui/ui-kit/card';
-import { useQuery } from '@tanstack/react-query';
 import groupBy from 'lodash/groupBy';
 import { useMemo } from 'react';
 import { IoAddOutline } from 'react-icons/io5';
@@ -110,10 +113,9 @@ export function ManageWalletView() {
   const location = useLocation();
   const openGroupId = location.state?.openGroupId as string | undefined;
 
-  const { data: walletGroups, isLoading } = useQuery({
-    queryKey: ['wallet/uiGetWalletGroups'],
-    queryFn: () => walletPort.request('uiGetWalletGroups'),
-  });
+  const { data: walletGroups, isLoading } = useWalletGroups();
+
+  usePrefetchWalletGroupDetails(walletGroups);
 
   const groupedBySeedType = useMemo(() => {
     if (!walletGroups) return null;
@@ -136,9 +138,9 @@ export function ManageWalletView() {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center h-40">
-        <span className="text-neutral-400">Loading wallets...</span>
-      </div>
+      <ViewLoading
+        onBack={() => navigate('/settings', { state: { direction: 'back' } })}
+      />
     );
   }
 

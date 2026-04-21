@@ -4,7 +4,6 @@ import { FungibleListGroupedVirtual } from '@/ui/components/fungible/FungibleLis
 import { useDiscoveredTokens } from '@/ui/components/fungible/useDiscoveredTokens';
 import { useWalletPortfolioSummary } from '@/ui/hooks/request/external/use-wallet-portfolio-summary';
 import { useAddressParams } from '@/ui/hooks/request/internal/useAddressParams';
-import { usePrefetchWalletGroups } from '@/ui/hooks/request/internal/useWalletGroups';
 import { useFiatConversion } from '@/ui/hooks/useFiatConversion';
 import { NeutralDecimals } from '@/ui/ui-kit';
 import { memo, useCallback, useMemo, useState } from 'react';
@@ -55,8 +54,6 @@ const TokenHeader = memo(function TokenHeader({
 export function Overview() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-
-  usePrefetchWalletGroups();
 
   const networkId = searchParams.get('network') || 'all';
   const { singleAddress: currentAddress } = useAddressParams();
