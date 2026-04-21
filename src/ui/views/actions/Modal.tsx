@@ -16,7 +16,7 @@ export function Modal({ isOpen, onClose, title, children }: ModalProps) {
       <DrawerContent variant="inset" title={title} description={title}>
         <div className="px-4 pb-4 flex flex-col gap-4">
           <div>{children}</div>
-          <Button onClick={onClose} variant="gradient-teal" size="md" shimmer>
+          <Button onClick={onClose} variant="primary" size="md" shimmer>
             Close
           </Button>
         </div>

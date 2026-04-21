@@ -17,7 +17,7 @@ import { ActionsRoutes } from '@/ui/views/actions';
 import { FungibleInfoView } from '@/ui/views/fungible-info';
 import { SettingsRoutes } from '@/ui/views/settings';
 import { TestView } from '@/ui/views/tests/test-view';
-import { RenderArea } from 'react-area';
+import { GlobalToast } from '../components/toast/GlobalToast';
 import {
   ChooseGlobalProviderGuard,
   RequestAccounts,
@@ -130,7 +130,7 @@ export function GlobalRoutes({ initialRoute }: { initialRoute?: string }) {
           </Routes>
         )}
       </ViewTransition>
-      <RenderArea name="toast-overlay" />
+      <GlobalToast />
     </DefiSdkClientProvider>
   );
 }

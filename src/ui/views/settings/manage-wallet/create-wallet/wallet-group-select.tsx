@@ -1,8 +1,7 @@
-import { walletPort } from '@/shared/channel';
 import { isMnemonicContainer } from '@/shared/types/validators';
 import { Header } from '@/ui/components/header';
+import { useWalletGroups } from '@/ui/hooks/request/internal/useWallet';
 import { Button, Card, CardItem } from '@/ui/ui-kit';
-import { useQuery } from '@tanstack/react-query';
 import { useMemo } from 'react';
 import { IoAddOutline } from 'react-icons/io5';
 import { LuChevronRight } from 'react-icons/lu';
@@ -12,10 +11,7 @@ import { WalletGroupCollapsible } from '../components/WalletGroupCollapsible';
 export function WalletGroupSelectView() {
   const navigate = useNavigate();
 
-  const { data: walletGroups } = useQuery({
-    queryKey: ['wallet/uiGetWalletGroups'],
-    queryFn: () => walletPort.request('uiGetWalletGroups'),
-  });
+  const { data: walletGroups } = useWalletGroups();
 
   const mnemonicGroups = useMemo(
     () =>

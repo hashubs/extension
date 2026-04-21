@@ -1,1 +1,1 @@
-export { PopoverToast } from './PopoverToast';
+export { GlobalToast } from './GlobalToast';

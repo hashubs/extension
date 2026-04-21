@@ -8,7 +8,7 @@ import { DappSecurityCheck } from '@/ui/components/DappSecurityCheck/DappSecurit
 import { SiteFaviconImg } from '@/ui/components/SiteFaviconImg';
 import { WalletDisplayName } from '@/ui/components/wallet';
 import { usePhishingDefenceStatus } from '@/ui/hooks/request/internal/usePhishingDefenceStatus';
-import { usePrefetchWalletGroups } from '@/ui/hooks/request/internal/useWalletGroups';
+import { usePrefetchWalletGroups } from '@/ui/hooks/request/internal/useWallet';
 import { useEvent } from '@/ui/hooks/useEvent';
 import { Button, Drawer, DrawerContent, DrawerTrigger } from '@/ui/ui-kit';
 import { useQuery } from '@tanstack/react-query';

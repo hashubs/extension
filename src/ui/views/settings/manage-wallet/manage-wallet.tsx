@@ -7,7 +7,7 @@ import { getWalletDisplayName } from '@/ui/components/wallet/WalletDisplayName/g
 import {
   usePrefetchWalletGroupDetails,
   useWalletGroups,
-} from '@/ui/hooks/request/internal/useWalletGroups';
+} from '@/ui/hooks/request/internal/useWallet';
 import { Button, Card, CardItem } from '@/ui/ui-kit';
 import { ItemType } from '@/ui/ui-kit/card';
 import groupBy from 'lodash/groupBy';

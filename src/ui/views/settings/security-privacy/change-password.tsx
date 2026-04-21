@@ -1,6 +1,7 @@
 import { accountPublicRPCPort, walletPort } from '@/shared/channel';
 import { invariant } from '@/shared/invariant';
 import { queryClient } from '@/shared/query-client/queryClient';
+import { useToastStore } from '@/shared/store/useToastStore';
 import {
   estimatePasswordStrengh,
   Strength,
@@ -9,13 +10,11 @@ import { zeroizeAfterSubmission } from '@/shared/zeroize-submission';
 import { FormField } from '@/ui/components/form';
 import { Header } from '@/ui/components/header';
 import { StrengthIndicator } from '@/ui/components/strength-indicator';
-import {
-  PopoverToast,
-  PopoverToastHandle,
-} from '@/ui/components/toast/PopoverToast';
+import { useGetExistingUser } from '@/ui/hooks/request/internal/useAccount';
+import { GET_PASSKEY_ENABLED_QUERY_KEY } from '@/ui/hooks/request/internal/usePasskey';
 import { Drawer, DrawerContent, DrawerFooter, DrawerTitle } from '@/ui/ui-kit';
 import { Button } from '@/ui/ui-kit/button';
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation } from '@tanstack/react-query';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { MdLock, MdWarning } from 'react-icons/md';
 import { useNavigate } from 'react-router-dom';
@@ -30,7 +29,7 @@ function getError(error: unknown): { message: string } {
 export function ChangePasswordView() {
   const navigate = useNavigate();
 
-  const toastRef = useRef<PopoverToastHandle>(null);
+  const { show: showToast } = useToastStore();
   const inputRef = useRef<HTMLInputElement>(null);
 
   const [weakDrawerOpen, setWeakDrawerOpen] = useState(false);
@@ -40,10 +39,7 @@ export function ChangePasswordView() {
     newPassword: string;
   } | null>(null);
 
-  const userQuery = useQuery({
-    queryKey: ['account/getExistingUser'],
-    queryFn: () => accountPublicRPCPort.request('getExistingUser'),
-  });
+  const userQuery = useGetExistingUser();
 
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -77,7 +73,7 @@ export function ChangePasswordView() {
     onSuccess: () => {
       zeroizeAfterSubmission();
       walletPort.request('passwordChangeSuccess');
-      toastRef.current?.showToast();
+      showToast('Password changed successfully.');
       setNewPassword('');
       setConfirmPassword('');
       setFormError(null);
@@ -86,7 +82,7 @@ export function ChangePasswordView() {
       setNewPassword('');
       setConfirmPassword('');
       zeroizeAfterSubmission();
-      queryClient.refetchQueries({ queryKey: ['account/getPasskeyEnabled'] });
+      queryClient.refetchQueries({ queryKey: GET_PASSKEY_ENABLED_QUERY_KEY });
     },
     onError: (error) => {
       walletPort.request('passwordChangeError');
@@ -280,8 +276,6 @@ export function ChangePasswordView() {
           </DrawerFooter>
         </DrawerContent>
       </Drawer>
-
-      <PopoverToast ref={toastRef}>Password changed successfully.</PopoverToast>
     </div>
   );
 }

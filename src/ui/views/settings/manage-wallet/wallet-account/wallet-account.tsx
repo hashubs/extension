@@ -1,6 +1,7 @@
 import { walletPort } from '@/shared/channel';
 import { invariant } from '@/shared/invariant';
 import { queryClient } from '@/shared/query-client/queryClient';
+import { useToastStore } from '@/shared/store/useToastStore';
 import { ExternallyOwnedAccount } from '@/shared/types/externally-owned-account';
 import { isBareWallet, isDeviceAccount } from '@/shared/types/validators';
 import { formatFiatToParts } from '@/shared/units/format-fiat';
@@ -9,10 +10,10 @@ import { ConfirmationSheet } from '@/ui/components/Confirmation/confirmation-she
 import { Header } from '@/ui/components/header';
 import { useProfileName } from '@/ui/hooks/request/internal/useProfileName';
 import {
+  QUERY_WALLET,
+  useWalletByAddress,
   useWalletGroupByGroupId,
-  WALLET_GROUP_QUERY_KEY,
-  WALLET_GROUPS_QUERY_KEY,
-} from '@/ui/hooks/request/internal/useWalletGroups';
+} from '@/ui/hooks/request/internal/useWallet';
 import { useCopyToClipboard } from '@/ui/hooks/useCopyToClipboard';
 import { useDebouncedCallback } from '@/ui/hooks/useDebouncedCallback';
 import { useFiatConversion } from '@/ui/hooks/useFiatConversion';
@@ -20,7 +21,7 @@ import { truncateAddress } from '@/ui/lib/utils';
 import { NeutralDecimals } from '@/ui/ui-kit';
 import { Card, CardItem, ItemType } from '@/ui/ui-kit/card';
 import { InputDecorator } from '@/ui/ui-kit/input/Input-decorator';
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation } from '@tanstack/react-query';
 import { useCallback, useEffect, useId, useState } from 'react';
 import { FiCopy } from 'react-icons/fi';
 import { IoKeyOutline, IoLogoUsd } from 'react-icons/io5';
@@ -118,12 +119,12 @@ export function WalletAccountView() {
       text: address,
     });
 
+  const { show: showToast } = useToastStore();
   const [openConfirm, setOpenConfirm] = useState(false);
 
-  const { data: wallet, refetch: refetchWallet } = useQuery({
-    queryKey: ['wallet/uiGetWalletByAddress', address, groupId],
-    queryFn: () =>
-      walletPort.request('uiGetWalletByAddress', { address, groupId }),
+  const { data: wallet, refetch: refetchWallet } = useWalletByAddress({
+    address,
+    groupId,
   });
 
   const { data: walletGroupByGroupId } = useWalletGroupByGroupId({
@@ -141,11 +142,12 @@ export function WalletAccountView() {
       navigate(`/settings/manage-wallets/groups/${groupId}`, {
         state: { direction: 'back' },
       });
+      showToast('Remove wallet address successfully');
       queryClient.invalidateQueries({
-        queryKey: WALLET_GROUPS_QUERY_KEY,
+        queryKey: QUERY_WALLET.walletGroups,
       });
       queryClient.invalidateQueries({
-        queryKey: WALLET_GROUP_QUERY_KEY,
+        queryKey: QUERY_WALLET.walletGroup(groupId),
       });
     },
   });

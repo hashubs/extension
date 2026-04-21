@@ -1,2 +1,4 @@
 'color-scheme-2022-12-26'
 1. value-to-hex.ts sudah di migrasi ke v6 ethers
+
+NOTE= Setiap memanggil mutation pastikan onSuccess memanggil queryClient.invalidateQueries

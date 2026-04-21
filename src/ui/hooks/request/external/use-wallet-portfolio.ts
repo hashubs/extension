@@ -7,7 +7,7 @@ import { queryClient } from '@/shared/query-client/queryClient';
 import { ApiClient } from '@/shared/request/api.client';
 import { useQuery } from '@tanstack/react-query';
 import { useEffect } from 'react';
-import { useWalletAddresses } from '../internal/useWalletAddresses';
+import { useWalletAddresses } from '../internal/useWallet';
 
 interface Params {
   addresses: string[];

@@ -1,5 +1,6 @@
 import { QueryClient } from '@tanstack/react-query';
 import { emitter } from '../events';
+import { QUERY_WALLET } from '@/ui/hooks/request/internal/useWallet';
 
 export const queryClient = new QueryClient({
   defaultOptions: {
@@ -17,10 +18,10 @@ export const queryClient = new QueryClient({
 
 emitter.on('uiAccountsChanged', () => {
   queryClient.removeQueries({
-    queryKey: ['wallet/getCurrentAddress'],
+    queryKey: QUERY_WALLET.currentAddress,
   });
   queryClient.removeQueries({
-    queryKey: ['wallet/uiGetCurrentWallet'],
+    queryKey: QUERY_WALLET.currentWallet,
   });
 });
 

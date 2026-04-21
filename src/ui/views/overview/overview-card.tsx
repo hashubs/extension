@@ -1,4 +1,3 @@
-import { useConnectionHeaderDrag } from '@/ui/hooks/useConnectionHeaderDrag';
 import { useState } from 'react';
 import {
   FiArrowDownLeft,
@@ -20,16 +19,12 @@ const ACTIONS: { key: ActionKey; label: string; icon: React.ReactNode }[] = [
   { key: 'buy', label: 'Buy', icon: <FiShoppingCart size={18} /> },
   { key: 'actions', label: 'History', icon: <LuHistory size={18} /> },
 ];
-
-type DragHandlers = ReturnType<typeof useConnectionHeaderDrag>['dragHandlers'];
-
 interface Props {
   accountName?: string;
   balance?: string;
   balanceChange?: string;
   onMenuOpen?: () => void;
   onConnectionSite?: () => void;
-  dragHandlers?: DragHandlers;
 }
 
 export function OverviewCard({
@@ -37,14 +32,13 @@ export function OverviewCard({
   balanceChange = '+$35',
   onMenuOpen,
   onConnectionSite,
-  dragHandlers,
 }: Props) {
   const navigate = useNavigate();
 
   const [pressedAction, setPressedAction] = useState<ActionKey | null>(null);
 
   return (
-    <div className="p-1.5" {...dragHandlers}>
+    <div className="p-1.5">
       <div className="p-1.5 rounded-[24px] bg-[#f6f6f8] dark:bg-[#1f1f1f]">
         <div className="bg-white dark:bg-[#171717] p-[14px] rounded-[20px]">
           <OverviewHeader

@@ -1,13 +1,10 @@
-import { accountPublicRPCPort, walletPort } from '@/shared/channel';
-import { invariant } from '@/shared/invariant';
-import { queryClient } from '@/shared/query-client/queryClient';
-import { PublicUser } from '@/shared/types/User';
-import { wait } from '@/shared/wait';
 import { zeroizeAfterSubmission } from '@/shared/zeroize-submission';
 import { BlockieAddress } from '@/ui/components/Blockie';
 import { BrandLogo } from '@/ui/components/svg';
+import { useGetExistingUser } from '@/ui/hooks/request/internal/useAccount';
+import { useLogin } from '@/ui/hooks/request/internal/useAuth';
+import { getLastUsedAddress } from '@/ui/hooks/request/internal/useWallet';
 import { Button, Input } from '@/ui/ui-kit';
-import { useMutation, useQuery } from '@tanstack/react-query';
 import { useCallback, useState } from 'react';
 import { RiLockPasswordLine } from 'react-icons/ri';
 import { useNavigate, useSearchParams } from 'react-router-dom';
@@ -22,20 +19,8 @@ export function LoginView() {
   const [forgotPasswordOpen, setForgotPasswordOpen] = useState(false);
   const [unlocked, setUnlocked] = useState(false);
 
-  const { data: user, isLoading } = useQuery({
-    queryKey: ['account/getExistingUser'],
-    queryFn: () => accountPublicRPCPort.request('getExistingUser'),
-  });
-
-  const { data: lastUsedAddress } = useQuery({
-    enabled: Boolean(user?.id),
-    queryKey: ['wallet/getLastUsedAddress', user?.id],
-    queryFn: async () => {
-      await wait(500);
-      invariant(user?.id, "user['id'] is required");
-      return walletPort.request('getLastUsedAddress', { userId: user.id });
-    },
-  });
+  const { data: user, isLoading: isUserLoading } = useGetExistingUser();
+  const { data: lastUsedAddress } = getLastUsedAddress(user?.id);
 
   const handleSuccess = useCallback(() => {
     navigate(params.get('next') || '/', {
@@ -45,23 +30,12 @@ export function LoginView() {
     });
   }, [navigate, params]);
 
-  const loginMutation = useMutation({
-    mutationFn: async ({
-      user,
-      password,
-    }: {
-      user: PublicUser;
-      password: string;
-    }) => {
-      return accountPublicRPCPort.request('login', { user, password });
-    },
-    onSuccess: async () => {
+  const loginMutation = useLogin({
+    onSuccess: () => {
       zeroizeAfterSubmission();
       setUnlocked(true);
-      await wait(100);
-      queryClient.invalidateQueries({ queryKey: ['authState'] });
-      handleSuccess();
     },
+    onAfterInvalidate: handleSuccess,
   });
 
   const handleUnlock = () => {
@@ -109,7 +83,7 @@ export function LoginView() {
             isError={!!loginMutation.error}
             size="lg"
             placeholder="Password"
-            autoFocus={!isLoading}
+            autoFocus={!isUserLoading}
             leftIcon={RiLockPasswordLine}
           />
           {!!loginMutation.error && (

@@ -1,8 +1,9 @@
 import { accountPublicRPCPort } from '@/shared/channel';
 import { PublicUser } from '@/shared/types/User';
 import { zeroizeAfterSubmission } from '@/shared/zeroize-submission';
+import { useGetExistingUser } from '@/ui/hooks/request/internal/useAccount';
 import { Button, Input } from '@/ui/ui-kit';
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation } from '@tanstack/react-query';
 import React, { useId, useRef } from 'react';
 
 export function VerifyUser({
@@ -14,10 +15,7 @@ export function VerifyUser({
   buttonTitle?: React.ReactNode;
   onSuccess: () => void;
 }) {
-  const { data: user } = useQuery({
-    queryKey: ['account/getExistingUser'],
-    queryFn: () => accountPublicRPCPort.request('getExistingUser'),
-  });
+  const { data: user } = useGetExistingUser();
 
   const loginMutation = useMutation({
     mutationFn: ({ user, password }: { user: PublicUser; password: string }) =>

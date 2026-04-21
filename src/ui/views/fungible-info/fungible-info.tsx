@@ -5,7 +5,7 @@ import {
   OptimisticFungibleInfo,
   useFungibleInfo,
 } from '@/ui/components/fungible/fungible-info';
-import { useAddressParams } from '@/ui/hooks/request/internal/useAddressParams';
+import { useAddressParams } from '@/ui/hooks/request/internal/useWallet';
 import { ActionInfo } from '@/ui/views/actions/ActionInfo';
 import { Modal } from '@/ui/views/actions/Modal';
 import { useUnifiedActivity } from '@/ui/views/actions/useUnifiedActivity';

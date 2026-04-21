@@ -11,6 +11,12 @@ import {
 
 export const CONNECTION_HEADER_HEIGHT = 55;
 
+/**
+ * Hook to handle connection header drag.
+ * @param enabled Whether the drag is enabled.
+ * @returns The y position of the header, drag handlers, and whether the header is open.
+ * Note: This hook is not used in the current implementation.
+ */
 export function useConnectionHeaderDrag({
   enabled = true,
 }: { enabled?: boolean } = {}) {

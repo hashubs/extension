@@ -1,5 +1,6 @@
-import { useState, useCallback, useEffect } from 'react';
 import { useSpring } from '@react-spring/web';
+import { useCallback, useEffect, useState } from 'react';
+import { useAnimationPreference } from '../features/appearance';
 
 export function useTransformTrigger({
   x = 0,
@@ -14,6 +15,8 @@ export function useTransformTrigger({
   },
   delay = 0,
 }) {
+  const { enableAnimation } = useAnimationPreference();
+
   const [on, set] = useState(false);
 
   const style = useSpring({
@@ -29,6 +32,7 @@ export function useTransformTrigger({
          scaleX(1)`,
     config: springConfig,
     delay,
+    immediate: !enableAnimation,
   } as const);
 
   useEffect(() => {

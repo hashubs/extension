@@ -10,7 +10,7 @@ import {
 } from '@/ui/components/fungible/chart-fungible/types';
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import { useMemo } from 'react';
-import { useAddressParams } from '../internal/useAddressParams';
+import { useAddressParams } from '../internal/useWallet';
 
 const PERIOD_TO_DEFILLAMA: Record<ChartPeriod, string> = {
   '1h': 'HOUR',

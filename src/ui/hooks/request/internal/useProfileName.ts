@@ -70,38 +70,3 @@ export function useProfileName(
 
   return { type, value: finalValue, isLoading: isQueryLoading };
 }
-
-// export function useProfileName(
-//   wallet: Pick<BareWallet, 'address' | 'name'>,
-//   {
-//     padding = 5,
-//     maxCharacters,
-//   }: { padding?: number; maxCharacters?: number } = {}
-// ): { type: WalletNameType; value: string } {
-//   const { isLoading: isDomainLoading, data: domain } = useQuery({
-//     queryKey: persistentQuery([lookupAddressNameKey, wallet.address]),
-//     queryFn: async () => lookupAddressName(wallet.address),
-//     enabled: !wallet.name,
-//     refetchOnWindowFocus: false,
-//     refetchOnMount: false,
-//     retryOnMount: false,
-//     retry: 0,
-//     staleTime: 40000,
-//   });
-
-//   const domainName = isDomainLoading ? null : domain;
-
-//   if (wallet.name) {
-//     return {
-//       type: WalletNameType.customName,
-//       value: getWalletDisplayName(wallet, { padding, maxCharacters }),
-//     };
-//   }
-//   const value =
-//     domainName ?? getWalletDisplayName(wallet, { padding, maxCharacters });
-//   const type = domainName ? WalletNameType.domain : WalletNameType.address;
-//   if (normalizeAddress(wallet.address) === testAddress) {
-//     return { type, value: `${value} ${testWalletSuffix}` };
-//   }
-//   return { type, value };
-// }

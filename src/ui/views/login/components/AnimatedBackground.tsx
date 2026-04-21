@@ -1,4 +1,5 @@
-import { animated, useSprings, config } from '@react-spring/web';
+import { useAnimationPreference } from '@/ui/features/appearance';
+import { animated, config, useSprings } from '@react-spring/web';
 
 interface AnimatedBackgroundProps {
   show: boolean;
@@ -15,10 +16,13 @@ const SHAPES = [
   {
     className: '',
     style: {
-      width: 0, height: 0,
-      borderLeft: '58px solid transparent', borderRight: '58px solid transparent',
+      width: 0,
+      height: 0,
+      borderLeft: '58px solid transparent',
+      borderRight: '58px solid transparent',
       borderBottom: '100px solid #D4577A',
-      top: -20, right: 18,
+      top: -20,
+      right: 18,
     },
     from: { x: -150, y: 160, scale: 0, opacity: 0 },
   },
@@ -32,10 +36,13 @@ const SHAPES = [
   {
     className: '',
     style: {
-      width: 0, height: 0,
-      borderLeft: '50px solid transparent', borderRight: '50px solid transparent',
+      width: 0,
+      height: 0,
+      borderLeft: '50px solid transparent',
+      borderRight: '50px solid transparent',
       borderBottom: '86px solid #2BBFA4',
-      bottom: 18, left: 12,
+      bottom: 18,
+      left: 12,
     },
     from: { x: 180, y: -100, scale: 0, opacity: 0 },
   },
@@ -60,6 +67,8 @@ const SHAPES = [
 ];
 
 export function AnimatedBackground({ show }: AnimatedBackgroundProps) {
+  const { enableAnimation } = useAnimationPreference();
+
   const springs = useSprings(
     SHAPES.length,
     SHAPES.map((shape) => ({
@@ -76,6 +85,7 @@ export function AnimatedBackground({ show }: AnimatedBackgroundProps) {
         y: shape.from.y,
       },
       config: config.wobbly,
+      immediate: !enableAnimation,
     }))
   );
 

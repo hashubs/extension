@@ -8,7 +8,7 @@ import {
 } from '@/shared/fungible/token-builders';
 import { CustomToken } from '@/shared/fungible/types';
 import { ApiClient } from '@/shared/request/api.client';
-import { useCustomTokenStore } from '@/shared/store/custom-token-store';
+import { useCustomTokenStore } from '@/shared/store/useCustomTokenStore';
 import { getAddressType } from '@/shared/wallet/classifiers';
 import { useIsTestnetMode } from '@/ui/features/preferences';
 import { useCrawlTokenImages } from '@/ui/hooks/request/external/use-crawl-token-images';

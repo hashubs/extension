@@ -1,5 +1,6 @@
 import { BlockieAddress } from '@/ui/components/Blockie';
 import { ViewLoading } from '@/ui/components/view-loading';
+import { useAnimationPreference } from '@/ui/features/appearance';
 import { cn, truncateAddress } from '@/ui/lib/utils';
 import { animated, useSpring } from '@react-spring/web';
 import confetti from 'canvas-confetti';
@@ -43,10 +44,13 @@ function WalletItem({ wallet }: { wallet: any }) {
 }
 
 export function ImportDecoration({ wallets, isLoading, loadingTitle }: Props) {
+  const { enableAnimation } = useAnimationPreference();
+
   const style = useSpring({
     opacity: isLoading ? 0 : 1,
     transform: isLoading ? 'scale(0.8)' : 'scale(1)',
     config: { tension: 200, friction: 20 },
+    immediate: !enableAnimation,
   });
 
   useEffect(() => {

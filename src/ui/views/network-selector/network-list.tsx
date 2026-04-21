@@ -6,8 +6,8 @@ import { getOriginUrlFromMetaData } from '@/modules/networks/helpers';
 import { NetworkConfigMetaData, Networks } from '@/modules/networks/networks';
 import { BlockchainType, getAddressType } from '@/shared/wallet/classifiers';
 import { usePreferences } from '@/ui/features/preferences';
-import { useAddressParams } from '@/ui/hooks/request/internal/useAddressParams';
 import { useNetworks } from '@/ui/hooks/request/internal/useNetworks';
+import { useAddressParams } from '@/ui/hooks/request/internal/useWallet';
 import { cn } from '@/ui/lib/utils';
 import { Card, CardItem } from '@/ui/ui-kit/card';
 

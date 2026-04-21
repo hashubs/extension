@@ -6,8 +6,11 @@ import { ExternallyOwnedAccount } from '@/shared/types/externally-owned-account'
 import type { BlockchainType } from '@/shared/wallet/classifiers';
 import { Header } from '@/ui/components/header';
 import { WalletList } from '@/ui/components/wallet/wallet-list/wallet-list';
-import { useAddressParams } from '@/ui/hooks/request/internal/useAddressParams';
-import { useWalletGroups } from '@/ui/hooks/request/internal/useWalletGroups';
+import {
+  QUERY_WALLET,
+  useAddressParams,
+  useWalletGroups,
+} from '@/ui/hooks/request/internal/useWallet';
 import { Input } from '@/ui/ui-kit';
 import { useMutation } from '@tanstack/react-query';
 import { useCallback, useMemo, useState } from 'react';
@@ -32,10 +35,10 @@ export function WalletSelectorView() {
     mutationFn: (address: string) => setCurrentAddress({ address }),
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ['wallet/uiGetCurrentWallet'],
+        queryKey: QUERY_WALLET.currentWallet,
       });
       queryClient.invalidateQueries({
-        queryKey: ['wallet/getCurrentAddress'],
+        queryKey: QUERY_WALLET.currentAddress,
       });
     },
   });

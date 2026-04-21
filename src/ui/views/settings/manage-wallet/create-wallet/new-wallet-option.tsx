@@ -18,7 +18,7 @@ export function NewWalletOptionView() {
         </p>
       </div>
 
-      <div className="px-4 space-y-3">
+      <div className="px-4 space-y-3 pb-4">
         <Button
           variant="primary"
           size="md"

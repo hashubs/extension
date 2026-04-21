@@ -25,7 +25,7 @@ import {
   prepareWalletsToImport,
   suggestInitialWallets,
 } from '@/ui/components/ImportWallet/Mnemonic/helpers';
-import { useAllExistingMnemonicAddresses } from '@/ui/hooks/request/internal/useAllExistingAddresses';
+import { useAllExistingMnemonicAddresses } from '@/ui/hooks/request/internal/useWallet';
 import { useFiatConversion } from '@/ui/hooks/useFiatConversion';
 import { truncateAddress } from '@/ui/lib/utils';
 import { useQuery } from '@tanstack/react-query';

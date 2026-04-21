@@ -1,5 +1,4 @@
 import { Header } from '@/ui/components/header';
-import { PopoverToast } from '@/ui/components/toast/PopoverToast';
 import { usePreferences } from '@/ui/features/preferences';
 import { useGlobalPreferences } from '@/ui/features/preferences/usePreferences';
 import { Card, CardItem, ItemType } from '@/ui/ui-kit/card';
@@ -21,7 +20,6 @@ export function DeveloperToolsView() {
   const {
     clearPendingTransactions,
     isPending,
-    toastRef: clearPendingTransactionsToastRef,
   } = useClearPendingTransactions();
 
   const navigations: navigationType[] = [
@@ -130,10 +128,6 @@ export function DeveloperToolsView() {
           </div>
         ))}
       </div>
-
-      <PopoverToast ref={clearPendingTransactionsToastRef} showClose>
-        Pending transactions cleared
-      </PopoverToast>
     </div>
   );
 }

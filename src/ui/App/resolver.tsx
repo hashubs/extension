@@ -1,4 +1,4 @@
-import { useAuthState } from './auth';
+import { useAuthState } from '../hooks/request/internal/useAuth';
 
 export function SomeKindOfResolver({
   noUser,

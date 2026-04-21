@@ -1,20 +1,17 @@
 import { accountPublicRPCPort, walletPort } from '@/shared/channel';
 import { IdempotentRequest } from '@/shared/IdempotentRequest';
 import { invariant } from '@/shared/invariant';
+import { queryClient } from '@/shared/query-client/queryClient';
 import { setCurrentAddress } from '@/shared/request/internal/setCurrentAddress';
 import { assertKnownEcosystems } from '@/shared/wallet/shared';
 import { Header } from '@/ui/components/header';
 import { WithPasswordSession } from '@/ui/components/verify-user/WithPasswordSession';
-import {
-  useWalletGroups,
-  WALLET_GROUPS_QUERY_KEY,
-} from '@/ui/hooks/request/internal/useWalletGroups';
 import { Button } from '@/ui/ui-kit';
 import { useMutation } from '@tanstack/react-query';
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { ImportBackground, ImportDecoration } from './components';
-import { queryClient } from '@/shared/query-client/queryClient';
+import { QUERY_WALLET } from '@/ui/hooks/request/internal/useWallet';
 
 function GenerateWalletContent() {
   const navigate = useNavigate();
@@ -36,7 +33,7 @@ function GenerateWalletContent() {
       return walletPort.request('uiGenerateMnemonic', { ecosystems });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: WALLET_GROUPS_QUERY_KEY });
+      queryClient.invalidateQueries({ queryKey: QUERY_WALLET.walletGroups });
     },
   });
 

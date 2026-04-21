@@ -1,18 +1,16 @@
-import { walletPort } from '@/shared/channel';
 import { BlockieAddress } from '@/ui/components/Blockie';
 import { WalletDisplayName } from '@/ui/components/wallet';
-import { useAddressParams } from '@/ui/hooks/request/internal/useAddressParams';
-import { useQuery } from '@tanstack/react-query';
+import {
+  getCurrentWallet,
+  useAddressParams,
+} from '@/ui/hooks/request/internal/useWallet';
 import { useNavigate } from 'react-router-dom';
 
 export function WalletSelect() {
   const navigate = useNavigate();
 
   const { singleAddress } = useAddressParams();
-  const { data: wallet } = useQuery({
-    queryKey: ['wallet/uiGetCurrentWallet'],
-    queryFn: () => walletPort.request('uiGetCurrentWallet'),
-  });
+  const { data: wallet } = getCurrentWallet();
 
   const address = wallet?.address || singleAddress;
 

@@ -6,8 +6,8 @@ import {
   useNativeTokenBalance,
   useSingleTokenBalance,
 } from '@/ui/hooks/request/external/use-token-balance';
-import { useAddressParams } from '@/ui/hooks/request/internal/useAddressParams';
 import { useNetworks } from '@/ui/hooks/request/internal/useNetworks';
+import { useAddressParams } from '@/ui/hooks/request/internal/useWallet';
 import { useMemo } from 'react';
 
 export interface OptimisticFungibleInfo extends FungibleInfo {

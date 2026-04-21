@@ -1,5 +1,7 @@
 import { walletPort } from '@/shared/channel';
 import { invariant } from '@/shared/invariant';
+import { queryClient } from '@/shared/query-client/queryClient';
+import { useToastStore } from '@/shared/store/useToastStore';
 import {
   isHardwareContainer,
   isMnemonicContainer,
@@ -16,11 +18,10 @@ import { ViewLoading } from '@/ui/components/view-loading';
 import { ViewNotFound } from '@/ui/components/view-not-found';
 import { getGroupDisplayName } from '@/ui/components/wallet/WalletDisplayName/getGroupDisplayName';
 import {
+  QUERY_WALLET,
   useWalletGroupByGroupId,
   useWalletGroupsByGroupId,
-  WALLET_GROUP_QUERY_KEY,
-  WALLET_GROUPS_QUERY_KEY,
-} from '@/ui/hooks/request/internal/useWalletGroups';
+} from '@/ui/hooks/request/internal/useWallet';
 import { useDebouncedCallback } from '@/ui/hooks/useDebouncedCallback';
 import { useFiatConversion } from '@/ui/hooks/useFiatConversion';
 import { truncateAddress } from '@/ui/lib/utils';
@@ -39,7 +40,6 @@ import {
 import { PiSpinnerLight } from 'react-icons/pi';
 import { useNavigate, useParams } from 'react-router-dom';
 import { groupByEcosystem } from '../_shared/groupByEcosystem';
-import { queryClient } from '@/shared/query-client/queryClient';
 
 function EditableWalletGroupName({
   id,
@@ -172,6 +172,8 @@ export function WalletGroupView() {
 
   const [removeGroupOpen, setRemoveGroupOpen] = useState(false);
 
+  const { show: showToast } = useToastStore();
+
   const {
     data: walletGroup,
     isLoading: walletGroupIsLoading,
@@ -188,11 +190,12 @@ export function WalletGroupView() {
     onSuccess() {
       refetch();
       navigate('/settings/manage-wallets');
+      showToast('Remove wallet group successfully');
       queryClient.invalidateQueries({
-        queryKey: WALLET_GROUPS_QUERY_KEY,
+        queryKey: QUERY_WALLET.walletGroups,
       });
       queryClient.invalidateQueries({
-        queryKey: WALLET_GROUP_QUERY_KEY,
+        queryKey: QUERY_WALLET.walletGroup(groupId),
       });
     },
   });

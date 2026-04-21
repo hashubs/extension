@@ -1,3 +1,4 @@
+import { useAnimationPreference } from '@/ui/features/appearance';
 import { cn } from '@/ui/lib/utils';
 import {
   alertVariants,
@@ -125,6 +126,8 @@ export function SecurityStatusButton({
   onClick?: () => void;
   size: 'small' | 'big';
 }) {
+  const { enableAnimation } = useAnimationPreference();
+
   const isLoading = kind === 'loading';
   const variant = KIND_TO_ALERT_VARIANT[kind];
 
@@ -136,6 +139,7 @@ export function SecurityStatusButton({
       tension: isLoading ? 100 : 200,
       friction: isLoading ? 50 : 10,
     },
+    immediate: !enableAnimation,
   });
 
   useEffect(() => {

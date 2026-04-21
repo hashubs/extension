@@ -1,19 +1,15 @@
 import { walletPort } from '@/shared/channel';
 import { openInNewWindow } from '@/shared/open-in-new-window';
-import {
-  PopoverToast,
-  PopoverToastHandle,
-} from '@/ui/components/toast/PopoverToast';
+import { useToastStore } from '@/shared/store/useToastStore';
 import { Button } from '@/ui/ui-kit';
 import { useMutation } from '@tanstack/react-query';
 import { getError } from 'get-error';
-import { useRef } from 'react';
 import { PiWarningFill } from 'react-icons/pi';
 import { useNavigate } from 'react-router-dom';
 
 export function RestoreDataView() {
   const navigate = useNavigate();
-  const toastRef = useRef<PopoverToastHandle>(null);
+  const { show: showToast } = useToastStore();
 
   const handleRestoreDataMutation = useMutation({
     mutationFn: () => {
@@ -23,8 +19,8 @@ export function RestoreDataView() {
       navigate('/', { replace: true });
       window.location.reload();
     },
-    onError: () => {
-      toastRef.current?.showToast();
+    onError: (error) => {
+      showToast(getError(error).message, { variant: 'error' });
     },
   });
 
@@ -79,10 +75,6 @@ export function RestoreDataView() {
           </a>
         </p>
       </div>
-
-      <PopoverToast ref={toastRef} className="text-red-500!">
-        {getError(handleRestoreDataMutation.error).message}
-      </PopoverToast>
     </div>
   );
 }

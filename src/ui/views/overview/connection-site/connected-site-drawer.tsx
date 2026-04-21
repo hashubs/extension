@@ -1,4 +1,3 @@
-import { walletPort } from '@/shared/channel';
 import { getConnectedSite } from '@/shared/getConnectedSite';
 import { normalizeAddress } from '@/shared/normalize-address';
 import { queryClient } from '@/shared/query-client/queryClient';
@@ -7,6 +6,7 @@ import { ExternallyOwnedAccount } from '@/shared/types/externally-owned-account'
 import { MetamaskMode } from '@/ui/components/ConnectedSite/MetamaskMode';
 import { SiteFaviconImg } from '@/ui/components/SiteFaviconImg';
 import { useRemovePermissionMutation } from '@/ui/hooks/request/internal/useRemovePermission';
+import { getCurrentWallet } from '@/ui/hooks/request/internal/useWallet';
 import { cn } from '@/ui/lib/utils';
 import { Button, Drawer, DrawerContent, DrawerTrigger } from '@/ui/ui-kit';
 import { useQuery } from '@tanstack/react-query';
@@ -39,12 +39,7 @@ export function ConnectedSiteDrawer({
   const siteOrigin = connectedSite?.origin;
   const siteHostname = siteOrigin ? new URL(siteOrigin).hostname : null;
 
-  const { data: currentWallet } = useQuery({
-    queryKey: ['wallet/uiGetCurrentWallet'],
-    queryFn: () => {
-      return walletPort.request('uiGetCurrentWallet');
-    },
-  });
+  const { data: currentWallet } = getCurrentWallet();
 
   const currentAddress = currentWallet?.address;
   const currentWalletIsConnected = useMemo(

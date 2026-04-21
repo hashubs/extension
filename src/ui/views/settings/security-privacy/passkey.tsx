@@ -1,13 +1,14 @@
-import { getPasskeyTitle, setupAccountPasskey } from '@/modules/passkey';
-import { accountPublicRPCPort, walletPort } from '@/shared/channel';
-import { invariant } from '@/shared/invariant';
-import { queryClient } from '@/shared/query-client/queryClient';
+import { getPasskeyTitle } from '@/modules/passkey';
+import { useToastStore } from '@/shared/store/useToastStore';
 import { zeroizeAfterSubmission } from '@/shared/zeroize-submission';
 import { FormField } from '@/ui/components/form';
+import { useGetExistingUser } from '@/ui/hooks/request/internal/useAccount';
 import {
-  PopoverToast,
-  PopoverToastHandle,
-} from '@/ui/components/toast/PopoverToast';
+  getPasskeyEnabled,
+  usePasskeyAvailability,
+  useRemovePasskey,
+  useSetupPasskey,
+} from '@/ui/hooks/request/internal/usePasskey';
 import {
   Button,
   CardItem,
@@ -19,73 +20,35 @@ import {
   DrawerTitle,
 } from '@/ui/ui-kit';
 import { Switch } from '@/ui/ui-kit/switch';
-import { useMutation, useQuery } from '@tanstack/react-query';
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { LuFingerprint } from 'react-icons/lu';
 import { MdLock, MdWarning } from 'react-icons/md';
 
 export function PasskeyItem() {
-  const toastRef = useRef<PopoverToastHandle>(null);
+  const { show: showToast } = useToastStore();
   const [userValue, setUserValue] = useState<boolean | null>(null);
   const [openEnable, setOpenEnable] = useState(false);
   const [openDisable, setOpenDisable] = useState(false);
   const [password, setPassword] = useState('');
   const passkeyTitle = getPasskeyTitle();
 
-  const passkeyAvailabilityQuery = useQuery({
-    queryKey: ['passkey/isSupported'],
-    queryFn: async () => {
-      if (!window.PublicKeyCredential) return false;
-      try {
-        return await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable();
-      } catch {
-        return false;
-      }
-    },
-    staleTime: Infinity,
-  });
+  const passkeyAvailabilityQuery = usePasskeyAvailability();
 
-  const defaultValueQuery = useQuery({
-    queryKey: ['account/getPasskeyEnabled'],
-    queryFn: () => accountPublicRPCPort.request('getPasskeyEnabled'),
-  });
+  const defaultValueQuery = getPasskeyEnabled();
+  const userQuery = useGetExistingUser();
 
-  const userQuery = useQuery({
-    queryKey: ['account/getExistingUser'],
-    queryFn: () => accountPublicRPCPort.request('getExistingUser'),
-  });
-
-  const setupTouchIdMutation = useMutation({
-    mutationFn: async (password: string) => {
-      invariant(userQuery.data, 'User must be defined');
-      await accountPublicRPCPort.request('login', {
-        user: userQuery.data,
-        password,
-      });
-      return setupAccountPasskey(password);
-    },
+  const setupTouchIdMutation = useSetupPasskey({
     onSuccess: () => {
-      walletPort.request('passkeyLoginEnabled');
-      queryClient.invalidateQueries({
-        queryKey: ['account/getPasskeyEnabled'],
-      });
       zeroizeAfterSubmission();
-      toastRef.current?.showToast();
+      showToast(`${passkeyTitle} is enabled.`);
       setOpenEnable(false);
       setUserValue(true);
-      setPassword(''); // Reset after success
+      setPassword('');
     },
   });
 
-  const removeTouchIdMutation = useMutation({
-    mutationFn: async () => {
-      await accountPublicRPCPort.request('removePasskey');
-    },
+  const removeTouchIdMutation = useRemovePasskey({
     onSuccess: () => {
-      walletPort.request('passkeyLoginDisabled');
-      queryClient.invalidateQueries({
-        queryKey: ['account/getPasskeyEnabled'],
-      });
       setOpenDisable(false);
       setUserValue(false);
     },
@@ -198,8 +161,6 @@ export function PasskeyItem() {
           </DrawerFooter>
         </DrawerContent>
       </Drawer>
-
-      <PopoverToast ref={toastRef}>{passkeyTitle} is enabled.</PopoverToast>
     </>
   );
 }

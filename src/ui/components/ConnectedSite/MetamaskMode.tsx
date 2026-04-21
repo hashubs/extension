@@ -1,6 +1,6 @@
 import { reloadActiveTab } from '@/shared/reloadActiveTab';
 import { WalletNameFlag } from '@/shared/types/wallet-name-flag';
-import { useWalletNameFlags } from '@/ui/hooks/request/internal/useWalletNameFlags';
+import { useWalletNameFlags } from '@/ui/hooks/request/internal/useWallet';
 import { Card, CardItem } from '@/ui/ui-kit';
 import MetamaskIcon from 'jsx:@/ui/assets/metamask.svg';
 import MetamaskDisabledIcon from 'jsx:@/ui/assets/metamask_disabled.svg';

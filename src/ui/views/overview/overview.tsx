@@ -3,7 +3,7 @@ import { formatFiat, formatFiatToParts } from '@/shared/units/format-fiat';
 import { FungibleListGroupedVirtual } from '@/ui/components/fungible/FungibleListGroupedVirtual';
 import { useDiscoveredTokens } from '@/ui/components/fungible/useDiscoveredTokens';
 import { useWalletPortfolioSummary } from '@/ui/hooks/request/external/use-wallet-portfolio-summary';
-import { useAddressParams } from '@/ui/hooks/request/internal/useAddressParams';
+import { useAddressParams } from '@/ui/hooks/request/internal/useWallet';
 import { useFiatConversion } from '@/ui/hooks/useFiatConversion';
 import { NeutralDecimals } from '@/ui/ui-kit';
 import { memo, useCallback, useMemo, useState } from 'react';

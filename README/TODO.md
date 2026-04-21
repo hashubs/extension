@@ -8,3 +8,5 @@
 4. Passkey belum di Test
 5. Animation belum semua di disable saat user pilih disable animation
 6. Merapihkan Query dan Mutation ke dalam folder terpisah
+
+7. InterpretationSecurityCheck.tsx Not Implement

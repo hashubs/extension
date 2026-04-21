@@ -1,6 +1,6 @@
 import type { AnyAddressAction } from '@/modules/ethereum/transactions/addressAction';
 import { Header } from '@/ui/components/header';
-import { useAddressParams } from '@/ui/hooks/request/internal/useAddressParams';
+import { useAddressParams } from '@/ui/hooks/request/internal/useWallet';
 import { useUnifiedActivity } from '@/ui/views/actions/useUnifiedActivity';
 import {
   useCallback,

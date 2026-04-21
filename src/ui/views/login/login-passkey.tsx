@@ -1,13 +1,10 @@
-import { getPasskeyTitle, getPasswordWithPasskey } from '@/modules/passkey';
-import { accountPublicRPCPort } from '@/shared/channel';
-import { invariant } from '@/shared/invariant';
+import { getPasskeyTitle } from '@/modules/passkey';
 import { PublicUser } from '@/shared/types/User';
 import {
-  PopoverToast,
-  PopoverToastHandle,
-} from '@/ui/components/toast/PopoverToast';
+  getPasskeyEnabled,
+  usePasskeyLogin,
+} from '@/ui/hooks/request/internal/usePasskey';
 import { Button } from '@/ui/ui-kit';
-import { useMutation, useQuery } from '@tanstack/react-query';
 import { useEffect, useRef } from 'react';
 import { LuFingerprint, LuLoader } from 'react-icons/lu';
 import { useNavigationType } from 'react-router-dom';
@@ -19,29 +16,16 @@ export function LoginPasskey({
   user: PublicUser | undefined;
   onSuccess: () => void;
 }) {
-  const toastPasskeyNotEnabledRef = useRef<PopoverToastHandle>(null);
+  const defaultValueQuery = getPasskeyEnabled();
 
-  const defaultValueQuery = useQuery({
-    queryKey: ['account/getPasskeyEnabled'],
-    queryFn: () => {
-      return accountPublicRPCPort.request('getPasskeyEnabled');
-    },
-  });
+  const passkeyEnabled = defaultValueQuery.data;
 
-  const loginMutation = useMutation({
-    mutationFn: async () => {
-      if (!passkeyEnabled) {
-        toastPasskeyNotEnabledRef.current?.showToast();
-        return;
-      }
-      invariant(user, 'user is required');
-      const password = await getPasswordWithPasskey();
-      return accountPublicRPCPort.request('login', { user, password });
-    },
+  const { mutation: loginMutation } = usePasskeyLogin({
+    user,
+    passkeyEnabled,
     onSuccess,
   });
 
-  const passkeyEnabled = defaultValueQuery.data;
   const navigationType = useNavigationType();
   const autologinRef = useRef(false);
   const passkeyTitle = getPasskeyTitle();
@@ -88,10 +72,6 @@ export function LoginPasskey({
             : 'Authentication failed. Please try again.'}
         </p>
       )}
-
-      <PopoverToast ref={toastPasskeyNotEnabledRef}>
-        Passkey is not enabled
-      </PopoverToast>
     </>
   );
 }
