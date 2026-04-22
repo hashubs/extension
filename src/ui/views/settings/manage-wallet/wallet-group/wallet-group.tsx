@@ -20,7 +20,7 @@ import { getGroupDisplayName } from '@/ui/components/wallet/WalletDisplayName/ge
 import {
   QUERY_WALLET,
   useWalletGroupByGroupId,
-  useWalletGroupsByGroupId,
+  useWalletGroups,
 } from '@/ui/hooks/request/internal/useWallet';
 import { useDebouncedCallback } from '@/ui/hooks/useDebouncedCallback';
 import { useFiatConversion } from '@/ui/hooks/useFiatConversion';
@@ -182,13 +182,13 @@ export function WalletGroupView() {
     groupId,
   });
 
+  const { data: allGroups } = useWalletGroups();
+
   const groupInputId = useId();
-  const { data: allGroups, refetch } = useWalletGroupsByGroupId();
 
   const removeWalletGroupMutation = useMutation({
     mutationFn: () => walletPort.request('removeWalletGroup', { groupId }),
     onSuccess() {
-      refetch();
       navigate('/settings/manage-wallets');
       showToast('Remove wallet group successfully');
       queryClient.invalidateQueries({
@@ -213,8 +213,8 @@ export function WalletGroupView() {
     );
   }
 
-  const handleRemoveGroup = () => {
-    removeWalletGroupMutation.mutate();
+  const handleRemoveGroup = async () => {
+    await removeWalletGroupMutation.mutateAsync();
     setRemoveGroupOpen(false);
   };
 
@@ -223,6 +223,8 @@ export function WalletGroupView() {
   const isMnemonicGroup = isMnemonicContainer(walletContainer);
   const isHardwareGroup = isHardwareContainer(walletContainer);
 
+  const isLastGroup = allGroups ? allGroups.length <= 1 : true;
+
   const items: ItemType[] = [
     {
       label: 'Add New Wallet',
@@ -230,7 +232,7 @@ export function WalletGroupView() {
       iconRight: LuChevronRight,
       onClick: () =>
         navigate(
-          `/settings/manage-wallets/add/import/mnemonic?groupId=${walletGroup.id}`
+          `/settings/manage-wallets/import/mnemonic?groupId=${walletGroup.id}`
         ),
     },
     isSignerGroup
@@ -249,9 +251,9 @@ export function WalletGroupView() {
       label: 'Remove Group',
       icon: LuTrash,
       variant: 'danger',
-      disabled: allGroups ? allGroups.length <= 1 : true,
+      disabled: isLastGroup,
       onClick: () => {
-        if (allGroups && allGroups.length <= 1) return;
+        if (isLastGroup) return;
         setRemoveGroupOpen(true);
       },
     },

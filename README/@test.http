@@ -124,11 +124,11 @@ Content-Type: application/json
 }
 
 ### Activity Transactions - with actionTypes filter
-POST {{host}}/wallet/portfolio/pnl
+POST {{host}}/wallet/portfolio/values
 Content-Type: application/json
 
 {
-  "addresses": ["0x60e39ead71123e5f7c8470f2aa83effb90fcb8d1"],
+  "addresses": ["0x60e39ead71123e5f7c8470f2aa83effb90fcb8d1", "0x1b10845bd3bfd221ccb679a963b76cb1264cfc88"],
   "currency": "usd",
   "mode": "mainnet"
 }

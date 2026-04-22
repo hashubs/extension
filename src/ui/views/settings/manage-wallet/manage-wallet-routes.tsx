@@ -1,4 +1,6 @@
+import { WithPasswordSession } from '@/ui/components/verify-user/WithPasswordSession';
 import { Route, Routes } from 'react-router-dom';
+
 import { EcosystemSelectView } from './create-wallet/ecosystem-select';
 import { GenerateWalletView } from './create-wallet/generate-wallet';
 import { NewWalletExistingView } from './create-wallet/new-wallet-existing';
@@ -8,12 +10,14 @@ import { ManageWalletView } from './manage-wallet';
 import { WalletAccountView } from './wallet-account';
 import { WalletGroupView } from './wallet-group';
 
+import { ImportWalletRoutes } from './import-wallet';
+
 export function ManageWalletsRoutes() {
   return (
     <Routes>
       <Route index element={<ManageWalletView />} />
-      <Route path="/groups/:groupId" element={<WalletGroupView />} />
-      <Route path="/accounts/:address" element={<WalletAccountView />} />
+      <Route path="groups/:groupId" element={<WalletGroupView />} />
+      <Route path="accounts/:address" element={<WalletAccountView />} />
 
       <Route path="add">
         <Route index element={<NewWalletOptionView />} />
@@ -21,9 +25,21 @@ export function ManageWalletsRoutes() {
         <Route path="select-group" element={<WalletGroupSelectView />} />
         <Route path="select-ecosystem">
           <Route index element={<EcosystemSelectView />} />
-          <Route path="generate" element={<GenerateWalletView />} />
+          <Route
+            path="generate"
+            element={
+              <WithPasswordSession
+                text="Your password is required to securely access your recovery phrase."
+                buttonTitle="Continue"
+              >
+                <GenerateWalletView />
+              </WithPasswordSession>
+            }
+          />
         </Route>
       </Route>
+
+      <Route path="import/*" element={<ImportWalletRoutes />} />
     </Routes>
   );
 }

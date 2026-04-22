@@ -7,6 +7,7 @@ export * from './drawer';
 export * from './input/input';
 export * from './media-fallback';
 export * from './popover';
+export * from './select';
 export * from './sheet';
 export * from './tabs';
 

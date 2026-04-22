@@ -154,8 +154,8 @@ export function WalletAccountView() {
 
   const nameInputId = useId();
 
-  const handleRemoveAddress = () => {
-    removeAddressMutation.mutate();
+  const handleRemoveAddress = async () => {
+    await removeAddressMutation.mutateAsync();
     setOpenConfirm(false);
   };
 

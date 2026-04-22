@@ -4,7 +4,7 @@ import { zeroizeAfterSubmission } from '@/shared/zeroize-submission';
 import { useGetExistingUser } from '@/ui/hooks/request/internal/useAccount';
 import { Button, Input } from '@/ui/ui-kit';
 import { useMutation } from '@tanstack/react-query';
-import React, { useId, useRef } from 'react';
+import React, { useId, useRef, useState } from 'react';
 
 export function VerifyUser({
   text,
@@ -28,6 +28,7 @@ export function VerifyUser({
 
   const inputId = useId();
   const passwordRef = useRef<HTMLInputElement>(null);
+  const [isEmpty, setIsEmpty] = useState(true);
 
   const handleSubmit = () => {
     const password = passwordRef.current?.value;
@@ -51,6 +52,7 @@ export function VerifyUser({
           placeholder="Enter password"
           size="md"
           isError={!!loginMutation.error}
+          onChange={(e) => setIsEmpty(e.target.value === '')}
           onKeyDown={(e) => e.key === 'Enter' && handleSubmit()}
         />
         {loginMutation.error && (
@@ -62,7 +64,7 @@ export function VerifyUser({
       <Button
         variant="primary"
         size="md"
-        disabled={loginMutation.isPending}
+        disabled={isEmpty || loginMutation.isPending}
         loading={loginMutation.isPending}
         loadingText="Checking..."
         className="mt-auto"

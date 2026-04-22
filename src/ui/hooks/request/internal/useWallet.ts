@@ -251,7 +251,9 @@ export function useWalletGroupByGroupId({ groupId }: { groupId: string }) {
   });
 }
 
-export function useWalletGroupsByGroupId(options: { enabled?: boolean } = {}) {
+export function useWalletGroupsWithTestAddressCheck(
+  options: { enabled?: boolean } = {}
+) {
   const onSuccess = useEvent((groups: WalletGroup[] | null) => {
     requestIdleCallback(() => {
       checkForTestAddress(groups);

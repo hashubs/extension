@@ -48,7 +48,7 @@ export function Processing({ title, description }: Props) {
   });
 
   return (
-    <div className="flex flex-1 min-h-0 items-center justify-center">
+    <div className="flex flex-1 h-full min-h-0 items-center justify-center">
       <div className="flex flex-col items-center gap-5 text-center p-8">
         <div className="relative w-20 h-20 flex items-center justify-center">
           <RadarPulse delay={0} />

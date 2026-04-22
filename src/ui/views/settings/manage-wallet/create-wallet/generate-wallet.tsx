@@ -5,15 +5,14 @@ import { queryClient } from '@/shared/query-client/queryClient';
 import { setCurrentAddress } from '@/shared/request/internal/setCurrentAddress';
 import { assertKnownEcosystems } from '@/shared/wallet/shared';
 import { Header } from '@/ui/components/header';
-import { WithPasswordSession } from '@/ui/components/verify-user/WithPasswordSession';
+import { QUERY_WALLET } from '@/ui/hooks/request/internal/useWallet';
 import { Button } from '@/ui/ui-kit';
 import { useMutation } from '@tanstack/react-query';
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { ImportBackground, ImportDecoration } from './components';
-import { QUERY_WALLET } from '@/ui/hooks/request/internal/useWallet';
+import { ImportBackground, ImportDecoration } from '../components';
 
-function GenerateWalletContent() {
+export function GenerateWalletView() {
   const navigate = useNavigate();
   const [params] = useSearchParams();
   const ecosystems = params.getAll('ecosystems');
@@ -125,16 +124,5 @@ function GenerateWalletContent() {
         )}
       </div>
     </div>
-  );
-}
-
-export function GenerateWalletView() {
-  return (
-    <WithPasswordSession
-      text="Your password is required to securely access your recovery phrase."
-      buttonTitle="Continue"
-    >
-      <GenerateWalletContent />
-    </WithPasswordSession>
   );
 }
