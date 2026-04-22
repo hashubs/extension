@@ -1,16 +1,18 @@
 import { accountPublicRPCPort, walletPort } from '@/shared/channel';
+import { getError } from '@/shared/errors/get-error';
 import { IdempotentRequest } from '@/shared/IdempotentRequest';
+import { queryClient } from '@/shared/query-client/queryClient';
 import { setCurrentAddress } from '@/shared/request/internal/setCurrentAddress';
 import { MaskedBareWallet } from '@/shared/types/bare-wallet';
 import { useRenderDelay } from '@/ui/components/DelayedRender/DelayedRender';
 import { Header } from '@/ui/components/header';
+import { QUERY_WALLET } from '@/ui/hooks/request/internal/useWallet';
 import { Button } from '@/ui/ui-kit';
 import { useMutation } from '@tanstack/react-query';
 import { isTruthy } from 'is-truthy-ts';
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ImportBackground, ImportDecoration } from '../../../components';
-import { getError } from '@/shared/errors/get-error';
 
 export function OnMount({
   children,
@@ -28,11 +30,12 @@ const ANIMATION_DURATION = 1500;
 
 export function AddressImportMessages({
   values,
+  groupId,
 }: {
   values: MaskedBareWallet[];
+  groupId: string | null;
 }) {
   const navigate = useNavigate();
-
   const ready = useRenderDelay(ANIMATION_DURATION);
   const buttonFocusReady = useRenderDelay(ANIMATION_DURATION + 300);
   const [idempotentRequest] = useState(() => new IdempotentRequest());
@@ -53,6 +56,9 @@ export function AddressImportMessages({
         }
       });
     },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: QUERY_WALLET.walletGroups });
+    },
   });
 
   useEffect(() => {
@@ -72,22 +78,34 @@ export function AddressImportMessages({
     }
   }, [buttonFocusReady]);
 
+  const successImport = ready && isSuccess;
+
   return (
     <div className="flex flex-col h-full bg-background relative overflow-hidden">
       <Header
-        title={ready ? 'Wallet Created' : 'Generating...'}
-        onBack={() => {}}
+        title={
+          finalizeMutation.isPending
+            ? 'Importing...'
+            : isSuccess
+            ? 'Successfully Created!'
+            : 'Generating...'
+        }
+        onBack={() =>
+          navigate(`/settings/manage-wallets/groups/${groupId}`, {
+            state: { direction: 'back' },
+          })
+        }
       />
 
       <div className="flex-1 p-4 relative flex flex-col items-center">
         <div className="absolute inset-0 pointer-events-none">
-          <ImportBackground animate={!ready} />
+          <ImportBackground animate={!successImport} />
         </div>
 
         <div className="flex-1 w-full z-10">
           <ImportDecoration
             wallets={values}
-            isLoading={!values}
+            isLoading={!successImport}
             loadingTitle="Importing wallets"
           />
         </div>
@@ -98,7 +116,7 @@ export function AddressImportMessages({
           </div>
         ) : null}
 
-        {ready && isSuccess && (
+        {successImport && (
           <div className="mt-auto w-full space-y-4 z-10 animate-in slide-in-from-bottom-4 duration-700">
             <div className="text-center space-y-1">
               <h2 className="text-xl font-bold">Successfully Created!</h2>
@@ -110,11 +128,11 @@ export function AddressImportMessages({
             <Button
               size="md"
               variant="primary"
-              onClick={() =>
+              onClick={() => {
                 navigate('/overview', {
                   state: { direction: 'back' },
-                })
-              }
+                });
+              }}
             >
               View Wallets
             </Button>

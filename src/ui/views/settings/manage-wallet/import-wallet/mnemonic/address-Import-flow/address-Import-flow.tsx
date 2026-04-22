@@ -31,7 +31,7 @@ import {
 } from '@/ui/ui-kit';
 import { useVirtualizer } from '@tanstack/react-virtual';
 import groupBy from 'lodash/groupBy';
-import { useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { SiEthereum, SiSolana } from 'react-icons/si';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { AddressImportMessages } from './address-import-messages';
@@ -169,7 +169,7 @@ function VirtualizedWalletList({
   );
 }
 
-export function SelectMoreWalletsDialog({
+function SelectMoreWalletsDialog({
   isOpen,
   onOpenChange,
   wallets,
@@ -308,16 +308,16 @@ export function SelectMoreWalletsDialog({
 
 function AddressImportList({
   wallets,
+  groupId,
   activeWallets,
   onSubmit,
 }: {
   wallets: DerivedWallets;
+  groupId: string | null;
   activeWallets: Record<string, { totalValue?: number }>;
   onSubmit: (values: MaskedBareWallet[]) => void;
 }) {
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
-  const groupId = searchParams.get('groupId');
 
   const { convertUsdToFiat, defaultCurrency } = useFiatConversion();
   const existingAddresses = useAllExistingMnemonicAddresses();
@@ -351,7 +351,6 @@ function AddressImportList({
     );
     const allByAddress = new Map(allWallets.map((w) => [w.address, w]));
 
-    // Visible addresses = suggested addresses + currently selected addresses
     const visibleAddresses = new Set([
       ...suggestedAddresses,
       ...selectedAddresses,
@@ -370,10 +369,28 @@ function AddressImportList({
     ];
   }, [suggestedWallets, selectedAddresses, wallets]);
 
+  useEffect(() => {
+    setSelectedAddresses((prev) => {
+      const next = new Set(prev);
+      let changed = false;
+      for (const addr of next) {
+        if (existingAddressesSet.has(normalizeAddress(addr))) {
+          next.delete(addr);
+          changed = true;
+        }
+      }
+      return changed ? next : prev;
+    });
+  }, [existingAddressesSet]);
+
   const handleSelect = (selectedValues: Set<string>) => {
     const selectedWallets = wallets
       .flatMap((c) => c.wallets)
-      .filter((wallet) => selectedValues.has(wallet.address));
+      .filter(
+        (wallet) =>
+          selectedValues.has(wallet.address) &&
+          !existingAddressesSet.has(normalizeAddress(wallet.address))
+      );
     onSubmit(selectedWallets);
   };
 
@@ -526,13 +543,17 @@ export function AddressImportFlow({
   wallets: DerivedWallets;
   activeWallets: Record<string, { totalValue?: number }>;
 }) {
+  const [searchParams] = useSearchParams();
+  const groupId = searchParams.get('groupId');
+
   const [valuesToImport, setValuesToImport] = useState<MaskedBareWallet[]>();
 
   return valuesToImport ? (
-    <AddressImportMessages values={valuesToImport} />
+    <AddressImportMessages values={valuesToImport} groupId={groupId} />
   ) : (
     <AddressImportList
       wallets={wallets}
+      groupId={groupId}
       activeWallets={activeWallets}
       onSubmit={(values) => setValuesToImport(values)}
     />

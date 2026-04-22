@@ -74,17 +74,10 @@ export function ImportDecoration({ wallets, isLoading, loadingTitle }: Props) {
             <h3 className="text-lg text-center">
               Your {wallets.length > 1 ? 'wallets' : 'wallet'} are ready
             </h3>
-            <div className="flex flex-col gap-2 w-full">
-              {wallets.slice(0, 3).map((w, i) => (
+            <div className="flex flex-col gap-2 w-full max-h-[220px] overflow-y-auto no-scrollbar py-0.5">
+              {wallets.map((w, i) => (
                 <WalletItem key={w.address || i} wallet={w} />
               ))}
-              {wallets.length > 3 && (
-                <div className="text-center py-1">
-                  <span className="text-xs text-muted-foreground font-medium">
-                    +{wallets.length - 3} more accounts
-                  </span>
-                </div>
-              )}
             </div>
           </div>
         </animated.div>
