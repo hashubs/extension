@@ -38,7 +38,7 @@ export function NewWalletExistingView() {
       <Header
         title="Add Existing Wallet"
         onBack={() =>
-          navigate('/settings/manage-wallets/add', {
+          navigate('/settings/manage-wallets/create-wallet', {
             state: { direction: 'back' },
           })
         }

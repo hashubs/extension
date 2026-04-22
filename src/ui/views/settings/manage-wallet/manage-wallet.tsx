@@ -65,7 +65,7 @@ function AddWalletOptions() {
       icon: IoAddOutline,
       label: 'Create New Wallet',
       onClick: () => {
-        navigate('add');
+        navigate('create-wallet');
       },
       iconClassName: 'text-lime-500 bg-lime-500/10',
       iconRight: LuChevronRight,

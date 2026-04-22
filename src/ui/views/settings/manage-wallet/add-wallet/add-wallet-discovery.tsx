@@ -1,4 +1,5 @@
 import { isEthereumAddress } from '@/shared/is-ethereum-address';
+import { isSessionExpiredError } from '@/shared/isSessionExpiredError';
 import { normalizeAddress } from '@/shared/normalize-address';
 import { MaskedBareWallet } from '@/shared/types/bare-wallet';
 import { formatFiat } from '@/shared/units/format-fiat';
@@ -6,8 +7,10 @@ import { BlockieAddress } from '@/ui/components/Blockie';
 import { Header } from '@/ui/components/header';
 import {
   DerivedWallets,
+  prepareWalletsToImport,
   suggestInitialWallets,
 } from '@/ui/components/ImportWallet/Mnemonic/helpers';
+import { usePortfolioValues } from '@/ui/hooks/request/external/usePortfolioValues';
 import { useAllExistingMnemonicAddresses } from '@/ui/hooks/request/internal/useWallet';
 import { useFiatConversion } from '@/ui/hooks/useFiatConversion';
 import { useToggledValues } from '@/ui/hooks/useToggledValues';
@@ -29,12 +32,14 @@ import {
   TabsList,
   TabsTrigger,
 } from '@/ui/ui-kit';
+import { useQuery } from '@tanstack/react-query';
 import { useVirtualizer } from '@tanstack/react-virtual';
 import groupBy from 'lodash/groupBy';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { SiEthereum, SiSolana } from 'react-icons/si';
-import { useNavigate, useSearchParams } from 'react-router-dom';
-import { AddressImportMessages } from './address-import-messages';
+
+import { MemoryLocationState } from './memoryLocationState';
+import { useMnenomicPhraseForLocation } from './useMnemonicLocal';
 
 const ECOSYSTEM_META = {
   evm: {
@@ -306,30 +311,34 @@ function SelectMoreWalletsDialog({
   );
 }
 
-function AddressImportList({
+function AddWalletDiscoveryContent({
   wallets,
-  groupId,
   activeWallets,
-  onSubmit,
+  onBack,
+  onSuccess,
 }: {
   wallets: DerivedWallets;
-  groupId: string | null;
   activeWallets: Record<string, { totalValue?: number }>;
-  onSubmit: (values: MaskedBareWallet[]) => void;
+  onBack: () => void;
+  onSuccess: (selectedWallets: MaskedBareWallet[]) => void;
 }) {
-  const navigate = useNavigate();
-
   const { convertUsdToFiat, defaultCurrency } = useFiatConversion();
   const existingAddresses = useAllExistingMnemonicAddresses();
   const existingAddressesSet = useMemo(
     () => new Set(existingAddresses),
     [existingAddresses]
   );
+
   const suggestedWallets = useMemo(
     () =>
-      suggestInitialWallets({ wallets, activeWallets, existingAddressesSet }),
+      suggestInitialWallets({
+        wallets,
+        activeWallets: activeWallets || {},
+        existingAddressesSet,
+      }),
     [activeWallets, existingAddressesSet, wallets]
   );
+
   const [selectedAddresses, setSelectedAddresses] = useState<Set<string>>(
     () => {
       return new Set(
@@ -339,6 +348,20 @@ function AddressImportList({
       );
     }
   );
+
+  useEffect(() => {
+    setSelectedAddresses((prev) => {
+      const next = new Set(prev);
+      let changed = false;
+      for (const addr of next) {
+        if (existingAddressesSet.has(normalizeAddress(addr))) {
+          next.delete(addr);
+          changed = true;
+        }
+      }
+      return changed ? next : prev;
+    });
+  }, [existingAddressesSet]);
 
   const [isSheetOpen, setIsSheetOpen] = useState(false);
 
@@ -369,20 +392,6 @@ function AddressImportList({
     ];
   }, [suggestedWallets, selectedAddresses, wallets]);
 
-  useEffect(() => {
-    setSelectedAddresses((prev) => {
-      const next = new Set(prev);
-      let changed = false;
-      for (const addr of next) {
-        if (existingAddressesSet.has(normalizeAddress(addr))) {
-          next.delete(addr);
-          changed = true;
-        }
-      }
-      return changed ? next : prev;
-    });
-  }, [existingAddressesSet]);
-
   const handleSelect = (selectedValues: Set<string>) => {
     const selectedWallets = wallets
       .flatMap((c) => c.wallets)
@@ -391,7 +400,8 @@ function AddressImportList({
           selectedValues.has(wallet.address) &&
           !existingAddressesSet.has(normalizeAddress(wallet.address))
       );
-    onSubmit(selectedWallets);
+
+    onSuccess(selectedWallets);
   };
 
   const getValueAddress = (address: string) => {
@@ -404,14 +414,7 @@ function AddressImportList({
 
   return (
     <div className="flex flex-col h-full bg-background overflow-hidden">
-      <Header
-        title="Wallets Ready to Import"
-        onBack={() =>
-          navigate(`/settings/manage-wallets/groups/${groupId}`, {
-            state: { direction: 'back' },
-          })
-        }
-      />
+      <Header title="Wallets Ready to Import" onBack={onBack} />
 
       <div className="flex-1 flex flex-col p-4 pt-0 space-y-4 no-scrollbar overflow-y-auto">
         <div className="text-center space-y-1">
@@ -475,11 +478,9 @@ function AddressImportList({
                             : () => {
                                 setSelectedAddresses((prev) => {
                                   const next = new Set(prev);
-                                  if (next.has(wallet.address)) {
+                                  if (next.has(wallet.address))
                                     next.delete(wallet.address);
-                                  } else {
-                                    next.add(wallet.address);
-                                  }
+                                  else next.add(wallet.address);
                                   return next;
                                 });
                               },
@@ -509,13 +510,12 @@ function AddressImportList({
           >
             Select Another Wallet
           </Button>
-
           <Button
             variant="primary"
             disabled={selectedAddresses.size === 0}
             onClick={() => handleSelect(selectedAddresses)}
           >
-            Continue
+            Continue{' '}
             {selectedAddresses.size ? ` (${selectedAddresses.size})` : ''}
           </Button>
         </div>
@@ -526,36 +526,74 @@ function AddressImportList({
         onOpenChange={setIsSheetOpen}
         initialValues={selectedAddresses}
         wallets={wallets}
-        activeWallets={activeWallets}
+        activeWallets={activeWallets || {}}
         existingAddressesSet={existingAddressesSet}
-        onSubmit={(newValues) => {
-          setSelectedAddresses(new Set(newValues));
-        }}
+        onSubmit={(v) => setSelectedAddresses(new Set(v))}
       />
     </div>
   );
 }
 
-export function AddressImportFlow({
-  wallets,
-  activeWallets,
+export function AddWalletDiscoveryView({
+  locationStateStore,
+  onBack,
+  onSuccess,
+  onSessionExpired,
 }: {
-  wallets: DerivedWallets;
-  activeWallets: Record<string, { totalValue?: number }>;
+  locationStateStore: MemoryLocationState;
+  onBack: () => void;
+  onSuccess: (selectedWallets: MaskedBareWallet[]) => void;
+  onSessionExpired: () => void;
 }) {
-  const [searchParams] = useSearchParams();
-  const groupId = searchParams.get('groupId');
+  const {
+    phrase,
+    isLoading: isLoadingPhrase,
+    isError: isErrorPhrase,
+    error: errorPhrase,
+  } = useMnenomicPhraseForLocation({
+    locationStateStore,
+  });
 
-  const [valuesToImport, setValuesToImport] = useState<MaskedBareWallet[]>();
+  const {
+    data: scanData,
+    isLoading: isLoadingScan,
+    isError: isErrorScan,
+    error: errorScan,
+  } = useQuery({
+    queryKey: ['prepareWalletsToImport', phrase],
+    queryFn: async () => {
+      if (!phrase) return;
+      return prepareWalletsToImport(phrase);
+    },
+    enabled: Boolean(phrase),
+  });
 
-  return valuesToImport ? (
-    <AddressImportMessages values={valuesToImport} groupId={groupId} />
-  ) : (
-    <AddressImportList
+  useEffect(() => {
+    if (
+      (isErrorPhrase && isSessionExpiredError(errorPhrase)) ||
+      (isErrorScan && isSessionExpiredError(errorScan))
+    ) {
+      onSessionExpired();
+    }
+  }, [isErrorPhrase, errorPhrase, isErrorScan, errorScan, onSessionExpired]);
+
+  const { data: activeWallets, isLoading: isLoadingPortfolio } =
+    usePortfolioValues(scanData?.addressesToCheck || []);
+
+  const wallets = scanData?.derivedWallets;
+
+  if (isLoadingPhrase || isLoadingScan || isLoadingPortfolio || !wallets) {
+    // Return null or a simple placeholder while loading
+    // The previous ScanView already showed a processing state
+    return null;
+  }
+
+  return (
+    <AddWalletDiscoveryContent
       wallets={wallets}
-      groupId={groupId}
-      activeWallets={activeWallets}
-      onSubmit={(values) => setValuesToImport(values)}
+      activeWallets={activeWallets || {}}
+      onBack={onBack}
+      onSuccess={onSuccess}
     />
   );
 }

@@ -5,6 +5,7 @@ import { useGetExistingUser } from '@/ui/hooks/request/internal/useAccount';
 import { Button, Input } from '@/ui/ui-kit';
 import { useMutation } from '@tanstack/react-query';
 import React, { useId, useRef, useState } from 'react';
+import { Header } from '../header';
 
 export function VerifyUser({
   text,
@@ -72,6 +73,26 @@ export function VerifyUser({
       >
         {buttonTitle}
       </Button>
+    </div>
+  );
+}
+
+export function VerifyUserView({
+  onBack,
+  text,
+  buttonTitle,
+  onSuccess,
+}: {
+  onBack: () => void;
+  text: string;
+  buttonTitle: string;
+  onSuccess: () => void;
+}) {
+  return (
+    <div className="flex flex-col h-full">
+      <Header title="Enter Password" onBack={onBack} />
+
+      <VerifyUser text={text} buttonTitle={buttonTitle} onSuccess={onSuccess} />
     </div>
   );
 }

@@ -75,7 +75,7 @@ export function GenerateWalletView() {
         state: { direction: 'back' },
       });
     } else {
-      navigate('/settings/manage-wallets/add', {
+      navigate('/settings/manage-wallets/create-wallet', {
         state: { direction: 'back' },
       });
     }

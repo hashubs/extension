@@ -11,31 +11,23 @@ import { Button } from '@/ui/ui-kit';
 import { useMutation } from '@tanstack/react-query';
 import { isTruthy } from 'is-truthy-ts';
 import { useEffect, useRef, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { ImportBackground, ImportDecoration } from '../../../components';
-
-export function OnMount({
-  children,
-  onMount,
-}: React.PropsWithChildren<{ onMount: () => void }>) {
-  const onMountRef = useRef(onMount);
-  onMountRef.current = onMount;
-  useEffect(() => {
-    onMountRef.current();
-  }, []);
-  return children as JSX.Element;
-}
+import { useLocation } from 'react-router-dom';
+import { ImportBackground, ImportDecoration } from '../components';
 
 const ANIMATION_DURATION = 1500;
 
-export function AddressImportMessages({
-  values,
-  groupId,
+export function AddWalletSuccessView({
+  onBack,
+  onSessionExpired,
+  onSuccess,
 }: {
-  values: MaskedBareWallet[];
-  groupId: string | null;
+  onBack: () => void;
+  onSessionExpired: () => void;
+  onSuccess: () => void;
 }) {
-  const navigate = useNavigate();
+  const location = useLocation();
+  const values = (location.state?.values || []) as MaskedBareWallet[];
+
   const ready = useRenderDelay(ANIMATION_DURATION);
   const buttonFocusReady = useRenderDelay(ANIMATION_DURATION + 300);
   const [idempotentRequest] = useState(() => new IdempotentRequest());
@@ -43,7 +35,9 @@ export function AddressImportMessages({
   const {
     mutate: finalize,
     isSuccess,
-    ...finalizeMutation
+    isPending,
+    isError,
+    error,
   } = useMutation({
     mutationFn: async (
       mnemonics: NonNullable<MaskedBareWallet['mnemonic']>[]
@@ -62,7 +56,13 @@ export function AddressImportMessages({
   });
 
   useEffect(() => {
-    if (ready) {
+    if (values.length === 0) {
+      onSessionExpired();
+    }
+  }, [onSessionExpired, values.length]);
+
+  useEffect(() => {
+    if (ready && values.length > 0) {
       const mnemonics = values
         .map((wallet) => wallet.mnemonic)
         .filter(isTruthy);
@@ -71,7 +71,7 @@ export function AddressImportMessages({
     }
   }, [finalize, ready, values]);
 
-  const autoFocusRef = useRef<HTMLAnchorElement | null>(null);
+  const autoFocusRef = useRef<HTMLButtonElement | null>(null);
   useEffect(() => {
     if (buttonFocusReady) {
       autoFocusRef.current?.focus();
@@ -84,17 +84,13 @@ export function AddressImportMessages({
     <div className="flex flex-col h-full bg-background relative overflow-hidden">
       <Header
         title={
-          finalizeMutation.isPending
+          isPending
             ? 'Importing...'
             : isSuccess
             ? 'Successfully Created!'
             : 'Generating...'
         }
-        onBack={() =>
-          navigate(`/settings/manage-wallets/groups/${groupId}`, {
-            state: { direction: 'back' },
-          })
-        }
+        onBack={onBack}
       />
 
       <div className="flex-1 p-4 relative flex flex-col items-center">
@@ -110,9 +106,9 @@ export function AddressImportMessages({
           />
         </div>
 
-        {finalizeMutation.isError ? (
-          <div className="text-sm text-destructive text-center">
-            {getError(finalizeMutation.error).message}
+        {isError ? (
+          <div className="text-sm text-destructive text-center z-10">
+            {getError(error).message}
           </div>
         ) : null}
 
@@ -126,13 +122,10 @@ export function AddressImportMessages({
             </div>
 
             <Button
+              ref={autoFocusRef}
               size="md"
               variant="primary"
-              onClick={() => {
-                navigate('/overview', {
-                  state: { direction: 'back' },
-                });
-              }}
+              onClick={onSuccess}
             >
               View Wallets
             </Button>

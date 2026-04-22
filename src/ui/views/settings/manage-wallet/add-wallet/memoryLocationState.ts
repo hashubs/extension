@@ -1,7 +1,7 @@
 /**
  * This module is a precaution. Normally, we'd use location state
  * or searchParams for routes like
- * '/settings/manage-wallet/import/mnemonic' and '/settings/manage-wallet/import/private-key',
+ * '/settings/manage-wallet/add-wallet/mnemonic' and '/settings/manage-wallet/add-wallet/private-key',
  * but storing privateKey or a mnemonic in browser history seems
  * to be unsafe. Instead, we're creating a simple in-memory store
  * which serves the same purpose as location state.

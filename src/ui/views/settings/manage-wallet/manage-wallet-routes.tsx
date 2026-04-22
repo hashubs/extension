@@ -10,7 +10,8 @@ import { ManageWalletView } from './manage-wallet';
 import { WalletAccountView } from './wallet-account';
 import { WalletGroupView } from './wallet-group';
 
-import { ImportWalletRoutes } from './import-wallet';
+import { AddWalletRoutes } from './add-wallet';
+import { BackupWalletRoutes } from './backup-wallet';
 
 export function ManageWalletsRoutes() {
   return (
@@ -19,7 +20,7 @@ export function ManageWalletsRoutes() {
       <Route path="groups/:groupId" element={<WalletGroupView />} />
       <Route path="accounts/:address" element={<WalletAccountView />} />
 
-      <Route path="add">
+      <Route path="create-wallet">
         <Route index element={<NewWalletOptionView />} />
         <Route path="existing" element={<NewWalletExistingView />} />
         <Route path="select-group" element={<WalletGroupSelectView />} />
@@ -39,7 +40,8 @@ export function ManageWalletsRoutes() {
         </Route>
       </Route>
 
-      <Route path="import/*" element={<ImportWalletRoutes />} />
+      <Route path="add-wallet/*" element={<AddWalletRoutes />} />
+      <Route path="backup/*" element={<BackupWalletRoutes />} />
     </Routes>
   );
 }

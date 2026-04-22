@@ -25,7 +25,7 @@ export function WalletGroupSelectView() {
     <div className="flex flex-col h-full">
       <Header
         title="Select Wallet Group"
-        onBack={() => navigate('/settings/manage-wallets/add')}
+        onBack={() => navigate('/settings/manage-wallets/create-wallet')}
       />
 
       <div className="flex-1 p-4 pt-0 space-y-4 no-scrollbar overflow-y-auto">
@@ -46,7 +46,9 @@ export function WalletGroupSelectView() {
                   size="sm"
                   onClick={(e) => {
                     e.stopPropagation();
-                    navigate(`../import/mnemonic?groupId=${group.id}`);
+                    navigate(
+                      `/settings/manage-wallets/add-wallet?groupId=${group.id}`
+                    );
                   }}
                 >
                   Add New Wallet

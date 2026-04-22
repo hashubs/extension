@@ -68,7 +68,7 @@ export function EcosystemSelectView() {
       <Header
         title="Select Ecosystem"
         onBack={() =>
-          navigate('/settings/manage-wallets/add/select-group', {
+          navigate('/settings/manage-wallets/create-wallet/select-group', {
             state: { direction: 'back' },
           })
         }

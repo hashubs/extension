@@ -10,7 +10,7 @@ import {
 import { WalletGroup } from '@/shared/types/wallet-group';
 import { formatFiatToParts } from '@/shared/units/format-fiat';
 import { BLOCKCHAIN_TYPES } from '@/shared/wallet/classifiers';
-import { BackupInfoNote } from '@/ui/components/BackupInfoNote';
+import { BackupInfoNote, needsBackup } from '@/ui/components/BackupInfoNote';
 import { BlockieAddress } from '@/ui/components/Blockie';
 import { ConfirmationSheet } from '@/ui/components/Confirmation/confirmation-sheet';
 import { Header } from '@/ui/components/header';
@@ -225,6 +225,8 @@ export function WalletGroupView() {
 
   const isLastGroup = allGroups ? allGroups.length <= 1 : true;
 
+  const needsBackupQuery = needsBackup(walletGroup);
+
   const items: ItemType[] = [
     {
       label: 'Add New Wallet',
@@ -232,7 +234,8 @@ export function WalletGroupView() {
       iconRight: LuChevronRight,
       onClick: () =>
         navigate(
-          `/settings/manage-wallets/import/mnemonic?groupId=${walletGroup.id}`
+          `/settings/manage-wallets/add-wallet?groupId=${walletGroup.id}`,
+          { state: { direction: 'forward' } }
         ),
     },
     isSignerGroup
@@ -241,10 +244,13 @@ export function WalletGroupView() {
           icon: LuKey,
           iconRight: LuChevronRight,
           subLabelElement: <BackupInfoNote group={walletGroup} />,
-          onClick: () =>
+          onClick: () => {
+            const params = new URLSearchParams({ groupId: walletGroup.id });
+            if (needsBackupQuery) params.set('needsBackup', 'true');
             navigate(
-              `/settings/manage-wallets/recovery-phrase/${walletGroup.id}`
-            ),
+              `/settings/manage-wallets/backup/verify-user?${params.toString()}`
+            );
+          },
         }
       : null,
     {
