@@ -3,16 +3,22 @@ import { invariant } from '@/shared/invariant';
 import { queryClient } from '@/shared/query-client/queryClient';
 import { useToastStore } from '@/shared/store/useToastStore';
 import { ExternallyOwnedAccount } from '@/shared/types/externally-owned-account';
-import { isBareWallet, isDeviceAccount } from '@/shared/types/validators';
+import {
+  ContainerType,
+  getContainerType,
+  isBareWallet,
+  isDeviceAccount,
+} from '@/shared/types/validators';
 import { formatFiatToParts } from '@/shared/units/format-fiat';
-import { BlockieAddress } from '@/ui/components/Blockie';
-import { ConfirmationSheet } from '@/ui/components/Confirmation/confirmation-sheet';
+import { BlockieAddress } from '@/ui/components/blockie';
+import { ConfirmationSheet } from '@/ui/components/confirmation';
 import { Header } from '@/ui/components/header';
 import { useProfileName } from '@/ui/hooks/request/internal/useProfileName';
 import {
   QUERY_WALLET,
   useWalletByAddress,
   useWalletGroupByGroupId,
+  useWalletGroups,
 } from '@/ui/hooks/request/internal/useWallet';
 import { useCopyToClipboard } from '@/ui/hooks/useCopyToClipboard';
 import { useDebouncedCallback } from '@/ui/hooks/useDebouncedCallback';
@@ -21,6 +27,7 @@ import { truncateAddress } from '@/ui/lib/utils';
 import { NeutralDecimals } from '@/ui/ui-kit';
 import { Card, CardItem, ItemType } from '@/ui/ui-kit/card';
 import { InputDecorator } from '@/ui/ui-kit/input/Input-decorator';
+import { REVEAL_PK_ROUTES } from '@/ui/views/reveal-private-key';
 import { useMutation } from '@tanstack/react-query';
 import { useCallback, useEffect, useId, useState } from 'react';
 import { FiCopy } from 'react-icons/fi';
@@ -33,10 +40,12 @@ import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 function EditableWalletName({
   id,
   wallet,
+  placeholder,
   onRename,
 }: {
   id: string;
   wallet: ExternallyOwnedAccount | null;
+  placeholder?: string;
   onRename?: () => void;
 }) {
   const [value, setValue] = useState(wallet?.name || '');
@@ -59,7 +68,7 @@ function EditableWalletName({
       <div className="grid grid-cols-[1fr_auto] items-center gap-1">
         <input
           id={id}
-          placeholder={truncateAddress(wallet?.address || '')}
+          placeholder={placeholder || truncateAddress(wallet?.address || '')}
           type="text"
           value={value}
           disabled={wallet?.name === undefined}
@@ -135,11 +144,24 @@ export function WalletAccountView() {
 
   const { value: displayName } = useProfileName({ address, name: walletName });
 
+  const { data: walletGroups } = useWalletGroups();
+
   const removeAddressMutation = useMutation({
     mutationFn: () => walletPort.request('removeAddress', { address, groupId }),
     onSuccess() {
       refetchWallet();
-      navigate(`/settings/manage-wallets/groups/${groupId}`, {
+      const containerType = walletGroupByGroupId
+        ? getContainerType(walletGroupByGroupId.walletContainer)
+        : null;
+      const isFlat =
+        containerType === ContainerType.readonly ||
+        containerType === ContainerType.privateKey;
+
+      const backUrl = isFlat
+        ? '/settings/manage-wallets'
+        : `/settings/manage-wallets/groups/${groupId}`;
+
+      navigate(backUrl, {
         state: { direction: 'back' },
       });
       showToast('Remove wallet address successfully');
@@ -159,16 +181,43 @@ export function WalletAccountView() {
     setOpenConfirm(false);
   };
 
+  const containerType = walletGroupByGroupId
+    ? getContainerType(walletGroupByGroupId.walletContainer)
+    : null;
+
+  const isFlat =
+    containerType === ContainerType.readonly ||
+    containerType === ContainerType.privateKey;
+
+  const totalWalletsGlobal =
+    walletGroups?.reduce(
+      (total: number, group: any) =>
+        total + group.walletContainer.wallets.length,
+      0
+    ) || 0;
+
   const disableRemove =
-    walletGroupByGroupId?.walletContainer.wallets.length === 1;
+    ((containerType === ContainerType.mnemonic ||
+      containerType === ContainerType.hardware) &&
+      walletGroupByGroupId?.walletContainer.wallets.length === 1) ||
+    totalWalletsGlobal === 1;
 
   const items: ItemType[] = [
-    {
-      label: 'Export Private Key',
-      icon: LuKey,
-      iconRight: LuChevronRight,
-      onClick: () => {},
-    },
+    wallet && isBareWallet(wallet)
+      ? {
+          label: 'Export Private Key',
+          icon: LuKey,
+          iconRight: LuChevronRight,
+          onClick: () => {
+            navigate(
+              `${REVEAL_PK_ROUTES.ROOT}?groupId=${groupId}&address=${address}`,
+              {
+                state: { direction: 'forward' },
+              }
+            );
+          },
+        }
+      : null,
     {
       label: 'Remove Wallet',
       icon: LuTrash,
@@ -181,17 +230,24 @@ export function WalletAccountView() {
         setOpenConfirm(true);
       },
     },
-  ];
+  ].filter(Boolean) as ItemType[];
 
   return (
     <div className="flex flex-col h-full">
       <Header
         title={displayName}
-        onBack={() =>
-          navigate(`/settings/manage-wallets/groups/${groupId}`, {
-            state: { direction: 'back' },
-          })
-        }
+        onBack={() => {
+          const backUrl = isFlat
+            ? '/settings/manage-wallets'
+            : `/settings/manage-wallets/groups/${groupId}`;
+
+          navigate(backUrl, {
+            state: {
+              direction: 'back',
+              openGroupId: isFlat ? groupId : undefined,
+            },
+          });
+        }}
       />
 
       <div className="flex-1 p-4 pt-0! space-y-4 overflow-y-auto no-scrollbar">
@@ -219,6 +275,12 @@ export function WalletAccountView() {
                 <span className="text-xs text-muted-foreground">
                   Derivation path: {wallet.mnemonic?.path}
                 </span>
+              ) : isFlat ? (
+                <span className="text-xs text-muted-foreground">
+                  {containerType === ContainerType.readonly
+                    ? 'Read-only wallet'
+                    : 'Private key wallet'}
+                </span>
               ) : (
                 isDeviceAccount(wallet) && (
                   <span className="text-xs text-muted-foreground">
@@ -239,6 +301,7 @@ export function WalletAccountView() {
             <EditableWalletName
               id={nameInputId}
               wallet={wallet || null}
+              placeholder={displayName}
               onRename={refetchWallet}
             />
           }

@@ -1,4 +1,3 @@
-import { invariant } from '@/shared/invariant';
 import { Payload } from '@/shared/request/types/payload';
 import type { ApiContext } from '../api-bare';
 import type { ClientOptions } from '../shared';
@@ -24,7 +23,6 @@ export async function walletGetMetadata(
   params: Payload,
   options: ClientOptions = CLIENT_DEFAULTS
 ) {
-  invariant(params.addresses.length > 0, 'Addresses param is empty');
   const kyOptions = this.getKyOptions();
   const endpoint = '/wallet/meta/identifiers';
   return await HttpClient.post<Response>(

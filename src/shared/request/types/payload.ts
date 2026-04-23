@@ -8,7 +8,7 @@ export interface Payload {
    */
   currency?: string;
   /** @description Wallet addresses */
-  addresses: string[];
+  addresses?: string[];
   /** @description Pagination cursor */
   cursor?: string;
   /** @description Pagination limit */
@@ -36,4 +36,6 @@ export interface Payload {
   period?: '1h' | '1d' | '1w' | '1m' | '1y' | 'max';
   /** @description Environment mode (default: mainnet) */
   mode?: 'mainnet' | 'testnet';
+  /** @description For wallet meta*/
+  identifiers?: string[];
 }

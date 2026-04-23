@@ -1,0 +1,161 @@
+import { FEATURE_SOLANA } from '@/env/config';
+import { isSolanaPrivateKey } from '@/modules/solana/shared';
+import { prepareUserInputSeedOrPrivateKey } from '@/shared/prepareUserInputSeedOrPrivateKey';
+import { SeedType } from '@/shared/seed-type';
+import { ValidationResult } from '@/shared/validation/ValidationResult';
+import { isValidMnemonic, isValidPrivateKey } from '@/shared/validation/wallet';
+import { encodeForMasking } from '@/shared/wallet/encode-locally';
+import { Header } from '@/ui/components/header';
+import { SecretInput } from '@/ui/components/secret-input';
+import { useDeferredMount } from '@/ui/hooks/useDeferredMount';
+import type { MemoryLocationState } from '@/ui/shared/memoryLocationState';
+import { Button } from '@/ui/ui-kit';
+import { useState } from 'react';
+import { LuShieldCheck } from 'react-icons/lu';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { MNEMONIC_STEPS } from './constants';
+
+function getSeedType(value: string) {
+  if (isValidMnemonic(value)) {
+    return SeedType.mnemonic;
+  } else if (isValidPrivateKey(value)) {
+    return SeedType.privateKey;
+  } else {
+    return null;
+  }
+}
+
+export function validate({
+  recoveryInput,
+}: {
+  recoveryInput: string;
+}): ValidationResult {
+  if (recoveryInput.trim().split(/\s+/).length > 1) {
+    if (isValidMnemonic(recoveryInput)) {
+      return { valid: true, message: '' };
+    } else {
+      return { valid: false, message: 'Invalid recovery phrase' };
+    }
+  } else {
+    if (FEATURE_SOLANA !== 'on' && isSolanaPrivateKey(recoveryInput)) {
+      return { valid: false, message: 'Solana support is coming soon' };
+    }
+    if (isValidPrivateKey(recoveryInput)) {
+      return { valid: true, message: '' };
+    } else {
+      return { valid: false, message: 'Invalid private key' };
+    }
+  }
+}
+
+export function ImportWalletView({
+  locationStateStore,
+}: {
+  locationStateStore: MemoryLocationState;
+}) {
+  const { pathname: currentPath } = useLocation();
+  const navigate = useNavigate();
+  const ready = useDeferredMount(250);
+  const [inputValue, setInputValue] = useState('');
+  const [validationResult, setValidationResult] =
+    useState<ValidationResult | null>(null);
+
+  const handleImport = () => {
+    let value = prepareUserInputSeedOrPrivateKey(inputValue);
+
+    if (value.includes(' ')) {
+      value = value.toLowerCase();
+    }
+
+    if (!value) return;
+
+    const validity = validate({ recoveryInput: value });
+    setValidationResult(validity);
+    if (!validity.valid) return;
+
+    const seedType = getSeedType(value);
+    if (seedType == null) {
+      throw new Error('Unexpected input value');
+    }
+
+    const encoded = encodeForMasking(value);
+    /**
+     * Use relative-friendly pathing.
+     * We set the state for both current path and potential sub-paths
+     * to avoid "View data expired" if the router structure changes.
+     */
+    const base = currentPath.replace(/\/$/, '');
+
+    if (seedType === SeedType.privateKey) {
+      const target = `${base}/private-key`;
+      locationStateStore.set(target, encoded);
+      navigate(`./private-key?state=memory`);
+    } else if (seedType === SeedType.mnemonic) {
+      // Set for Mnemonic sub-paths
+      locationStateStore.set(
+        `${base}/mnemonic/${MNEMONIC_STEPS.VERIFY}`,
+        encoded
+      );
+      locationStateStore.set(
+        `${base}/mnemonic/${MNEMONIC_STEPS.SCAN}`,
+        encoded
+      );
+      locationStateStore.set(
+        `${base}/mnemonic/${MNEMONIC_STEPS.DISCOVERY}`,
+        encoded
+      );
+
+      navigate(`./mnemonic/${MNEMONIC_STEPS.VERIFY}?state=memory`);
+    }
+  };
+
+  return (
+    <div className="flex flex-col h-full bg-background overflow-hidden">
+      <Header onBack={() => navigate(-1)} title="Import Wallet" />
+
+      <div className="flex-1 flex flex-col p-4 pt-0 space-y-4 no-scrollbar overflow-y-auto">
+        <h2 className="text-xl font-bold tracking-tight">
+          Enter Recovery Phrase or Private Key
+        </h2>
+
+        <div className="flex-1 flex flex-col pt-2">
+          <SecretInput
+            showRevealElement={true}
+            autoFocus={ready}
+            value={inputValue}
+            onChange={(val) => {
+              setInputValue(val);
+              setValidationResult(null);
+            }}
+            label="Use spaces between words if using a recovery phrase"
+            hint={
+              validationResult?.valid === false && (
+                <div
+                  className="mt-2 p-3 rounded-lg bg-red-500/10 border border-red-500/20 text-red-500 text-xs font-medium animate-in fade-in slide-in-from-top-1"
+                  role="alert"
+                >
+                  {validationResult.message}
+                </div>
+              )
+            }
+          />
+          <div className="flex flex-col gap-4 mt-auto pt-8 border-t border-muted/10">
+            <div className="flex items-center justify-center gap-2 py-1 px-3 rounded-full bg-muted/30 self-center">
+              <LuShieldCheck className="text-teal-500 w-4 h-4" />
+              <span className="text-[11px] font-medium text-muted-foreground">
+                Your keys never leave this device
+              </span>
+            </div>
+            <Button
+              onClick={handleImport}
+              variant="primary"
+              disabled={!inputValue.trim()}
+            >
+              Import
+            </Button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}

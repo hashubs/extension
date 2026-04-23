@@ -1,3 +1,5 @@
-export { ImportBackground } from './ImportBackground';
-export { ImportDecoration } from './ImportDecoration';
-export { GroupImportDecoration } from './GroupImportDecoration';
+export { GroupImportDecoration } from '@/ui/components/wallet/GroupImportDecoration';
+export { ImportBackground } from '@/ui/components/wallet/ImportBackground';
+export { ImportDecoration } from '@/ui/components/wallet/ImportDecoration';
+export { WalletGroupCollapsible } from '@/ui/components/wallet/WalletGroupCollapsible';
+export { WalletGroupItem } from '@/ui/components/wallet/WalletGroupItem';

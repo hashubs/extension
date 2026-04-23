@@ -1,21 +1,25 @@
 import type { WalletGroup } from '@/background/wallet/model/types';
 import { ContainerType, getContainerType } from '@/shared/types/validators';
-import { BlockieAddress } from '@/ui/components/Blockie';
+import { BlockieAddress } from '@/ui/components/blockie';
 import { Header } from '@/ui/components/header';
 import { ViewLoading } from '@/ui/components/view-loading';
-import { getWalletDisplayName } from '@/ui/components/wallet/WalletDisplayName/getWalletDisplayName';
+import {
+  WalletDisplayName,
+  WalletGroupCollapsible,
+} from '@/ui/components/wallet';
 import {
   usePrefetchWalletGroupDetails,
   useWalletGroups,
 } from '@/ui/hooks/request/internal/useWallet';
 import { Button, Card, CardItem } from '@/ui/ui-kit';
 import { ItemType } from '@/ui/ui-kit/card';
+import { IMPORT_ROUTES } from '@/ui/views/import-wallet/constants';
 import groupBy from 'lodash/groupBy';
 import { useMemo } from 'react';
 import { IoAddOutline } from 'react-icons/io5';
 import { LuChevronRight } from 'react-icons/lu';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { WalletGroupCollapsible } from './components/WalletGroupCollapsible';
+import { CREATE_WALLET_ROUTES } from '../../create-wallet';
 
 function FlatWalletList({
   groups,
@@ -37,14 +41,13 @@ function FlatWalletList({
 
   const items: ItemType[] = wallets.map((wallet) => ({
     iconNode: (
-      <BlockieAddress address={wallet.address} size={18} borderRadius={4} />
+      <BlockieAddress address={wallet.address} size={28} borderRadius={4} />
     ),
-    label: getWalletDisplayName(wallet),
+    label: <WalletDisplayName wallet={wallet} />,
     onClick: () =>
       navigate(
         `/settings/manage-wallets/accounts/${wallet.address}?groupId=${wallet.groupId}`
       ),
-    iconClassName: 'text-lime-500 bg-lime-500/10',
     iconRight: LuChevronRight,
   }));
 
@@ -65,7 +68,9 @@ function AddWalletOptions() {
       icon: IoAddOutline,
       label: 'Create New Wallet',
       onClick: () => {
-        navigate('create-wallet');
+        navigate(CREATE_WALLET_ROUTES.ROOT, {
+          state: { direction: 'forward' },
+        });
       },
       iconClassName: 'text-lime-500 bg-lime-500/10',
       iconRight: LuChevronRight,
@@ -73,21 +78,24 @@ function AddWalletOptions() {
     {
       icon: IoAddOutline,
       label: 'Import Wallet',
-      onClick: () => navigate('add/import'),
+      onClick: () =>
+        navigate(IMPORT_ROUTES.ROOT, { state: { direction: 'forward' } }),
       iconClassName: 'text-lime-500 bg-lime-500/10',
       iconRight: LuChevronRight,
     },
     {
       icon: IoAddOutline,
       label: 'Connect Hardware Wallet',
-      onClick: () => navigate('add/hardware'),
+      onClick: () =>
+        navigate(IMPORT_ROUTES.HARDWARE, { state: { direction: 'forward' } }),
       iconClassName: 'text-lime-500 bg-lime-500/10',
       iconRight: LuChevronRight,
     },
     {
       icon: IoAddOutline,
       label: 'Watch Address',
-      onClick: () => navigate('add/watch'),
+      onClick: () =>
+        navigate(IMPORT_ROUTES.READONLY, { state: { direction: 'forward' } }),
       iconClassName: 'text-lime-500 bg-lime-500/10',
       iconRight: LuChevronRight,
     },

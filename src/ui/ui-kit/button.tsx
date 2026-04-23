@@ -3,7 +3,6 @@ import { cva, type VariantProps } from 'class-variance-authority';
 import { type ButtonHTMLAttributes, forwardRef } from 'react';
 import type { IconType } from 'react-icons';
 import { AiOutlineLoading3Quarters } from 'react-icons/ai';
-import { useAnimationPreference } from '../features/appearance';
 
 const buttonVariants = cva(
   [
@@ -100,11 +99,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     },
     ref
   ) => {
-    const { enableAnimation } = useAnimationPreference();
-
     const isDisabled = disabled || loading;
-
-    const resolvedTransition = enableAnimation ? transition : 'none';
 
     if (iconOnly) {
       return (
@@ -125,10 +120,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
           {...props}
         >
           {shimmer && !loading && (
-            <ShimmerOverlay
-              className={shimmerClassName}
-              enableAnimation={enableAnimation}
-            />
+            <ShimmerOverlay className={shimmerClassName} />
           )}
           {loading ? (
             <AiOutlineLoading3Quarters className="animate-spin h-4 w-4" />
@@ -158,27 +150,19 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
           buttonVariants({
             variant,
             size: resolvedSize,
-            transition: resolvedTransition,
+            transition: transition,
           }),
           className
         )}
         disabled={isDisabled}
         {...props}
       >
-        {shimmer && !loading && (
-          <ShimmerOverlay
-            className={shimmerClassName}
-            enableAnimation={enableAnimation}
-          />
-        )}
+        {shimmer && !loading && <ShimmerOverlay className={shimmerClassName} />}
 
         {loading ? (
           <>
             <AiOutlineLoading3Quarters
-              className={cn(
-                'h-4 w-4 shrink-0',
-                enableAnimation && 'animate-spin'
-              )}
+              className={cn('h-4 w-4 shrink-0', 'animate-spin')}
             />
             {loadingText ?? children}
           </>
@@ -200,22 +184,14 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
 
 Button.displayName = 'Button';
 
-function ShimmerOverlay({
-  className,
-  enableAnimation,
-}: {
-  className?: string;
-  enableAnimation: boolean;
-}) {
+function ShimmerOverlay({ className }: { className?: string }) {
   return (
     <div
       aria-hidden
       className={cn(
         'pointer-events-none absolute inset-0',
         'bg-linear-to-r from-background/0 via-white/10 to-background/0',
-        enableAnimation
-          ? '-translate-x-full group-hover:translate-x-full transition-transform duration-700'
-          : 'hidden',
+        '-translate-x-full group-hover:translate-x-full transition-transform duration-700',
         className
       )}
     />

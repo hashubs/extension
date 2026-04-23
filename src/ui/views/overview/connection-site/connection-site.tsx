@@ -5,7 +5,6 @@ import { isEthereumAddress } from '@/shared/is-ethereum-address';
 import { isConnectableDapp } from '@/shared/isConnectableDapp';
 import { requestChainForOrigin } from '@/shared/request/internal/requestChainForOrigin';
 import { getAddressType } from '@/shared/wallet/classifiers';
-import { useAnimationPreference } from '@/ui/features/appearance';
 import { useIsConnectedToActiveTab } from '@/ui/hooks/request/internal/useIsConnectedToActiveTab';
 import { useNetworkConfig } from '@/ui/hooks/request/internal/useNetworks';
 import { useAddressParams } from '@/ui/hooks/request/internal/useWallet';
@@ -118,8 +117,6 @@ export function useConnectionSite() {
 }
 
 export function ConnectionSite({ isHidden }: { isHidden: boolean }) {
-  const { enableAnimation } = useAnimationPreference();
-
   const {
     tabData,
     isRevealable,
@@ -152,7 +149,6 @@ export function ConnectionSite({ isHidden }: { isHidden: boolean }) {
       transform: isHidden ? 'translateY(-10px)' : 'translateY(0px)',
     },
     config: { tension: 300, friction: 26 },
-    immediate: !enableAnimation,
   });
 
   if (!isRevealable) return null;

@@ -600,6 +600,12 @@ export class WalletRecordModel {
         draft.walletManager.groups,
         (group) => group.id === groupId
       );
+
+      if (draft.walletManager.groups.length === 1) {
+        throw new Error(
+          'Removing the last wallet group is not allowed. Your wallet must have at least one group.'
+        );
+      }
       if (!item) {
         throw new Error('Group not found');
       }
@@ -638,6 +644,16 @@ export class WalletRecordModel {
     });
     if (!group) {
       throw new Error('Group not found');
+    }
+
+    const isLastAddressOverall =
+      draft.walletManager.groups.length === 1 &&
+      group.walletContainer.wallets.length === 1;
+
+    if (isLastAddressOverall) {
+      throw new Error(
+        'Removing the last wallet address is not allowed. Your wallet must have at least one address.'
+      );
     }
     const isLastAddress = group.walletContainer.wallets.length === 1;
     if (isMnemonicContainer(group.walletContainer) && isLastAddress) {

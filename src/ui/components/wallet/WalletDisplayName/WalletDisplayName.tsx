@@ -1,6 +1,5 @@
 import { ExternallyOwnedAccount } from '@/shared/types/externally-owned-account';
 import { useProfileName } from '@/ui/hooks/request/internal/useProfileName';
-import { cn } from '@/ui/lib/utils';
 import React from 'react';
 
 export function WalletDisplayName({
@@ -8,13 +7,11 @@ export function WalletDisplayName({
   padding,
   maxCharacters,
   render,
-  className,
 }: {
   wallet: ExternallyOwnedAccount | null | undefined;
   padding?: number;
   maxCharacters?: number;
   render?: (data: ReturnType<typeof useProfileName>) => React.ReactNode;
-  className?: string;
 }) {
   const data = useProfileName(wallet, {
     padding,
@@ -25,5 +22,5 @@ export function WalletDisplayName({
     return render(data);
   }
 
-  return <span className={cn(className)}>{data.value}</span>;
+  return data.value;
 }

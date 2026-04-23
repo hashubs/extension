@@ -1,5 +1,5 @@
 import { zeroizeAfterSubmission } from '@/shared/zeroize-submission';
-import { BlockieAddress } from '@/ui/components/Blockie';
+import { BlockieAddress } from '@/ui/components/blockie';
 import { BrandLogo } from '@/ui/components/svg';
 import { useGetExistingUser } from '@/ui/hooks/request/internal/useAccount';
 import { useLogin } from '@/ui/hooks/request/internal/useAuth';

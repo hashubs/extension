@@ -1,0 +1,21 @@
+# Selvo Global Principles
+
+## 1. Respect Original Intent (NURUT)
+
+- **STRICT ADHERENCE**: Saat mengedit file, pertahankan layout, spacing, typography, dan desain asal. Jangan pernah mengubah `Tailwind classes` yang bersifat struktural (padding, margin, font size) kecuali secara eksplisit diminta untuk "Redesign".
+- **MINIMAL INTERVENTION**: Lakukan perubahan se-ekstraksi mungkin. Jika tugasnya adalah "Refactor Logic", maka UI harus tetap 100% identik dengan aslinya.
+- **NO UNILATERAL IMPROVEMENTS**: Jangan menambahkan animasi, shadow, border, atau elemen dekoratif lainnya karena insting AI. Estetika Selvo ditentukan oleh USER, bukan AI.
+
+## 2. Context Awareness
+
+- **ANALYZE PATTERNS**: Sebelum menulis kode baru, cek minimal 3 file serupa di folder yang sama untuk memahami pola penamaan, struktur `hooks`, dan cara penanganan `state`.
+- **UTILITY FIRST**: Selalu cari utilitas yang sudah ada di `@/shared` atau `@/modules` sebelum membuat fungsi baru. Jangan menduplikasi logika.
+
+## 3. Web3 & Security Defaults
+
+- **DATA INTEGRITY**: Selalu pertahankan case-sensitivity pada data sensitif (private keys, addresses).
+- **NON-DESTRUCTIVE**: Jangan menghapus komentar, dokumentasi, atau TODO yang ditinggalkan USER kecuali terkait langsung dengan kode yang dihapus.
+
+## 4. Obedience Policy
+
+- Jika instruksi USER terlihat bertentangan dengan praktik umum (best practices), pertanyakan dulu, tapi tetap ikuti instruksi USER sebagai prioritas utama jika mereka mengonfirmasi.

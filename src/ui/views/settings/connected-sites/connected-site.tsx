@@ -4,7 +4,7 @@ import { invariant } from '@/shared/invariant';
 import { prepareForHref } from '@/shared/prepare-for-href';
 import { getPermissionsWithWallets } from '@/shared/request/internal/getPermissionsWithWallets';
 import { ExternallyOwnedAccount } from '@/shared/types/externally-owned-account';
-import { BlockieAddress } from '@/ui/components/Blockie';
+import { BlockieAddress } from '@/ui/components/blockie';
 import { MetamaskMode } from '@/ui/components/ConnectedSite/MetamaskMode';
 import { Header } from '@/ui/components/header';
 import { ViewNotFound } from '@/ui/components/view-not-found';

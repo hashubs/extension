@@ -10,3 +10,4 @@
 6. Merapihkan Query dan Mutation ke dalam folder terpisah
 
 7. InterpretationSecurityCheck.tsx Not Implement
+8. Menambahkan params di onBack pada view

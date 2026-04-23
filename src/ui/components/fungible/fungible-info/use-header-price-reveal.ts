@@ -1,4 +1,3 @@
-import { useAnimationPreference } from '@/ui/features/appearance';
 import { animated, useSpring } from '@react-spring/web';
 import { useEffect, useRef, useState } from 'react';
 
@@ -7,8 +6,6 @@ import { useEffect, useRef, useState } from 'react';
  * Useful for sticky headers that should reveal "hidden" info when main info is scrolled away.
  */
 export function useHeaderPriceReveal() {
-  const { enableAnimation } = useAnimationPreference();
-
   const [show, setShow] = useState(false);
   const triggerRef = useRef<HTMLDivElement>(null);
 
@@ -19,7 +16,6 @@ export function useHeaderPriceReveal() {
       duration: 200,
       precision: 0.001,
     },
-    immediate: !enableAnimation,
   });
 
   useEffect(() => {

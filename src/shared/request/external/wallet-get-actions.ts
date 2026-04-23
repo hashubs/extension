@@ -1,5 +1,4 @@
 import { produce } from 'immer';
-import { invariant } from '../../../shared/invariant';
 import { ApiContext } from '../api-bare';
 import { CLIENT_DEFAULTS, ClientOptions, HttpClient } from '../shared';
 import { Payload } from '../types/payload';
@@ -24,7 +23,6 @@ export async function walletGetActions(
   params: Payload,
   options: ClientOptions = CLIENT_DEFAULTS
 ) {
-  invariant(params.addresses.length > 0, 'Addresses param is empty');
   const kyOptions = this.getKyOptions();
   const endpoint = '/wallet/activity';
   const result = await HttpClient.post<Response>(

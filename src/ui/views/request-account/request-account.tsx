@@ -3,7 +3,7 @@ import { walletPort, windowPort } from '@/shared/channel';
 import { focusNode } from '@/shared/focus-node';
 import { ExternallyOwnedAccount } from '@/shared/types/externally-owned-account';
 import type { BlockchainType } from '@/shared/wallet/classifiers';
-import { BlockieAddress } from '@/ui/components/Blockie';
+import { BlockieAddress } from '@/ui/components/blockie';
 import { DappSecurityCheck } from '@/ui/components/DappSecurityCheck/DappSecurityCheck';
 import { SiteFaviconImg } from '@/ui/components/SiteFaviconImg';
 import { WalletDisplayName } from '@/ui/components/wallet';
@@ -105,10 +105,9 @@ function Account({
           </div>
           <div className="flex flex-col">
             <span className="text-sm font-medium leading-tight">Wallet</span>
-            <WalletDisplayName
-              wallet={selectedWallet}
-              className="text-[11px] font-mono text-muted-foreground/80"
-            />
+            <span className="text-[11px] font-mono text-muted-foreground/80">
+              <WalletDisplayName wallet={selectedWallet} />
+            </span>
           </div>
         </div>
         <TiArrowSortedDown className="size-3.5 text-muted-foreground/80" />

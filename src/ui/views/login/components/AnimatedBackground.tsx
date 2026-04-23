@@ -1,4 +1,3 @@
-import { useAnimationPreference } from '@/ui/features/appearance';
 import { animated, config, useSprings } from '@react-spring/web';
 
 interface AnimatedBackgroundProps {
@@ -67,8 +66,6 @@ const SHAPES = [
 ];
 
 export function AnimatedBackground({ show }: AnimatedBackgroundProps) {
-  const { enableAnimation } = useAnimationPreference();
-
   const springs = useSprings(
     SHAPES.length,
     SHAPES.map((shape) => ({
@@ -85,7 +82,6 @@ export function AnimatedBackground({ show }: AnimatedBackgroundProps) {
         y: shape.from.y,
       },
       config: config.wobbly,
-      immediate: !enableAnimation,
     }))
   );
 

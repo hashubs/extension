@@ -10,13 +10,14 @@ import {
 import { WalletGroup } from '@/shared/types/wallet-group';
 import { formatFiatToParts } from '@/shared/units/format-fiat';
 import { BLOCKCHAIN_TYPES } from '@/shared/wallet/classifiers';
-import { BackupInfoNote, needsBackup } from '@/ui/components/BackupInfoNote';
-import { BlockieAddress } from '@/ui/components/Blockie';
-import { ConfirmationSheet } from '@/ui/components/Confirmation/confirmation-sheet';
+import { BackupInfoNote, needsBackup } from '@/ui/components/backup-info-note';
+import { BlockieAddress } from '@/ui/components/blockie';
+import { ConfirmationSheet } from '@/ui/components/confirmation';
 import { Header } from '@/ui/components/header';
 import { ViewLoading } from '@/ui/components/view-loading';
 import { ViewNotFound } from '@/ui/components/view-not-found';
-import { getGroupDisplayName } from '@/ui/components/wallet/WalletDisplayName/getGroupDisplayName';
+import { getGroupDisplayName, WalletDisplayName } from '@/ui/components/wallet';
+import { groupByEcosystem } from '@/ui/components/wallet/groupByEcosystem';
 import {
   QUERY_WALLET,
   useWalletGroupByGroupId,
@@ -24,10 +25,11 @@ import {
 } from '@/ui/hooks/request/internal/useWallet';
 import { useDebouncedCallback } from '@/ui/hooks/useDebouncedCallback';
 import { useFiatConversion } from '@/ui/hooks/useFiatConversion';
-import { truncateAddress } from '@/ui/lib/utils';
 import { Card, CardItem, NeutralDecimals } from '@/ui/ui-kit';
 import { ItemType } from '@/ui/ui-kit/card';
 import { InputDecorator } from '@/ui/ui-kit/input/Input-decorator';
+import { ADD_WALLET_ROUTES } from '@/ui/views/add-wallet';
+import { BACKUP_WALLET_ROUTES } from '@/ui/views/backup-wallet';
 import { useMutation } from '@tanstack/react-query';
 import { useCallback, useId, useMemo, useState } from 'react';
 import { IoKeyOutline } from 'react-icons/io5';
@@ -39,7 +41,6 @@ import {
 } from 'react-icons/md';
 import { PiSpinnerLight } from 'react-icons/pi';
 import { useNavigate, useParams } from 'react-router-dom';
-import { groupByEcosystem } from '../_shared/groupByEcosystem';
 
 function EditableWalletGroupName({
   id,
@@ -111,7 +112,7 @@ function WalletGroupItem({
           <BlockieAddress address={wallet.address} size={32} borderRadius={4} />
         ),
         iconClassName: 'rounded-md',
-        label: truncateAddress(wallet.address),
+        label: <WalletDisplayName wallet={wallet} />,
         subLabelElement: (
           <span className="text-xs text-muted-foreground">
             <NeutralDecimals
@@ -233,10 +234,9 @@ export function WalletGroupView() {
       icon: LuPlus,
       iconRight: LuChevronRight,
       onClick: () =>
-        navigate(
-          `/settings/manage-wallets/add-wallet?groupId=${walletGroup.id}`,
-          { state: { direction: 'forward' } }
-        ),
+        navigate(`${ADD_WALLET_ROUTES.ROOT}?groupId=${walletGroup.id}`, {
+          state: { direction: 'forward' },
+        }),
     },
     isSignerGroup
       ? {
@@ -247,9 +247,9 @@ export function WalletGroupView() {
           onClick: () => {
             const params = new URLSearchParams({ groupId: walletGroup.id });
             if (needsBackupQuery) params.set('needsBackup', 'true');
-            navigate(
-              `/settings/manage-wallets/backup/verify-user?${params.toString()}`
-            );
+            navigate(`${BACKUP_WALLET_ROUTES.ROOT}?${params.toString()}`, {
+              state: { direction: 'forward' },
+            });
           },
         }
       : null,

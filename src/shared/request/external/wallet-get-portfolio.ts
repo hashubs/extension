@@ -1,4 +1,3 @@
-import { invariant } from '@/shared/invariant';
 import { ApiContext } from '../api-bare';
 import { CLIENT_DEFAULTS, ClientOptions, HttpClient } from '../shared';
 import { Payload } from '../types/payload';
@@ -38,7 +37,6 @@ export async function walletGetPortfolio(
   params: Payload,
   options: ClientOptions = CLIENT_DEFAULTS
 ) {
-  invariant(params.addresses.length > 0, 'Addresses param is empty');
   const kyOptions = this.getKyOptions();
   const endpoint = '/wallet/portfolio';
   return await HttpClient.post<Response>(

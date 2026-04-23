@@ -1,4 +1,4 @@
-import { BlockieAddress } from '@/ui/components/Blockie';
+import { BlockieAddress } from '@/ui/components/blockie';
 import { WalletDisplayName } from '@/ui/components/wallet';
 import {
   getCurrentWallet,
