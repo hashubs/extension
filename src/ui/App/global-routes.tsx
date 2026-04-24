@@ -3,7 +3,10 @@ import { Navigate, Route, Routes } from 'react-router-dom';
 
 import { RouteRestoration } from '@/shared/RouteRestoration';
 import { getWindowType } from '@/shared/window-type';
-import { ViewTransition } from '@/ui/components/ViewTransition/ViewTransition';
+import {
+  CustomTransition,
+  ViewTransition,
+} from '@/ui/components/ViewTransition/ViewTransition';
 import { RequireAuth } from './auth';
 import { SomeKindOfResolver } from './resolver';
 
@@ -52,6 +55,19 @@ const excludedTransitions = [
   { from: '/login', to: '/overview' },
 ];
 
+const customTransitions = [
+  {
+    from: '/import-wallet/mnemonic/verify',
+    to: '/import-wallet/mnemonic/discovery',
+    animation: 'scaleUp' as const,
+  },
+  {
+    from: '/add-wallet',
+    to: '/add-wallet/discovery',
+    animation: 'scaleUp' as const,
+  },
+] satisfies CustomTransition[];
+
 export function GlobalRoutes({ initialRoute }: { initialRoute?: string }) {
   useRedirectToRestoreView();
   const isPopup = getWindowType() === 'popup';
@@ -61,6 +77,7 @@ export function GlobalRoutes({ initialRoute }: { initialRoute?: string }) {
       <ViewTransition
         animatedRoutes={animatedRoutes}
         excludedTransitions={excludedTransitions}
+        customTransitions={customTransitions}
       >
         {(location) => {
           console.log('[GlobalRoutes] Active Path:', location.pathname);

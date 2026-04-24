@@ -83,22 +83,6 @@ function AddWalletOptions() {
       iconClassName: 'text-lime-500 bg-lime-500/10',
       iconRight: LuChevronRight,
     },
-    {
-      icon: IoAddOutline,
-      label: 'Connect Hardware Wallet',
-      onClick: () =>
-        navigate(IMPORT_ROUTES.HARDWARE, { state: { direction: 'forward' } }),
-      iconClassName: 'text-lime-500 bg-lime-500/10',
-      iconRight: LuChevronRight,
-    },
-    {
-      icon: IoAddOutline,
-      label: 'Watch Address',
-      onClick: () =>
-        navigate(IMPORT_ROUTES.READONLY, { state: { direction: 'forward' } }),
-      iconClassName: 'text-lime-500 bg-lime-500/10',
-      iconRight: LuChevronRight,
-    },
   ];
 
   return (

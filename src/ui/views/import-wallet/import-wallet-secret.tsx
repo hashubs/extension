@@ -13,7 +13,11 @@ import { Button } from '@/ui/ui-kit';
 import { useState } from 'react';
 import { LuShieldCheck } from 'react-icons/lu';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { MNEMONIC_STEPS } from './constants';
+import {
+  MNEMONIC_STEPS,
+  PRIVATE_KEY_STEPS,
+  SHARED_IMPORT_STEPS,
+} from './constants';
 
 function getSeedType(value: string) {
   if (isValidMnemonic(value)) {
@@ -48,7 +52,7 @@ export function validate({
   }
 }
 
-export function ImportWalletView({
+export function ImportWalletSecretView({
   locationStateStore,
 }: {
   locationStateStore: MemoryLocationState;
@@ -81,15 +85,19 @@ export function ImportWalletView({
     const encoded = encodeForMasking(value);
     /**
      * Use relative-friendly pathing.
-     * We set the state for both current path and potential sub-paths
-     * to avoid "View data expired" if the router structure changes.
+     * The current path is /import-wallet/secret, but mnemonic/private-key 
+     * routes are siblings at /import-wallet/... 
      */
-    const base = currentPath.replace(/\/$/, '');
+    const base = currentPath.replace(/\/secret\/?$/, '');
 
     if (seedType === SeedType.privateKey) {
-      const target = `${base}/private-key`;
-      locationStateStore.set(target, encoded);
-      navigate(`./private-key?state=memory`);
+      const verifyTarget = `${base}/private-key/${PRIVATE_KEY_STEPS.VERIFY}`;
+      const successTarget = `${base}/private-key/${SHARED_IMPORT_STEPS.SUCCESS}`;
+
+      locationStateStore.set(verifyTarget, encoded);
+      locationStateStore.set(successTarget, encoded);
+
+      navigate(`../private-key/${PRIVATE_KEY_STEPS.VERIFY}?state=memory`);
     } else if (seedType === SeedType.mnemonic) {
       // Set for Mnemonic sub-paths
       locationStateStore.set(
@@ -97,15 +105,15 @@ export function ImportWalletView({
         encoded
       );
       locationStateStore.set(
-        `${base}/mnemonic/${MNEMONIC_STEPS.SCAN}`,
-        encoded
-      );
-      locationStateStore.set(
         `${base}/mnemonic/${MNEMONIC_STEPS.DISCOVERY}`,
         encoded
       );
+      locationStateStore.set(
+        `${base}/mnemonic/${SHARED_IMPORT_STEPS.SUCCESS}`,
+        encoded
+      );
 
-      navigate(`./mnemonic/${MNEMONIC_STEPS.VERIFY}?state=memory`);
+      navigate(`../mnemonic/${MNEMONIC_STEPS.VERIFY}?state=memory`);
     }
   };
 

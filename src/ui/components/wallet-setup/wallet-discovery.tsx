@@ -40,6 +40,7 @@ import { SiEthereum, SiSolana } from 'react-icons/si';
 
 import { useMnenomicPhraseForLocation } from '@/ui/hooks/request/internal/useMnemonicLocal';
 import { MemoryLocationState } from '@/ui/shared/memoryLocationState';
+import { Processing } from '@/ui/components/processing';
 
 const ECOSYSTEM_META = {
   evm: {
@@ -583,9 +584,12 @@ export function WalletDiscoveryView({
   const wallets = scanData?.derivedWallets;
 
   if (isLoadingPhrase || isLoadingScan || isLoadingPortfolio || !wallets) {
-    // Return null or a simple placeholder while loading
-    // The previous ScanView already showed a processing state
-    return null;
+    return (
+      <Processing
+        title="Scanning your wallets"
+        description="Please wait while we look for your active wallets..."
+      />
+    );
   }
 
   return (

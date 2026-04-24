@@ -7,10 +7,19 @@ import {
 } from 'react-router-dom';
 import styles from './ViewTransition.module.css';
 
+export type TransitionAnimation = 'slide' | 'scaleUp';
+
+export interface CustomTransition {
+  from: string;
+  to: string;
+  animation: TransitionAnimation;
+}
+
 interface ViewTransitionProps {
   children: (location: Location) => React.ReactNode;
   animatedRoutes?: string[];
   excludedTransitions?: Array<{ from: string; to: string }>;
+  customTransitions?: Array<CustomTransition>;
 }
 
 interface LayerState {
@@ -27,6 +36,7 @@ export function ViewTransition({
   children,
   animatedRoutes = [],
   excludedTransitions = [],
+  customTransitions = [],
 }: ViewTransitionProps) {
   const location = useLocation();
   const navigationType = useNavigationType();
@@ -74,11 +84,31 @@ export function ViewTransition({
     });
   };
 
+  const getCustomAnimation = (
+    from: string,
+    to: string
+  ): TransitionAnimation | null => {
+    const nFrom = normalizePath(from);
+    const nTo = normalizePath(to);
+    const match = customTransitions.find((t) => {
+      const exFrom = normalizePath(t.from);
+      const exTo = normalizePath(t.to);
+      const matchesFrom =
+        nFrom === exFrom || (exFrom !== '/' && nFrom.startsWith(exFrom + '/'));
+      const matchesTo =
+        nTo === exTo || (exTo !== '/' && nTo.startsWith(exTo + '/'));
+      return matchesFrom && matchesTo;
+    });
+    return match?.animation ?? null;
+  };
+
   const getDepth = (path: string) => path.split('/').filter(Boolean).length;
 
   const computeDirection = (prev: string, next: string): 'forward' | 'back' => {
     if (navigationType === 'POP') return 'back';
-    const state = location.state as { direction?: 'back' | 'forward' } | null;
+    const state = location.state as {
+      direction?: 'back' | 'forward';
+    } | null;
     if (state?.direction === 'back') return 'back';
     if (state?.direction === 'forward') return 'forward';
     return getDepth(next) >= getDepth(prev) ? 'forward' : 'back';
@@ -118,42 +148,61 @@ export function ViewTransition({
     }
 
     busyRef.current = true;
-    const direction = computeDirection(prevPath, nextPath);
     const nextId = idCounter++;
+    const customAnim = getCustomAnimation(prevPath, nextPath);
 
-    if (direction === 'forward') {
+    if (customAnim === 'scaleUp') {
+      // Current layer scales down and fades out, new layer scales up from center
       setLayers((prev) => {
         const current = prev[prev.length - 1];
         return [
-          { ...current, animClass: styles.animPushOut, zIndex: 1 },
+          { ...current, animClass: styles.animScaleOut, zIndex: 1 },
           {
             location,
             id: nextId,
-            animClass: styles.animPushIn,
+            animClass: styles.animScaleIn,
             zIndex: 2,
           },
         ];
       });
     } else {
-      setLayers((prev) => {
-        const current = prev[prev.length - 1];
-        const below = prev[prev.length - 2];
-        if (!below) {
+      // Default slide animation
+      const direction = computeDirection(prevPath, nextPath);
+
+      if (direction === 'forward') {
+        setLayers((prev) => {
+          const current = prev[prev.length - 1];
           return [
-            { ...current, animClass: styles.animPopOut, zIndex: 2 },
+            { ...current, animClass: styles.animPushOut, zIndex: 1 },
             {
               location,
               id: nextId,
-              animClass: styles.animPopIn,
-              zIndex: 1,
+              animClass: styles.animPushIn,
+              zIndex: 2,
             },
           ];
-        }
-        return [
-          { ...below, location, animClass: styles.animPopIn, zIndex: 1 },
-          { ...current, animClass: styles.animPopOut, zIndex: 2 },
-        ];
-      });
+        });
+      } else {
+        setLayers((prev) => {
+          const current = prev[prev.length - 1];
+          const below = prev[prev.length - 2];
+          if (!below) {
+            return [
+              { ...current, animClass: styles.animPopOut, zIndex: 2 },
+              {
+                location,
+                id: nextId,
+                animClass: styles.animPopIn,
+                zIndex: 1,
+              },
+            ];
+          }
+          return [
+            { ...below, location, animClass: styles.animPopIn, zIndex: 1 },
+            { ...current, animClass: styles.animPopOut, zIndex: 2 },
+          ];
+        });
+      }
     }
 
     setTimeout(() => {

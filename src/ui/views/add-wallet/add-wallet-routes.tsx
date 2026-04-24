@@ -4,11 +4,8 @@ import { MemoryLocationState } from '@/ui/shared/memoryLocationState';
 import { useCallback, useState } from 'react';
 import { Route, Routes, useNavigate, useSearchParams } from 'react-router-dom';
 
-import {
-  WalletDiscoveryView,
-  WalletScanView,
-  WalletSuccessView,
-} from '@/ui/components/wallet-setup';
+import { MnemonicImportProcessor } from '@/ui/components/wallet-setup/mnemonic-import-processor';
+import { WalletDiscoveryView } from '@/ui/components/wallet-setup/wallet-discovery';
 import { ADD_WALLET_ROUTES, ADD_WALLET_STEPS } from './constants';
 
 export function AddWalletRoutes() {
@@ -42,21 +39,6 @@ export function AddWalletRoutes() {
             buttonTitle="Continue"
             onBack={() => navigate(-1)}
             onSuccess={() =>
-              navigate(`${ADD_WALLET_ROUTES.SCAN}?groupId=${groupId}`, {
-                replace: true,
-                state: { direction: 'forward' },
-              })
-            }
-          />
-        }
-      />
-      <Route
-        path={ADD_WALLET_STEPS.SCAN}
-        element={
-          <WalletScanView
-            locationStateStore={memoryLocationState}
-            onSessionExpired={goToVerifyUser}
-            onNextStep={() =>
               navigate(`${ADD_WALLET_ROUTES.DISCOVERY}?groupId=${groupId}`, {
                 replace: true,
                 state: { direction: 'forward' },
@@ -84,7 +66,7 @@ export function AddWalletRoutes() {
       <Route
         path={ADD_WALLET_STEPS.SUCCESS}
         element={
-          <WalletSuccessView
+          <MnemonicImportProcessor
             onBack={onBack}
             onSessionExpired={goToVerifyUser}
             onSuccess={() =>

@@ -2,7 +2,7 @@ import { Header } from '@/ui/components/header';
 import { BrandLogo } from '@/ui/components/svg';
 import { Button } from '@/ui/ui-kit';
 
-export function NewWalletOptionView({
+export function CreateWalletOptionsView({
   onBack,
   onSelectNewPhrase,
   onSelectExisting,

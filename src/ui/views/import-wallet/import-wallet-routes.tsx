@@ -3,14 +3,20 @@ import { MemoryLocationState } from '@/ui/shared/memoryLocationState';
 import { useCallback } from 'react';
 import { Route, Routes, useNavigate } from 'react-router-dom';
 import { AddReadOnlyAddressView } from './add-read-only-address';
-import { IMPORT_ROUTES, MNEMONIC_STEPS } from './constants';
-import { ImportWalletView } from './import-wallet';
+import {
+  IMPORT_ROUTES,
+  MNEMONIC_STEPS,
+  PRIVATE_KEY_STEPS,
+  SHARED_IMPORT_STEPS,
+} from './constants';
 
 import {
+  MnemonicImportProcessor,
+  PrivateKeyImportProcessor,
   WalletDiscoveryView,
-  WalletScanView,
-  WalletSuccessView,
 } from '@/ui/components/wallet-setup';
+import { ImportWalletOptionsView } from './import-wallet-options';
+import { ImportWalletSecretView } from './import-wallet-secret';
 
 const globalMemoryLocationState = new MemoryLocationState({});
 
@@ -28,10 +34,14 @@ export function ImportWalletRoutes() {
 
   return (
     <Routes>
+      <Route path="/" element={<ImportWalletOptionsView />} />
+
       <Route
-        path="/"
+        path="secret"
         element={
-          <ImportWalletView locationStateStore={globalMemoryLocationState} />
+          <ImportWalletSecretView
+            locationStateStore={globalMemoryLocationState}
+          />
         }
       />
 
@@ -44,21 +54,6 @@ export function ImportWalletRoutes() {
               buttonTitle="Continue"
               onBack={() => navigate(-1)}
               onSuccess={() =>
-                navigate(
-                  `${IMPORT_ROUTES.MNEMONIC}/${MNEMONIC_STEPS.SCAN}?state=memory`,
-                  { replace: true }
-                )
-              }
-            />
-          }
-        />
-        <Route
-          path={MNEMONIC_STEPS.SCAN}
-          element={
-            <WalletScanView
-              locationStateStore={globalMemoryLocationState}
-              onSessionExpired={handleSessionExpired}
-              onNextStep={() =>
                 navigate(
                   `${IMPORT_ROUTES.MNEMONIC}/${MNEMONIC_STEPS.DISCOVERY}?state=memory`,
                   { replace: true }
@@ -76,7 +71,7 @@ export function ImportWalletRoutes() {
               onSessionExpired={handleSessionExpired}
               onSuccess={(selectedWallets) =>
                 navigate(
-                  `${IMPORT_ROUTES.MNEMONIC}/${MNEMONIC_STEPS.SUCCESS}`,
+                  `${IMPORT_ROUTES.MNEMONIC}/${SHARED_IMPORT_STEPS.SUCCESS}`,
                   {
                     replace: true,
                     state: { values: selectedWallets },
@@ -87,9 +82,9 @@ export function ImportWalletRoutes() {
           }
         />
         <Route
-          path={MNEMONIC_STEPS.SUCCESS}
+          path={SHARED_IMPORT_STEPS.SUCCESS}
           element={
-            <WalletSuccessView
+            <MnemonicImportProcessor
               onBack={() => navigate('/settings/manage-wallets')}
               onSessionExpired={handleSessionExpired}
               onSuccess={handleFinish}
@@ -98,10 +93,35 @@ export function ImportWalletRoutes() {
         />
       </Route>
 
-      <Route
-        path="private-key"
-        element={<div>Private Key View Coming Soon</div>}
-      />
+      <Route path="private-key">
+        <Route
+          path={PRIVATE_KEY_STEPS.VERIFY}
+          element={
+            <VerifyUserView
+              text="Your private key will be encrypted with your password"
+              buttonTitle="Continue"
+              onBack={() => navigate(-1)}
+              onSuccess={() =>
+                navigate(
+                  `${IMPORT_ROUTES.PRIVATE_KEY}/${SHARED_IMPORT_STEPS.SUCCESS}?state=memory`,
+                  { replace: true }
+                )
+              }
+            />
+          }
+        />
+        <Route
+          path={SHARED_IMPORT_STEPS.SUCCESS}
+          element={
+            <PrivateKeyImportProcessor
+              locationStateStore={globalMemoryLocationState}
+              onBack={() => navigate(-1)}
+              onSessionExpired={handleSessionExpired}
+              onSuccess={handleFinish}
+            />
+          }
+        />
+      </Route>
 
       <Route
         path="hardware"

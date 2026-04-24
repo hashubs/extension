@@ -17,7 +17,10 @@
 :root {
   --nav-dur: 380ms;
   --nav-ease: cubic-bezier(0.42, 0, 0.16, 1);
+  --nav-ease-scale: cubic-bezier(0.34, 1.56, 0.64, 1);
 }
+
+/* ─── Slide animations (default) ─────────────────────────────────────────── */
 
 @keyframes pushInRight {
   from {
@@ -65,19 +68,36 @@
   animation: popOutRight var(--nav-dur) var(--nav-ease) both;
 }
 
-/* .animPushOut::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  z-index: 10;
-  animation: dimIn var(--nav-dur) var(--nav-ease) both;
+/* ─── Scale animations (scaleUp) ─────────────────────────────────────────── */
+
+@keyframes scaleIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.4);
+  }
+  65% {
+    opacity: 1;
+    transform: scale(1.06);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
-@keyframes dimIn {
-  from {
-    background: transparent;
+@keyframes scaleOut {
+  0% {
+    opacity: 1;
+    transform: scale(1);
   }
-  to {
-    background: color-mix(in srgb, transparent 78%, black 22%);
+  100% {
+    opacity: 0;
+    transform: scale(0.5);
   }
-} */
+}
+
+.animScaleIn {
+  animation: scaleIn var(--nav-dur) var(--nav-ease-scale) both;
+}
+.animScaleOut {
+  animation: scaleOut 250ms cubic-bezier(0.4, 0, 1, 1) both;
+}

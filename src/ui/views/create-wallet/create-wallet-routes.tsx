@@ -1,9 +1,10 @@
 import { VerifyUserView } from '@/ui/components/verify-user';
 import { Route, Routes, useLocation, useNavigate } from 'react-router-dom';
+import { IMPORT_ROUTES } from '../import-wallet';
 import { CREATE_WALLET_ROUTES, CREATE_WALLET_STEPS } from './constants';
+import { CreateWalletOptionsView } from './create-wallet-option';
 import { EcosystemSelectView } from './ecosystem-select';
 import { GenerateWalletView } from './generate-wallet';
-import { NewWalletOptionView } from './new-wallet-option';
 import { WalletGroupSelectView } from './wallet-group-select';
 
 export function CreateWalletRoutes() {
@@ -15,12 +16,12 @@ export function CreateWalletRoutes() {
       <Route
         path="/"
         element={
-          <NewWalletOptionView
+          <CreateWalletOptionsView
             onBack={() => navigate(-1)}
             onSelectNewPhrase={() =>
               navigate(CREATE_WALLET_ROUTES.SELECT_ECOSYSTEM)
             }
-            onSelectExisting={() => navigate(CREATE_WALLET_ROUTES.SELECT_GROUP)}
+            onSelectExisting={() => navigate(IMPORT_ROUTES.ROOT)}
           />
         }
       />
