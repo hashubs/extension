@@ -119,6 +119,7 @@
     "@wallet-standard/features": "1.1.0",
     "@walletconnect/jsonrpc-provider": "^1.0.13",
     "@walletconnect/jsonrpc-utils": "^1.0.8",
+    "@zeriontech/hardware-wallet-connection": "^2.0.0",
     "bignumber.js": "^9.1.1",
     "bip32": "^5.0.0-rc.0",
     "bip39": "^3.1.0",

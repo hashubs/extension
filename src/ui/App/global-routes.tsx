@@ -26,6 +26,7 @@ import { RevealPrivateKeyRoutes } from '@/ui/views/reveal-private-key';
 import { SettingsRoutes } from '@/ui/views/settings';
 import { TestView } from '@/ui/views/tests/test-view';
 import { GlobalToast } from '../components/toast/GlobalToast';
+import { AddEthereumChain } from '../views/add-ethereum-chain';
 import {
   ChooseGlobalProviderGuard,
   RequestAccounts,
@@ -193,6 +194,14 @@ export function GlobalRoutes({ initialRoute }: { initialRoute?: string }) {
                     <ChooseGlobalProviderGuard>
                       <RequestAccounts />
                     </ChooseGlobalProviderGuard>
+                  </RequireAuth>
+                }
+              />
+              <Route
+                path="/addEthereumChain/*"
+                element={
+                  <RequireAuth>
+                    <AddEthereumChain />
                   </RequireAuth>
                 }
               />

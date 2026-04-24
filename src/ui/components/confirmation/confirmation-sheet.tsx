@@ -7,6 +7,7 @@ import { Header } from '../header';
 type ConfirmationItem = {
   icon: IconType;
   className?: string;
+  title?: string;
   text: string;
 };
 
@@ -23,6 +24,9 @@ type ConfirmationSheetProps = {
   heading?: string;
 
   items?: ConfirmationItem[];
+
+  isLoading?: boolean;
+  loadingText?: string;
 
   confirmLabel?: string;
   confirmVariant?:
@@ -56,6 +60,8 @@ export function ConfirmationSheet({
   onConfirm,
   title = defaultProps.title,
   heroIcon,
+  loadingText,
+  isLoading,
   heroGradient = defaultProps.heroGradient,
   heroShadow = defaultProps.heroShadow,
   heading = defaultProps.heading,
@@ -96,7 +102,16 @@ export function ConfirmationSheet({
                     >
                       <Icon className="size-5" />
                     </div>
-                    <p className="text-sm font-medium">{item.text}</p>
+                    {item.title ? (
+                      <div className="space-y-1">
+                        <p className="text-sm font-bold">{item.title}</p>
+                        <p className="text-xs text-muted-foreground leading-relaxed">
+                          {item.text}
+                        </p>
+                      </div>
+                    ) : (
+                      <p className="text-sm font-medium">{item.text}</p>
+                    )}
                   </div>
                 );
               })}
@@ -109,6 +124,9 @@ export function ConfirmationSheet({
             variant={confirmVariant}
             size="md"
             onClick={onConfirm}
+            disabled={isLoading}
+            loading={isLoading}
+            loadingText={loadingText}
             shimmer
           >
             {confirmLabel}

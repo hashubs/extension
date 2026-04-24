@@ -13,14 +13,9 @@ import {
 } from '@/ui/hooks/request/internal/useWallet';
 import { Card, CardItem } from '@/ui/ui-kit';
 import { ItemType } from '@/ui/ui-kit/card';
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from '@/ui/ui-kit/collapsible';
 import { IMPORT_ROUTES } from '@/ui/views/import-wallet/constants';
 import groupBy from 'lodash/groupBy';
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import { IoAddOutline } from 'react-icons/io5';
 import { LuChevronRight } from 'react-icons/lu';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -104,8 +99,6 @@ export function ManageWalletView() {
   const location = useLocation();
   const openGroupId = location.state?.openGroupId as string | undefined;
 
-  const [isMnemonicExpanded, setIsMnemonicExpanded] = useState(false);
-
   const { data: walletGroups, isLoading } = useWalletGroups();
 
   usePrefetchWalletGroupDetails(walletGroups);
@@ -150,86 +143,36 @@ export function ManageWalletView() {
             type === ContainerType.mnemonic ||
             type === ContainerType.hardware
           ) {
-            const isMnemonic = type === ContainerType.mnemonic;
-            const threshold = 2;
-            const hasMore = isMnemonic && items.length > threshold;
-
-            const initialItems = hasMore ? items.slice(0, threshold) : items;
-            const extraItems = hasMore ? items.slice(threshold) : [];
-
             return (
               <div key={type} className="space-y-2">
-                <Collapsible
-                  open={isMnemonicExpanded}
-                  onOpenChange={setIsMnemonicExpanded}
-                >
-                  <div className="flex items-center justify-between px-1 mb-2">
-                    <h3 className="text-xs font-bold uppercase tracking-widest text-muted-foreground/80">
-                      {isMnemonic ? 'Wallets' : 'Hardware Wallets'}
-                    </h3>
-                    {hasMore && (
-                      <CollapsibleTrigger className="text-[11px] font-bold text-primary hover:text-primary/80 transition-colors uppercase tracking-tight">
-                        {isMnemonicExpanded
-                          ? 'Show Less'
-                          : `Show ${extraItems.length} More`}
-                      </CollapsibleTrigger>
-                    )}
-                  </div>
-
-                  <div className="space-y-2">
-                    {initialItems.map((group, i) => (
-                      <WalletGroupCollapsible
-                        key={group.id}
-                        group={group}
-                        index={i}
-                        defaultOpen={
-                          openGroupId ? openGroupId === group.id : i === 0
-                        }
-                        footer={
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              navigate(
-                                `/settings/manage-wallets/groups/${group.id}`
-                              );
-                            }}
-                            className="text-primary text-[11px] font-medium hover:text-primary/80"
-                          >
-                            View All
-                          </button>
-                        }
-                      />
-                    ))}
-                  </div>
-
-                  {hasMore && (
-                    <CollapsibleContent>
-                      <div className="space-y-2 mt-2">
-                        {extraItems.map((group, i) => (
-                          <WalletGroupCollapsible
-                            key={group.id}
-                            group={group}
-                            index={i + threshold}
-                            defaultOpen={openGroupId === group.id}
-                            footer={
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  navigate(
-                                    `/settings/manage-wallets/groups/${group.id}`
-                                  );
-                                }}
-                                className="text-primary text-[11px] font-medium hover:text-primary/80"
-                              >
-                                View All
-                              </button>
-                            }
-                          />
-                        ))}
-                      </div>
-                    </CollapsibleContent>
-                  )}
-                </Collapsible>
+                <h3 className="px-1 text-xs font-bold uppercase tracking-widest text-muted-foreground/80">
+                  {type === ContainerType.mnemonic
+                    ? 'Wallets'
+                    : 'Hardware Wallets'}
+                </h3>
+                {items.map((group, i) => (
+                  <WalletGroupCollapsible
+                    key={group.id}
+                    group={group}
+                    index={i}
+                    defaultOpen={
+                      openGroupId ? openGroupId === group.id : i === 0
+                    }
+                    footer={
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          navigate(
+                            `/settings/manage-wallets/groups/${group.id}`
+                          );
+                        }}
+                        className="text-primary text-[11px] font-medium hover:text-primary/80"
+                      >
+                        View All
+                      </button>
+                    }
+                  />
+                ))}
               </div>
             );
           }

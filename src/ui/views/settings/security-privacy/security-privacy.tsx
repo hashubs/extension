@@ -1,6 +1,7 @@
+import { EraseData } from '@/ui/components/erase-data';
 import { Header } from '@/ui/components/header';
 import { Card, CardItem, ItemType } from '@/ui/ui-kit/card';
-import React from 'react';
+import React, { useState } from 'react';
 import {
   LuChevronRight,
   LuRectangleEllipsis,
@@ -22,6 +23,7 @@ type NavigationSection = {
 
 export function SecurityPrivacyView() {
   const navigate = useNavigate();
+  const [open, setOpen] = useState(false);
 
   const navigations: NavigationSection[] = [
     {
@@ -51,7 +53,7 @@ export function SecurityPrivacyView() {
         {
           icon: LuTrash2,
           label: 'Reset Wallet',
-          onClick: () => {},
+          onClick: () => setOpen(true),
           variant: 'danger',
           subLabel: 'Wipe all data and start over',
         },
@@ -80,6 +82,8 @@ export function SecurityPrivacyView() {
           </section>
         ))}
       </div>
+
+      <EraseData open={open} onOpenChange={setOpen} />
     </div>
   );
 }
