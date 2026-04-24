@@ -3,6 +3,7 @@ import { injectChainConfig } from '@/modules/networks/inject-chain-config';
 import { Networks } from '@/modules/networks/networks';
 import { walletPort, windowPort } from '@/shared/channel';
 import { normalizeChainId } from '@/shared/normalize-chain-id';
+import { SiteFaviconImg } from '@/ui/components/SiteFaviconImg';
 import { ViewLoading } from '@/ui/components/view-loading';
 import { useNetworks } from '@/ui/hooks/request/internal/useNetworks';
 import { CardItem } from '@/ui/ui-kit';
@@ -20,7 +21,6 @@ import {
   testenvNetworksStore,
 } from 'src/modules/networks/networks-store.client';
 import { invariant } from 'src/shared/invariant';
-import { SiteFaviconImg } from 'src/ui/components/SiteFaviconImg';
 import { RpcUrlForm } from './RpcUrlForm';
 import { RpcUrlHelp } from './RpcUrlHelp';
 import { NetworkForm } from './network-form';
@@ -46,6 +46,7 @@ function AddOrUpdateChain({
 }) {
   const [params] = useSearchParams();
   const hostname = useMemo(() => new URL(origin).hostname, [origin]);
+
   const addEthereumChainParameter = useMemo(
     () =>
       JSON.parse(
@@ -117,19 +118,21 @@ function AddOrUpdateChain({
   }
 
   return (
-    <div className="flex flex-col items-center h-full p-4 pt-0! gap-4">
-      <CardItem
-        item={{
-          label: hostname,
-          subLabel: `Suggests you ${
-            prevNetwork ? 'update RPC URL' : 'add this network'
-          }`,
-          iconNode: <SiteFaviconImg url={origin} alt={hostname} size={32} />,
-          iconClassName: 'size-12',
-          className:
-            'hover:bg-transparent dark:hover:bg-transparent p-0 my-4 cursor-default',
-        }}
-      />
+    <div className="flex flex-col items-center h-full p-4 space-y-4 overflow-y-auto">
+      <div className="sticky top-0 bg-background w-full pb-4 mb-4 border-b border-border z-50">
+        <CardItem
+          item={{
+            label: hostname,
+            subLabel: `Suggests you ${
+              prevNetwork ? 'update RPC URL' : 'add this network'
+            }`,
+            iconNode: <SiteFaviconImg url={origin} alt={hostname} size={32} />,
+            iconClassName: 'size-10',
+            className:
+              'p-0 cursor-default hover:bg-transparent dark:hover:bg-transparent',
+          }}
+        />
+      </div>
       {prevNetwork ? (
         <RpcUrlForm
           network={network}

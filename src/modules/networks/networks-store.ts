@@ -153,7 +153,10 @@ export class NetworksStore extends Store<State> {
     }
     const shouldUpdateNetworksInfo = this.getState()
       .networks?.getEvmNetworks()
-      .every((network) => Networks.getChainId(network) !== chainId);
+      .every(
+        (network) =>
+          Networks.isEip155(network) && Networks.getChainId(network) !== chainId
+      );
     const existingNetworks = this.getState().networks;
     if (!shouldUpdateNetworksInfo && existingNetworks) {
       return existingNetworks;

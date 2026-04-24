@@ -4,7 +4,7 @@ import { collectData } from '@/shared/form-data';
 import { normalizeChainId } from '@/shared/normalize-chain-id';
 import { apostrophe } from '@/shared/typography';
 import { FormField } from '@/ui/components/form';
-import { Card, CardItem } from '@/ui/ui-kit';
+import { Button, Card, CardItem } from '@/ui/ui-kit';
 import { Switch } from '@/ui/ui-kit/switch';
 import { produce } from 'immer';
 import merge from 'lodash/merge';
@@ -159,159 +159,154 @@ export function NetworkForm({
     useState<Record<string, string | undefined>>(EMPTY_OBJECT);
 
   return (
-    <div className="flex flex-col gap-0">
-      <form
-        id={id}
-        onChange={() => setErrors(EMPTY_OBJECT)}
-        onSubmit={(event) => {
-          event.preventDefault();
-          if (!hasChanges(event.currentTarget)) {
-            onCancel();
-            return;
+    <form
+      id={id}
+      onChange={() => setErrors(EMPTY_OBJECT)}
+      onSubmit={(event) => {
+        event.preventDefault();
+        if (!hasChanges(event.currentTarget)) {
+          onCancel();
+          return;
+        }
+        const { elements } = event.currentTarget;
+        const formErrors = collectErrors(event.currentTarget, validators);
+        setErrors(formErrors);
+        if (!event.currentTarget.checkValidity()) {
+          const input = findInput(elements, (e) => e.name in formErrors);
+          input?.focus();
+          return;
+        }
+        const formObject = collectData(event.currentTarget, parsers);
+        const result = produce(chainConfig, (draft) =>
+          merge(draft, formObject)
+        );
+        onSubmit(
+          !chain || isCustomNetworkId(chain)
+            ? toCustomNetworkId(result.chainId)
+            : chain,
+          result
+        );
+      }}
+      className="flex flex-col h-full gap-4"
+    >
+      <div className="flex flex-col gap-4">
+        <FormField
+          label="Network Name"
+          name="chainName"
+          defaultValue={chainConfig.chainName}
+          disabled={disabledFields?.has('chainName')}
+          required
+        />
+        <FormField
+          label="RPC URL"
+          name="rpcUrls[]"
+          placeholder={chainConfig.rpcUrls[0]}
+          type="url"
+          defaultValue={chainConfig.rpcUrls[0] || ''}
+          error={errors['rpcUrls[]']}
+          disabled={disabledFields?.has('rpcUrls[]')}
+          required
+        />
+        <FormField
+          label="Chain ID"
+          name="chainId"
+          title={chainConfig.chainId}
+          defaultValue={
+            chainConfig.chainId ? String(parseInt(chainConfig.chainId)) : ''
           }
-          const { elements } = event.currentTarget;
-          const formErrors = collectErrors(event.currentTarget, validators);
-          setErrors(formErrors);
-          if (!event.currentTarget.checkValidity()) {
-            const input = findInput(elements, (e) => e.name in formErrors);
-            input?.focus();
-            return;
+          pattern="^0x[\dabcdef]+|\d+"
+          error={errors.chainId}
+          onInvalid={(e) =>
+            e.currentTarget.setCustomValidity(
+              'Chain ID must be either a 0x-prefixed hex value or an integer'
+            )
           }
-          const formObject = collectData(event.currentTarget, parsers);
-          const result = produce(chainConfig, (draft) =>
-            merge(draft, formObject)
-          );
-          onSubmit(
-            !chain || isCustomNetworkId(chain)
-              ? toCustomNetworkId(result.chainId)
-              : chain,
-            result
-          );
-        }}
-      >
-        <div className="flex flex-col gap-4">
+          onInput={(e) => e.currentTarget.setCustomValidity('')}
+          disabled={disabledFields?.has('chainId')}
+          required
+        />
+        <div className="grid grid-cols-2 gap-4">
           <FormField
-            label="Network Name"
-            name="chainName"
-            defaultValue={chainConfig.chainName}
-            disabled={disabledFields?.has('chainName')}
-            required
-          />
-          <FormField
-            label="RPC URL"
-            name="rpcUrls[]"
-            placeholder={chainConfig.rpcUrls[0]}
-            type="url"
-            defaultValue={chainConfig.rpcUrls[0] || ''}
-            error={errors['rpcUrls[]']}
-            disabled={disabledFields?.has('rpcUrls[]')}
-            required
-          />
-          <FormField
-            label="Chain ID"
-            name="chainId"
-            title={chainConfig.chainId}
-            defaultValue={
-              chainConfig.chainId ? String(parseInt(chainConfig.chainId)) : ''
-            }
-            pattern="^0x[\dabcdef]+|\d+"
-            error={errors.chainId}
-            onInvalid={(e) =>
-              e.currentTarget.setCustomValidity(
-                'Chain ID must be either a 0x-prefixed hex value or an integer'
-              )
-            }
+            label="Currency Symbol"
+            name="nativeCurrency.symbol"
+            defaultValue={chainConfig.nativeCurrency.symbol || ''}
+            error={errors['nativeCurrency.symbol']}
             onInput={(e) => e.currentTarget.setCustomValidity('')}
-            disabled={disabledFields?.has('chainId')}
+            disabled={disabledFields?.has('nativeCurrency.symbol')}
             required
           />
-          <div className="grid grid-cols-2 gap-4">
-            <FormField
-              label="Currency Symbol"
-              name="nativeCurrency.symbol"
-              defaultValue={chainConfig.nativeCurrency.symbol || ''}
-              error={errors['nativeCurrency.symbol']}
-              onInput={(e) => e.currentTarget.setCustomValidity('')}
-              disabled={disabledFields?.has('nativeCurrency.symbol')}
-              required
-            />
-            <FormField
-              label="Decimals"
-              name="nativeCurrency.decimals"
-              error={errors['nativeCurrency.decimals']}
-              placeholder="18"
-              inputMode="decimal"
-              pattern="\d+"
-              defaultValue={chainConfig.nativeCurrency.decimals || ''}
-              disabled={disabledFields?.has('nativeCurrency.decimals')}
-              required={false}
-            />
-          </div>
           <FormField
-            label="Block Explorer URL (optional)"
-            type="url"
-            name="blockExplorerUrls[]"
-            data-parser-name="toLowerCase"
-            error={errors['blockExplorerUrls[]']}
-            placeholder="https://..."
-            defaultValue={chainConfig.blockExplorerUrls?.[0] || ''}
-            disabled={disabledFields?.has('blockExplorerUrls[]')}
+            label="Decimals"
+            name="nativeCurrency.decimals"
+            error={errors['nativeCurrency.decimals']}
+            placeholder="18"
+            inputMode="decimal"
+            pattern="\d+"
+            defaultValue={chainConfig.nativeCurrency.decimals || ''}
+            disabled={disabledFields?.has('nativeCurrency.decimals')}
             required={false}
           />
         </div>
+        <FormField
+          label="Block Explorer URL (optional)"
+          type="url"
+          name="blockExplorerUrls[]"
+          data-parser-name="toLowerCase"
+          error={errors['blockExplorerUrls[]']}
+          placeholder="https://..."
+          defaultValue={chainConfig.blockExplorerUrls?.[0] || ''}
+          disabled={disabledFields?.has('blockExplorerUrls[]')}
+          required={false}
+        />
+      </div>
 
-        <Card className="border border-border">
-          {!disabledFields?.has('hidden') && (
-            <NetworkHiddenFieldLine
-              name="hidden"
-              defaultChecked={chainConfig.hidden}
-            />
-          )}
+      <Card className="border border-border mt-4">
+        {!disabledFields?.has('hidden') && (
+          <NetworkHiddenFieldLine
+            name="hidden"
+            defaultChecked={chainConfig.hidden}
+          />
+        )}
 
-          {!disabledFields?.has('is_testnet') && (
-            <NetworkTestnetFieldLine
-              name="is_testnet"
-              defaultChecked={chainConfig.is_testnet}
-            />
-          )}
-        </Card>
+        {!disabledFields?.has('is_testnet') && (
+          <NetworkTestnetFieldLine
+            name="is_testnet"
+            defaultChecked={chainConfig.is_testnet}
+          />
+        )}
+      </Card>
 
-        {onReset ? (
-          <button
-            type="button"
-            onClick={onReset}
-            className="mt-6 w-full text-center text-xs font-medium text-indigo-600 dark:text-indigo-400 hover:underline"
-          >
-            Reset to Default
-          </button>
-        ) : onRemoveFromVisited ? (
-          <button
-            type="button"
-            onClick={onRemoveFromVisited}
-            className="mt-6 w-full text-center text-xs font-medium text-indigo-600 dark:text-indigo-400 hover:underline"
-          >
-            Remove from the list
-          </button>
-        ) : null}
-      </form>
-
-      <div className="mt-5 grid grid-cols-2 gap-2">
+      {onReset ? (
         <button
           type="button"
-          onClick={onCancel}
-          className="h-10 rounded-lg border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-sm font-medium text-neutral-700 dark:text-neutral-200 hover:bg-neutral-50 dark:hover:bg-neutral-700 transition-colors"
+          onClick={onReset}
+          className="mt-6 w-full text-center text-xs font-medium text-indigo-600 dark:text-indigo-400 hover:underline"
         >
-          Cancel
+          Reset to Default
         </button>
+      ) : onRemoveFromVisited ? (
         <button
+          type="button"
+          onClick={onRemoveFromVisited}
+          className="mt-6 w-full text-center text-xs font-medium text-indigo-600 dark:text-indigo-400 hover:underline"
+        >
+          Remove from the list
+        </button>
+      ) : null}
+
+      <div className="w-full mt-auto grid grid-cols-2 gap-2">
+        <Button type="button" onClick={onCancel} variant="secondary">
+          Cancel
+        </Button>
+        <Button
           type="submit"
           form={id}
+          variant="primary"
           disabled={isSubmitting}
-          className="h-10 rounded-lg bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium text-white transition-colors"
         >
           {isSubmitting ? 'Loading...' : submitText}
-        </button>
+        </Button>
       </div>
-    </div>
+    </form>
   );
 }

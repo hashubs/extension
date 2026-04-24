@@ -2624,3 +2624,14 @@ export const CHAIN_REGISTRY: ChainRegistry[] = [
 export function getChainRegistryByCaip(id: string) {
   return CHAIN_REGISTRY.find((p) => p.caip === id) ?? null;
 }
+
+/**
+ * Gets the chain registry entry by chain ID.
+ * @param chainId The chain ID (e.g., "1")
+ * @returns The chain registry entry or null if not found
+ */
+export function getChainRegistryByChainId(chainId: string) {
+  return (
+    CHAIN_REGISTRY.find((p) => p.chain_identifier === Number(chainId)) ?? null
+  );
+}

@@ -1,9 +1,12 @@
+import { ethers } from 'ethers';
 import type { ChainId } from '@/modules/ethereum/transactions/chainId';
-import type { BigNumber } from '@ethersproject/bignumber';
-import { valueToHex } from './units/value-to-hex';
 
 export function normalizeChainId(
-  value: string | number | bigint | BigNumber
+  value: string | number | bigint | any
 ): ChainId {
-  return valueToHex(String(value)).toLowerCase() as ChainId;
+  try {
+    return ethers.toBeHex(ethers.toBigInt(value)).toLowerCase() as ChainId;
+  } catch (error) {
+    return String(value).toLowerCase() as ChainId;
+  }
 }

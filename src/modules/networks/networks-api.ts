@@ -1,3 +1,4 @@
+import { normalizeChainId } from '../../shared/normalize-chain-id';
 import type { NetworkConfig } from './network-config';
 import { Networks } from './networks';
 import { networksFallbackInfo } from './networks-fallback';
@@ -22,8 +23,10 @@ export async function getNetworks({
 }
 
 export async function getNetworkByChainId(chainId: string) {
+  const normalizedId = normalizeChainId(chainId);
   const network = networksFallbackInfo.find(
-    (item) => Networks.getChainId(item) === chainId
+    (item) =>
+      Networks.isEip155(item) && Networks.getChainId(item) === normalizedId
   );
   return network || null;
 }
@@ -41,7 +44,8 @@ export async function getNetworksBySearch({
     return (
       network.name.toLowerCase().includes(queryLower) ||
       network.id.toLowerCase().includes(queryLower) ||
-      String(Networks.getChainId(network)).includes(queryLower)
+      (Networks.isEip155(network) &&
+        String(Networks.getChainId(network)).includes(queryLower))
     );
   });
   return Promise.resolve(filtered);

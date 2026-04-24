@@ -1,5 +1,9 @@
 import { parseCaip19 } from '@/modules/networks/helpers';
-import { CHAIN_REGISTRY, getChainRegistryByCaip } from './chain-registry';
+import {
+  CHAIN_REGISTRY,
+  getChainRegistryByCaip,
+  getChainRegistryByChainId,
+} from './chain-registry';
 
 import unknownLogo from 'url:@/ui/assets/unknown.svg';
 
@@ -7,6 +11,11 @@ export function getChainLogo(caip: string): string {
   const parsed = parseCaip19(caip);
   const parsedId = parsed?.caip ?? caip;
   const chainRegistry = getChainRegistryByCaip(parsedId);
+  return chainRegistry?.image ?? unknownLogo;
+}
+
+export function getChainLogoByChainId(chainId: string): string {
+  const chainRegistry = getChainRegistryByChainId(chainId);
   return chainRegistry?.image ?? unknownLogo;
 }
 

@@ -84,6 +84,7 @@ export function CardItem({ item }: { item: ItemType }) {
             src={item.imgUrl}
             alt={typeof item.label === 'string' ? item.label : ''}
             disabled={disabled}
+            className={cn('w-8 h-8 rounded-lg', item.iconClassName)}
           />
         ) : 'iconNode' in item && item.iconNode ? (
           <div
