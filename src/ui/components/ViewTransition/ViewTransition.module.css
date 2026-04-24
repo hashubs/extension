@@ -1,0 +1,83 @@
+.container {
+  position: relative;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+}
+
+.layer {
+  position: absolute;
+  inset: 0;
+  background-color: var(--color-background, white);
+  will-change: transform;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+:root {
+  --nav-dur: 380ms;
+  --nav-ease: cubic-bezier(0.42, 0, 0.16, 1);
+}
+
+@keyframes pushInRight {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0%);
+  }
+}
+@keyframes pushOutLeft {
+  from {
+    transform: translateX(0%);
+  }
+  to {
+    transform: translateX(-28%);
+  }
+}
+@keyframes popInLeft {
+  from {
+    transform: translateX(-28%);
+  }
+  to {
+    transform: translateX(0%);
+  }
+}
+@keyframes popOutRight {
+  from {
+    transform: translateX(0%);
+  }
+  to {
+    transform: translateX(100%);
+  }
+}
+
+.animPushIn {
+  animation: pushInRight var(--nav-dur) var(--nav-ease) both;
+}
+.animPushOut {
+  animation: pushOutLeft var(--nav-dur) var(--nav-ease) both;
+}
+.animPopIn {
+  animation: popInLeft var(--nav-dur) var(--nav-ease) both;
+}
+.animPopOut {
+  animation: popOutRight var(--nav-dur) var(--nav-ease) both;
+}
+
+/* .animPushOut::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 10;
+  animation: dimIn var(--nav-dur) var(--nav-ease) both;
+}
+@keyframes dimIn {
+  from {
+    background: transparent;
+  }
+  to {
+    background: color-mix(in srgb, transparent 78%, black 22%);
+  }
+} */

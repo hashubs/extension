@@ -1,11 +1,11 @@
 import { useAnimationPreference } from '@/ui/features/appearance';
-import { animated, useTransition } from '@react-spring/web';
-import React, { useRef } from 'react';
+import React, { useLayoutEffect, useRef, useState } from 'react';
 import {
   type Location,
   useLocation,
   useNavigationType,
 } from 'react-router-dom';
+import styles from './ViewTransition.module.css';
 
 interface ViewTransitionProps {
   children: (location: Location) => React.ReactNode;
@@ -13,21 +13,37 @@ interface ViewTransitionProps {
   excludedTransitions?: Array<{ from: string; to: string }>;
 }
 
+interface LayerState {
+  location: Location;
+  id: number;
+  animClass: string;
+  zIndex: number;
+}
+
+const DUR = 380;
+let idCounter = 0;
+
 export function ViewTransition({
   children,
   animatedRoutes = [],
   excludedTransitions = [],
 }: ViewTransitionProps) {
-  const { enableAnimation } = useAnimationPreference();
   const location = useLocation();
   const navigationType = useNavigationType();
+  const { enableAnimation } = useAnimationPreference();
 
+  const [layers, setLayers] = useState<LayerState[]>([
+    {
+      location,
+      id: idCounter++,
+      animClass: '',
+      zIndex: 2,
+    },
+  ]);
+
+  const busyRef = useRef(false);
   const prevPathRef = useRef(location.pathname);
-  const isBackRef = useRef(false);
-  const shouldAnimateRef = useRef(false);
   const isMountedRef = useRef(false);
-
-  const getDepth = (path: string) => path.split('/').filter(Boolean).length;
 
   const normalizePath = (path: string) =>
     path === '/' ? path : path.replace(/\/$/, '');
@@ -58,95 +74,111 @@ export function ViewTransition({
     });
   };
 
-  const prevPath = prevPathRef.current;
+  const getDepth = (path: string) => path.split('/').filter(Boolean).length;
 
-  const computeDirection = (): 'back' | 'forward' => {
+  const computeDirection = (prev: string, next: string): 'forward' | 'back' => {
+    if (navigationType === 'POP') return 'back';
     const state = location.state as { direction?: 'back' | 'forward' } | null;
     if (state?.direction === 'back') return 'back';
     if (state?.direction === 'forward') return 'forward';
-    if (navigationType === 'POP') return 'back';
-    return getDepth(location.pathname) >= getDepth(prevPath)
-      ? 'forward'
-      : 'back';
+    return getDepth(next) >= getDepth(prev) ? 'forward' : 'back';
   };
 
-  const isBack = computeDirection() === 'back';
+  useLayoutEffect(() => {
+    if (!isMountedRef.current) {
+      isMountedRef.current = true;
+      return;
+    }
 
-  const shouldAnimate =
-    enableAnimation &&
-    isMountedRef.current &&
-    prevPath !== location.pathname &&
-    !isExcludedTransition(prevPath, location.pathname) &&
-    (animatedRoutes.length === 0 ||
-      matchesRoute(location.pathname) ||
-      matchesRoute(prevPath));
+    const prevPath = prevPathRef.current;
+    const nextPath = location.pathname;
 
-  shouldAnimateRef.current = shouldAnimate;
-  isBackRef.current = isBack;
+    if (prevPath === nextPath) return;
+    if (busyRef.current) return;
 
-  React.useLayoutEffect(() => {
-    isMountedRef.current = true;
-    prevPathRef.current = location.pathname;
+    const shouldAnimate =
+      enableAnimation &&
+      !isExcludedTransition(prevPath, nextPath) &&
+      (animatedRoutes.length === 0 ||
+        matchesRoute(nextPath) ||
+        matchesRoute(prevPath));
+
+    prevPathRef.current = nextPath;
+
+    if (!shouldAnimate) {
+      setLayers([
+        {
+          location,
+          id: idCounter++,
+          animClass: '',
+          zIndex: 2,
+        },
+      ]);
+      return;
+    }
+
+    busyRef.current = true;
+    const direction = computeDirection(prevPath, nextPath);
+    const nextId = idCounter++;
+
+    if (direction === 'forward') {
+      setLayers((prev) => {
+        const current = prev[prev.length - 1];
+        return [
+          { ...current, animClass: styles.animPushOut, zIndex: 1 },
+          {
+            location,
+            id: nextId,
+            animClass: styles.animPushIn,
+            zIndex: 2,
+          },
+        ];
+      });
+    } else {
+      setLayers((prev) => {
+        const current = prev[prev.length - 1];
+        const below = prev[prev.length - 2];
+        if (!below) {
+          return [
+            { ...current, animClass: styles.animPopOut, zIndex: 2 },
+            {
+              location,
+              id: nextId,
+              animClass: styles.animPopIn,
+              zIndex: 1,
+            },
+          ];
+        }
+        return [
+          { ...below, location, animClass: styles.animPopIn, zIndex: 1 },
+          { ...current, animClass: styles.animPopOut, zIndex: 2 },
+        ];
+      });
+    }
+
+    setTimeout(() => {
+      setLayers([
+        {
+          location,
+          id: nextId,
+          animClass: '',
+          zIndex: 2,
+        },
+      ]);
+      busyRef.current = false;
+    }, DUR + 20);
   }, [location.pathname]);
 
-  const transitions = useTransition(location, {
-    key: location.pathname,
-
-    initial: null,
-
-    from: () => {
-      if (!shouldAnimateRef.current) return { transform: 'translateX(0%)' };
-      return {
-        transform: isBackRef.current ? 'translateX(-100%)' : 'translateX(100%)',
-        opacity: 0,
-      };
-    },
-
-    enter: () => ({
-      transform: 'translateX(0%)',
-      opacity: 1,
-      zIndex: 2,
-    }),
-
-    leave: () => {
-      if (!shouldAnimateRef.current)
-        return { transform: 'translateX(0%)', zIndex: 1 };
-      return {
-        transform: isBackRef.current ? 'translateX(100%)' : 'translateX(-30%)',
-        opacity: 0,
-        zIndex: 1,
-      };
-    },
-
-    config: { tension: 280, friction: 26 },
-    immediate: (key) => key === 'zIndex' || !enableAnimation,
-    exitBeforeEnter: false,
-  });
-
   return (
-    <div
-      id="view-transition-container"
-      style={{
-        position: 'relative',
-        height: '100%',
-        width: '100%',
-        overflow: 'hidden',
-      }}
-      className="bg-background"
-    >
-      {transitions((style, item) => (
-        <animated.div
-          key={item.key}
-          style={{
-            ...style,
-            position: 'absolute',
-            inset: 0,
-            backgroundColor: 'inherit',
-            willChange: 'transform, opacity',
-          }}
+    <div className={styles.container}>
+      {layers.map((layer) => (
+        <div
+          key={layer.id}
+          className={`${styles.layer} ${layer.animClass}`}
+          style={{ zIndex: layer.zIndex }}
         >
-          {children(item)}
-        </animated.div>
+          {children(layer.location)}
+        </div>
       ))}
     </div>
   );

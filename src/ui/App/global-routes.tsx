@@ -14,10 +14,10 @@ import { Overview } from '@/ui/views/overview';
 import { WalletSelectorView } from '@/ui/views/wallet-selector';
 
 import { ActionsRoutes } from '@/ui/views/actions';
-import { FungibleInfoView } from '@/ui/views/fungible-info';
 import { AddWalletRoutes } from '@/ui/views/add-wallet';
 import { BackupWalletRoutes } from '@/ui/views/backup-wallet';
 import { CreateWalletRoutes } from '@/ui/views/create-wallet';
+import { FungibleInfoView } from '@/ui/views/fungible-info';
 import { ImportWalletRoutes } from '@/ui/views/import-wallet';
 import { RevealPrivateKeyRoutes } from '@/ui/views/reveal-private-key';
 import { SettingsRoutes } from '@/ui/views/settings';
@@ -50,62 +50,6 @@ const animatedRoutes = [
 const excludedTransitions = [
   { from: '/', to: '/overview' },
   { from: '/login', to: '/overview' },
-  {
-    from: '/settings/manage-wallets/reveal-private-key',
-    to: '/settings/manage-wallets/reveal-private-key/view',
-  },
-  {
-    from: '/settings/manage-wallets/backup',
-    to: '/settings/manage-wallets/backup/mnemonic',
-  },
-  {
-    from: '/add-wallet',
-    to: '/add-wallet/scan',
-  },
-  {
-    from: '/add-wallet/scan',
-    to: '/add-wallet/discovery',
-  },
-  {
-    from: '/create-wallet',
-    to: '/create-wallet/select-ecosystem',
-  },
-  {
-    from: '/create-wallet/select-ecosystem',
-    to: '/create-wallet/verify',
-  },
-  {
-    from: '/create-wallet/verify',
-    to: '/create-wallet/generate',
-  },
-  {
-    from: '/backup-wallet',
-    to: '/backup-wallet/mnemonic',
-  },
-  {
-    from: '/backup-wallet/mnemonic',
-    to: '/backup-wallet/verify',
-  },
-  {
-    from: '/backup-wallet/verify',
-    to: '/backup-wallet/success',
-  },
-  {
-    from: '/reveal-private-key',
-    to: '/reveal-private-key/view',
-  },
-  {
-    from: '/import-wallet',
-    to: '/import-wallet/mnemonic/verify',
-  },
-  {
-    from: '/import-wallet/mnemonic/verify',
-    to: '/import-wallet/mnemonic/scan',
-  },
-  {
-    from: '/import-wallet/mnemonic/scan',
-    to: '/import-wallet/mnemonic/discovery',
-  },
 ];
 
 export function GlobalRoutes({ initialRoute }: { initialRoute?: string }) {

@@ -42,7 +42,7 @@ export function ImportWalletRoutes() {
             <VerifyUserView
               text="Recovery phrase will be encrypted with your password"
               buttonTitle="Continue"
-              onBack={() => navigate(IMPORT_ROUTES.ROOT)}
+              onBack={() => navigate(-1)}
               onSuccess={() =>
                 navigate(
                   `${IMPORT_ROUTES.MNEMONIC}/${MNEMONIC_STEPS.SCAN}?state=memory`,
@@ -72,11 +72,7 @@ export function ImportWalletRoutes() {
           element={
             <WalletDiscoveryView
               locationStateStore={globalMemoryLocationState}
-              onBack={() =>
-                navigate(
-                  `${IMPORT_ROUTES.MNEMONIC}/${MNEMONIC_STEPS.SCAN}?state=memory`
-                )
-              }
+              onBack={() => navigate(-1)}
               onSessionExpired={handleSessionExpired}
               onSuccess={(selectedWallets) =>
                 navigate(
@@ -94,11 +90,7 @@ export function ImportWalletRoutes() {
           path={MNEMONIC_STEPS.SUCCESS}
           element={
             <WalletSuccessView
-              onBack={() =>
-                navigate(
-                  `${IMPORT_ROUTES.MNEMONIC}/${MNEMONIC_STEPS.DISCOVERY}`
-                )
-              }
+              onBack={() => navigate('/settings/manage-wallets')}
               onSessionExpired={handleSessionExpired}
               onSuccess={handleFinish}
             />

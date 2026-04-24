@@ -68,7 +68,7 @@ export function BackupWalletRoutes() {
           <VerifyUserView
             text="Recovery phrase will be encrypted with your password"
             buttonTitle="Continue"
-            onBack={onBack}
+            onBack={() => navigate(-1)}
             onSuccess={() =>
               navigate(`${BACKUP_WALLET_ROUTES.MNEMONIC}${location.search}`, {
                 replace: true,
@@ -90,7 +90,7 @@ export function BackupWalletRoutes() {
               })
             }
             onSessionExpired={onSessionExpired}
-            onBack={onBack}
+            onBack={() => navigate(-1)}
           />
         }
       />
@@ -101,11 +101,7 @@ export function BackupWalletRoutes() {
             groupId={groupId}
             onSuccess={handleSuccess}
             onSessionExpired={onSessionExpired}
-            onBack={() =>
-              navigate(`${BACKUP_WALLET_ROUTES.MNEMONIC}${location.search}`, {
-                state: { direction: 'back' },
-              })
-            }
+            onBack={() => navigate(-1)}
           />
         }
       />

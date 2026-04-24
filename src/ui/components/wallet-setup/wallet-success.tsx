@@ -1,6 +1,7 @@
 import { accountPublicRPCPort, walletPort } from '@/shared/channel';
 import { getError } from '@/shared/errors/get-error';
 import { IdempotentRequest } from '@/shared/IdempotentRequest';
+import { isSessionExpiredError } from '@/shared/isSessionExpiredError';
 import { queryClient } from '@/shared/query-client/queryClient';
 import { setCurrentAddress } from '@/shared/request/internal/setCurrentAddress';
 import { MaskedBareWallet } from '@/shared/types/bare-wallet';
@@ -56,10 +57,10 @@ export function WalletSuccessView({
   });
 
   useEffect(() => {
-    if (values.length === 0) {
+    if (isError && isSessionExpiredError(error)) {
       onSessionExpired();
     }
-  }, [onSessionExpired, values.length]);
+  }, [isError, error, onSessionExpired]);
 
   useEffect(() => {
     if (ready && values.length > 0) {

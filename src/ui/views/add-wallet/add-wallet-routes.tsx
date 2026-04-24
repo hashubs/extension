@@ -40,7 +40,7 @@ export function AddWalletRoutes() {
           <VerifyUserView
             text="Recovery phrase will be encrypted with your password"
             buttonTitle="Continue"
-            onBack={onBack}
+            onBack={() => navigate(-1)}
             onSuccess={() =>
               navigate(`${ADD_WALLET_ROUTES.SCAN}?groupId=${groupId}`, {
                 replace: true,
@@ -70,7 +70,7 @@ export function AddWalletRoutes() {
         element={
           <WalletDiscoveryView
             locationStateStore={memoryLocationState}
-            onBack={onBack}
+            onBack={() => navigate(-1)}
             onSuccess={(selectedWallets) =>
               navigate(`${ADD_WALLET_ROUTES.SUCCESS}?groupId=${groupId}`, {
                 replace: true,

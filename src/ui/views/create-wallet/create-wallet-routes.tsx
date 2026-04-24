@@ -29,7 +29,7 @@ export function CreateWalletRoutes() {
         path={CREATE_WALLET_STEPS.SELECT_GROUP}
         element={
           <WalletGroupSelectView
-            onBack={() => navigate(CREATE_WALLET_ROUTES.ROOT)}
+            onBack={() => navigate(-1)}
             onAddNewPhrase={() =>
               navigate(CREATE_WALLET_ROUTES.SELECT_ECOSYSTEM)
             }
@@ -44,7 +44,7 @@ export function CreateWalletRoutes() {
         path={CREATE_WALLET_STEPS.SELECT_ECOSYSTEM}
         element={
           <EcosystemSelectView
-            onBack={() => navigate(CREATE_WALLET_ROUTES.ROOT)}
+            onBack={() => navigate(-1)}
             onNext={(ecosystems) => {
               const params = new URLSearchParams();
               ecosystems.forEach((id) => params.append('ecosystems', id));
@@ -77,7 +77,7 @@ export function CreateWalletRoutes() {
             onBack={() => navigate('/settings/manage-wallets')}
             onSuccess={() => navigate('/overview', { replace: true })}
             onSessionExpired={() =>
-              navigate(`${CREATE_WALLET_ROUTES.VERIFY}${location.search}`, {
+              navigate(`${CREATE_WALLET_ROUTES.SELECT_ECOSYSTEM}`, {
                 replace: true,
               })
             }

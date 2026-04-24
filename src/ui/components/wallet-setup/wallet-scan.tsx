@@ -39,8 +39,6 @@ export function WalletScanView({
     enabled: Boolean(phrase),
   });
 
-  console.log('[AddWalletScanView] data', data);
-
   useEffect(() => {
     if (
       (isError && isSessionExpiredError(error)) ||
