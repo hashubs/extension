@@ -230,5 +230,6 @@ export function ViewTransition({
         </div>
       ))}
     </div>
+    // <>{children(location)}</>
   );
 }

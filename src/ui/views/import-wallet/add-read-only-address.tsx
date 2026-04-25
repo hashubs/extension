@@ -6,7 +6,8 @@ import { isEthereumAddress } from '@/shared/is-ethereum-address';
 import { queryClient } from '@/shared/query-client/queryClient';
 import { ApiClient } from '@/shared/request/api.client';
 import { setCurrentAddress } from '@/shared/request/internal/setCurrentAddress';
-import { Header } from '@/ui/components/header';
+import { Footer, Layout } from '@/ui/components/layout';
+import { LayoutHeading } from '@/ui/components/layout/heading';
 import { QUERY_WALLET } from '@/ui/hooks/request/internal/useWallet';
 import { useCustomValidity } from '@/ui/hooks/useCustomValidity';
 import { Button, Input } from '@/ui/ui-kit';
@@ -130,114 +131,100 @@ export function AddReadOnlyAddressView() {
 
   const title = 'Watch Address';
   return (
-    <div className="flex flex-col h-full bg-background overflow-hidden">
-      <Header title={title} onBack={() => navigate(-1)} />
-      <div className="flex-1 flex flex-col p-4 pt-0 space-y-4 no-scrollbar overflow-y-auto">
-        <div>
-          <h2 className="text-lg font-semibold tracking-tight">{title}</h2>
-          <p className="text-muted-foreground text-sm mt-1 leading-relaxed">
-            Search or paste an address, domain or identity to start watching a
-            wallet.
-          </p>
-        </div>
+    <Layout title={title} onBack={() => navigate(-1)} wrapped={false}>
+      <LayoutHeading
+        title={title}
+        description="Search or paste an address, domain or identity to start watching a wallet."
+      />
 
-        <form
-          id={formId}
-          className="flex-1 flex flex-col"
-          onSubmit={(event) => {
-            event.preventDefault();
-            const form = event.currentTarget;
-            const data = new FormData(form);
-            if (form.checkValidity()) {
-              const address = data.get('address') as string | null;
-              if (!address) {
-                throw new Error('No address value found on form');
-              }
-              mutate({ address });
+      <form
+        id={formId}
+        className="flex-1 flex flex-col"
+        onSubmit={(event) => {
+          event.preventDefault();
+          const form = event.currentTarget;
+          const data = new FormData(form);
+          if (form.checkValidity()) {
+            const address = data.get('address') as string | null;
+            if (!address) {
+              throw new Error('No address value found on form');
             }
-          }}
-        >
-          <input
-            type="hidden"
-            name="address"
-            value={isSupportedAddress ? query : hints.address ?? ''}
-            required={true}
+            mutate({ address });
+          }
+        }}
+      >
+        <input
+          type="hidden"
+          name="address"
+          value={isSupportedAddress ? query : hints.address ?? ''}
+          required={true}
+        />
+
+        <div className="flex flex-col gap-4 flex-1">
+          <DebouncedInput
+            value={debouncedValue}
+            onChange={(value) => {
+              setDebouncedValue(value);
+            }}
+            render={({ value, handleChange }) => (
+              <Input
+                ref={inputRef}
+                name="addressOrDomain"
+                placeholder="Address, domain or identity"
+                className="pr-11 h-12"
+                value={value}
+                onChange={(event) => handleChange(event.currentTarget.value)}
+                required={true}
+                icon={isLoading ? CgSpinner : LuSearch}
+                iconPosition="right"
+              />
+            )}
           />
 
-          <div className="flex flex-col gap-4 flex-1">
-            <div className="relative group">
-              <DebouncedInput
-                value={debouncedValue}
-                onChange={(value) => {
-                  setDebouncedValue(value);
-                }}
-                render={({ value, handleChange }) => (
-                  <Input
-                    ref={inputRef}
-                    name="addressOrDomain"
-                    placeholder="Address, domain or identity"
-                    className="pr-11 h-12"
-                    value={value}
-                    onChange={(event) =>
-                      handleChange(event.currentTarget.value)
-                    }
-                    required={true}
-                  />
-                )}
-              />
-              <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-muted-foreground">
-                {isLoading ? (
-                  <CgSpinner className="w-5 h-5 animate-spin" />
-                ) : (
-                  <LuSearch className="w-5 h-5 opacity-50 group-focus-within:opacity-100 transition-opacity" />
-                )}
-              </div>
-            </div>
+          {isSupportedAddress && hasChecksumError(query) ? (
+            <p className="text-xs text-orange-500 font-medium px-1">
+              Warning: address might have an error
+            </p>
+          ) : null}
 
-            {isSupportedAddress && hasChecksumError(query) ? (
-              <p className="text-xs text-orange-500 font-medium px-1">
-                Warning: address might have an error
+          {errorMessage ? (
+            <p className="text-xs text-red-500 font-medium px-1">
+              {errorMessage}
+            </p>
+          ) : hints.address ? (
+            <div className="bg-muted/30 rounded-xl p-3 space-y-1">
+              <p className="text-xs font-mono break-all opacity-70">
+                {hints.address}
               </p>
-            ) : null}
-
-            {errorMessage ? (
-              <p className="text-xs text-red-500 font-medium px-1">
-                {errorMessage}
-              </p>
-            ) : hints.address ? (
-              <div className="bg-muted/30 rounded-xl p-3 space-y-1">
-                <p className="text-xs font-mono break-all opacity-70">
-                  {hints.address}
-                </p>
-                {hints.domains && !hints.domains.includes(query) ? (
-                  <p className="text-xs text-primary font-medium">
-                    {hints.domains.join(', ')}
-                  </p>
-                ) : null}
-              </div>
-            ) : hints.domains?.length ? (
-              <div className="bg-muted/30 rounded-xl p-3">
-                <p className="text-xs text-primary font-medium text-center">
+              {hints.domains && !hints.domains.includes(query) ? (
+                <p className="text-xs text-primary font-medium">
                   {hints.domains.join(', ')}
                 </p>
-              </div>
-            ) : null}
-          </div>
+              ) : null}
+            </div>
+          ) : hints.domains?.length ? (
+            <div className="bg-muted/30 rounded-xl p-3">
+              <p className="text-xs text-primary font-medium text-center">
+                {hints.domains.join(', ')}
+              </p>
+            </div>
+          ) : null}
+        </div>
 
-          <div className="mt-auto pt-4 border-t border-muted/20">
-            <Button
-              type="submit"
-              variant="primary"
-              disabled={
-                isSubmitting ||
-                (query !== '' && !isSupportedAddress && !hints.address)
-              }
-            >
-              {isSubmitting ? 'Adding...' : 'Continue'}
-            </Button>
-          </div>
-        </form>
-      </div>
-    </div>
+        <Footer>
+          <Button
+            type="submit"
+            variant="primary"
+            disabled={
+              isSubmitting ||
+              (query !== '' && !isSupportedAddress && !hints.address) ||
+              isLoading
+            }
+          >
+            {isSubmitting ? 'Adding...' : 'Continue'}
+          </Button>
+        </Footer>
+      </form>
+    </Layout>
   );
 }

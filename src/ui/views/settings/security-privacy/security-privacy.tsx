@@ -1,5 +1,5 @@
 import { EraseData } from '@/ui/components/erase-data';
-import { Header } from '@/ui/components/header';
+import { Layout } from '@/ui/components/layout';
 import { Card, CardItem, ItemType } from '@/ui/ui-kit/card';
 import React, { useState } from 'react';
 import {
@@ -62,12 +62,11 @@ export function SecurityPrivacyView() {
   ];
 
   return (
-    <div className="flex flex-col h-full">
-      <Header
+    <>
+      <Layout
         title="Security & Privacy"
         onBack={() => navigate('/settings', { state: { direction: 'back' } })}
-      />
-      <div className="flex-1 p-4 pt-0 space-y-4 no-scrollbar overflow-y-auto">
+      >
         {navigations.map((section, i) => (
           <section key={i}>
             <Card title={section.title}>
@@ -81,9 +80,8 @@ export function SecurityPrivacyView() {
             </Card>
           </section>
         ))}
-      </div>
-
+      </Layout>
       <EraseData open={open} onOpenChange={setOpen} />
-    </div>
+    </>
   );
 }

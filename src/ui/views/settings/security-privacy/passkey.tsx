@@ -112,7 +112,7 @@ export function PasskeyItem() {
               autoFocus
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              leftIcon={MdLock}
+              icon={MdLock}
               error={(setupTouchIdMutation.error as Error)?.message}
             />
 

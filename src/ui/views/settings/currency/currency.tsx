@@ -1,4 +1,4 @@
-import { Header } from '@/ui/components/header';
+import { Layout } from '@/ui/components/layout';
 import { preferenceStore, useCurrency } from '@/ui/features/appearance';
 import { Card, CardItem, Input } from '@/ui/ui-kit';
 import { useVirtualizer } from '@tanstack/react-virtual';
@@ -34,79 +34,80 @@ export function CurrencyView() {
     overscan: 10,
   });
 
+  const virtualItems = rowVirtualizer.getVirtualItems();
+  console.log('Virtualizer debug:', {
+    count: filteredCurrencies.length,
+    virtualItemsCount: virtualItems.length,
+    totalSize: rowVirtualizer.getTotalSize(),
+    parentHeight: parentRef.current?.offsetHeight,
+    parentScrollHeight: parentRef.current?.scrollHeight,
+  });
+
   return (
-    <div className="flex flex-col h-full">
-      <Header
-        title="Currency"
-        onBack={() => navigate('/settings', { state: { direction: 'back' } })}
+    <Layout
+      title="Currency"
+      onBack={() => navigate('/settings', { state: { direction: 'back' } })}
+      wrapped={false}
+    >
+      <Input
+        type="search"
+        placeholder="Search currencies"
+        value={searchQuery}
+        onChange={(e) => setSearchQuery(e.currentTarget.value)}
+        size="md"
+        status="default"
+        icon={IoSearchOutline}
       />
 
-      <div className="px-4 pb-3 pt-0.5 border-b border-muted-foreground/10">
-        <Input
-          type="search"
-          placeholder="Search currencies"
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.currentTarget.value)}
-          size="md"
-          status="default"
-          leftIcon={IoSearchOutline}
-        />
-      </div>
-
-      <div
-        ref={parentRef}
-        className="flex-1 p-4 pt-4 space-y-4 no-scrollbar overflow-y-auto"
-      >
-        <Card>
-          <div
-            style={{
-              height: `${rowVirtualizer.getTotalSize()}px`,
-              width: '100%',
-              position: 'relative',
-            }}
-          >
-            {rowVirtualizer.getVirtualItems().map((virtualItem) => {
-              const currency = filteredCurrencies[virtualItem.index];
-              return (
-                <div
-                  key={virtualItem.key}
-                  data-index={virtualItem.index}
-                  ref={rowVirtualizer.measureElement}
-                  style={{
-                    position: 'absolute',
-                    top: 0,
-                    left: 0,
-                    width: '100%',
-                    transform: `translateY(${virtualItem.start}px)`,
+      <Card ref={parentRef} className="overflow-y-auto">
+        <div
+          style={{
+            height: `${rowVirtualizer.getTotalSize()}px`,
+            width: '100%',
+            position: 'relative',
+          }}
+        >
+          {rowVirtualizer.getVirtualItems().map((virtualItem) => {
+            const currency = filteredCurrencies[virtualItem.index];
+            return (
+              <div
+                key={virtualItem.key}
+                data-index={virtualItem.index}
+                ref={rowVirtualizer.measureElement}
+                style={{
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  width: '100%',
+                  transform: `translateY(${virtualItem.start}px)`,
+                }}
+              >
+                <CardItem
+                  item={{
+                    iconNode: (
+                      <span className="text-sm font-semibold opacity-75">
+                        {currency.currencySymbol}
+                      </span>
+                    ),
+                    iconClassName: 'border border-muted-foreground/10',
+                    label: currency.name,
+                    subLabel: currency.symbol,
+                    iconRight:
+                      defaultCurrency.toLowerCase() === currency.id
+                        ? Check
+                        : undefined,
+                    onClick: () => {
+                      onSetDefaultCurrency(currency.id);
+                      navigate('/settings', { state: { direction: 'back' } });
+                    },
                   }}
-                >
-                  <CardItem
-                    item={{
-                      iconNode: (
-                        <span className="text-sm font-semibold opacity-75">
-                          {currency.currencySymbol}
-                        </span>
-                      ),
-                      iconClassName: 'border border-muted-foreground/10',
-                      label: currency.name,
-                      subLabel: currency.symbol,
-                      iconRight:
-                        defaultCurrency.toLowerCase() === currency.id
-                          ? Check
-                          : undefined,
-                      onClick: () => {
-                        onSetDefaultCurrency(currency.id);
-                        navigate('/settings', { state: { direction: 'back' } });
-                      },
-                    }}
-                  />
-                </div>
-              );
-            })}
-          </div>
-        </Card>
-      </div>
-    </div>
+                />
+              </div>
+            );
+          })}
+        </div>
+      </Card>
+    </Layout>
   );
 }
 

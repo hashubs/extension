@@ -1,4 +1,4 @@
-import { Header } from '@/ui/components/header';
+import { Layout } from '@/ui/components/layout';
 import { Input } from '@/ui/ui-kit';
 import { NetworkList } from '@/ui/views/network-selector/network-list';
 import { useCallback, useEffect, useState } from 'react';
@@ -20,7 +20,6 @@ export function NetworkSelectorView() {
   useEffect(() => {
     setLocalActiveId(resolvedActiveId);
   }, [resolvedActiveId]);
-
 
   const onSelect = useCallback(
     async (networkId: string, networkName: string) => {
@@ -46,12 +45,17 @@ export function NetworkSelectorView() {
 
       setSearchParams(newParams, { replace: true });
 
-
       if (next) {
-        const connector = next.includes('?') ? '&' : '?';
-        const target = `${next}${
-          newParams.toString() ? `${connector}${newParams.toString()}` : ''
-        }`;
+        const queryString = newParams.toString();
+        let target = next;
+        if (queryString) {
+          const connector = next.includes('?')
+            ? next.endsWith('?') || next.endsWith('&')
+              ? ''
+              : '&'
+            : '?';
+          target = `${next}${connector}${queryString}`;
+        }
 
         navigate(target, {
           replace: true,
@@ -64,33 +68,52 @@ export function NetworkSelectorView() {
     [navigate, searchParams, setSearchParams, customParamName]
   );
 
+  const handleBack = useCallback(() => {
+    const next = searchParams.get('next');
+    if (next) {
+      const newParams = new URLSearchParams(searchParams);
+      newParams.delete('next');
+      newParams.delete('paramName');
+      newParams.delete('showAll');
+
+      const queryString = newParams.toString();
+      let target = next;
+      if (queryString) {
+        const connector = next.includes('?')
+          ? next.endsWith('?') || next.endsWith('&')
+            ? ''
+            : '&'
+          : '?';
+        target = `${next}${connector}${queryString}`;
+      }
+
+      navigate(target, {
+        replace: true,
+        state: { direction: 'back' },
+      });
+    } else {
+      navigate('/overview', { state: { direction: 'back' } });
+    }
+  }, [navigate, searchParams]);
+
   return (
-    <div className="flex flex-col h-full overflow-hidden">
-      <Header
-        title="Select Network"
-        onBack={() => navigate('/overview', { state: { direction: 'back' } })}
+    <Layout title="Select Network" onBack={handleBack} wrapped={false}>
+      <Input
+        type="search"
+        placeholder="Search networks..."
+        value={searchQuery}
+        onChange={(e) => setSearchQuery(e.target.value)}
+        size="md"
+        status="default"
+        icon={IoSearchOutline}
       />
 
-      <div className="flex flex-col flex-1 h-full min-h-0 px-4 space-y-4">
-        <Input
-          type="search"
-          placeholder="Search networks..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          size="md"
-          status="default"
-          leftIcon={IoSearchOutline}
-        />
-
-        <div className="flex-1 overflow-y-auto no-scrollbar">
-          <NetworkList
-            activeNetworkId={localActiveId}
-            onSelect={onSelect}
-            searchQuery={searchQuery}
-            showAll={showAll}
-          />
-        </div>
-      </div>
-    </div>
+      <NetworkList
+        activeNetworkId={localActiveId}
+        onSelect={onSelect}
+        searchQuery={searchQuery}
+        showAll={showAll}
+      />
+    </Layout>
   );
 }

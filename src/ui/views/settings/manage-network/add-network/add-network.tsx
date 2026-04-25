@@ -6,7 +6,7 @@ import { walletPort } from '@/shared/channel';
 import { collectData, type Parsers } from '@/shared/form-data';
 import { normalizeChainId } from '@/shared/normalize-chain-id';
 import { FormField } from '@/ui/components/form';
-import { Header } from '@/ui/components/header';
+import { Layout } from '@/ui/components/layout';
 import { usePreferences } from '@/ui/features/preferences';
 import { useNetworks } from '@/ui/hooks/request/internal/useNetworks';
 import { Button, Card, CardItem, Input } from '@/ui/ui-kit';
@@ -99,16 +99,12 @@ export function AddNetwork() {
   };
 
   return (
-    <div className="flex flex-col h-full overflow-hidden relative">
-      <Header
-        title="Add Network"
-        onBack={() => navigate(BACK_ROUTE, { state: { direction: 'back' } })}
-      />
-
-      <Tabs
-        defaultValue="browse"
-        className="flex flex-col flex-1 min-h-0 px-4 gap-0!"
-      >
+    <Layout
+      title="Add Network"
+      onBack={() => navigate(BACK_ROUTE, { state: { direction: 'back' } })}
+      wrapped={false}
+    >
+      <Tabs defaultValue="browse" className="flex flex-col min-h-0 gap-0!">
         <TabsList
           variant="line"
           className="w-full border-b border-border rounded-none h-auto pb-0 mb-4"
@@ -123,11 +119,11 @@ export function AddNetwork() {
 
         <TabsContent
           value="browse"
-          className="flex flex-col flex-1 min-h-0 pb-4 space-y-4"
+          className="flex flex-col flex-1 min-h-0 space-y-4"
         >
           <Input
             placeholder="Search network or Chain ID..."
-            leftIcon={IoSearchOutline}
+            icon={IoSearchOutline}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
@@ -231,6 +227,6 @@ export function AddNetwork() {
           </form>
         </TabsContent>
       </Tabs>
-    </div>
+    </Layout>
   );
 }

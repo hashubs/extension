@@ -1,4 +1,3 @@
-import { Header } from '@/ui/components/header';
 import { Button, Card } from '@/ui/ui-kit';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { LuChevronRight } from 'react-icons/lu';
@@ -6,6 +5,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { ActionDaySelector } from './ActionDaySelector';
 import { ActionSelector } from './ActionSelector';
 
+import { Footer, Layout } from '@/ui/components/layout';
 import { cn } from '@/ui/lib/utils';
 
 export type ActionSearchParams = {
@@ -278,97 +278,80 @@ export function ActionFiltersView() {
   };
 
   return (
-    <div className="flex flex-col h-full bg-background overflow-hidden relative">
-      <Header title="Filters" onBack={handleBack} />
-
-      <div className="flex-1 overflow-y-auto no-scrollbar">
-        <div className="flex flex-col px-4 py-4 space-y-4">
-          <div>
-            <Card
-              title="Select Network"
-              className={cn(
-                isFromFungibleInfo && 'opacity-50 cursor-not-allowed'
-              )}
-            >
+    <Layout title="Filters" onBack={handleBack} wrapped={false}>
+      <div className="flex-1 space-y-2">
+        <Card
+          title="Select Network"
+          className={cn(isFromFungibleInfo && 'opacity-50 cursor-not-allowed')}
+        >
+          <FilterRow
+            label={stagedChainName || 'All Networks'}
+            onClick={handleSelectNetwork}
+          />
+        </Card>
+        <Card title="Date">
+          <ActionDaySelector
+            trigger={
               <FilterRow
-                label={stagedChainName || 'All Networks'}
-                onClick={handleSelectNetwork}
-              />
-            </Card>
-          </div>
-
-          <div>
-            <Card title="Date">
-              <ActionDaySelector
-                trigger={
-                  <FilterRow
-                    label={
-                      stagedDate
-                        ? new Intl.DateTimeFormat('en', {
-                            dateStyle: 'medium',
-                          }).format(new Date(stagedDate))
-                        : 'Select Date'
-                    }
-                  />
-                }
-                selectedDate={stagedDate ? new Date(stagedDate) : null}
-                onDateSelect={(d) => {
-                  setStagedDate(d?.toISOString());
-                }}
-                className="w-full text-left"
-              />
-            </Card>
-          </div>
-
-          <div>
-            <Card title="Asset Type">
-              <ActionSelector
-                title="Asset Type"
-                options={ASSET_TYPE_OPTIONS}
-                value={stagedAssetType || 'all'}
-                onChange={(v) => {
-                  setStagedAssetType(v as string);
-                }}
-                trigger={
-                  <FilterRow
-                    label={
-                      ASSET_TYPE_OPTIONS.find(
-                        (o) => o.value === (stagedAssetType || 'all')
-                      )?.label || 'All Assets'
-                    }
-                  />
+                label={
+                  stagedDate
+                    ? new Intl.DateTimeFormat('en', {
+                        dateStyle: 'medium',
+                      }).format(new Date(stagedDate))
+                    : 'Select Date'
                 }
               />
-            </Card>
-          </div>
-
-          <div>
-            <Card title="Transaction Type">
-              <ActionSelector
-                title="Transaction Type"
-                options={ACTION_TYPE_OPTIONS}
-                value={stagedActionTypeKeys}
-                multi
-                onChange={(v) => {
-                  setStagedActionTypeKeys(v as string[]);
-                }}
-                trigger={
-                  <FilterRow
-                    label={
-                      stagedActionTypeKeys.length
-                        ? `${stagedActionTypeKeys.length} Types`
-                        : 'All Types'
-                    }
-                  />
+            }
+            selectedDate={stagedDate ? new Date(stagedDate) : null}
+            onDateSelect={(d) => {
+              setStagedDate(d?.toISOString());
+            }}
+            className="w-full text-left"
+          />
+        </Card>
+        <Card title="Asset Type">
+          <ActionSelector
+            title="Asset Type"
+            options={ASSET_TYPE_OPTIONS}
+            value={stagedAssetType || 'all'}
+            onChange={(v) => {
+              setStagedAssetType(v as string);
+            }}
+            trigger={
+              <FilterRow
+                label={
+                  ASSET_TYPE_OPTIONS.find(
+                    (o) => o.value === (stagedAssetType || 'all')
+                  )?.label || 'All Assets'
                 }
               />
-            </Card>
-          </div>
-        </div>
+            }
+          />
+        </Card>
+        <Card title="Transaction Type">
+          <ActionSelector
+            title="Transaction Type"
+            options={ACTION_TYPE_OPTIONS}
+            value={stagedActionTypeKeys}
+            multi
+            onChange={(v) => {
+              setStagedActionTypeKeys(v as string[]);
+            }}
+            trigger={
+              <FilterRow
+                label={
+                  stagedActionTypeKeys.length
+                    ? `${stagedActionTypeKeys.length} Types`
+                    : 'All Types'
+                }
+              />
+            }
+          />
+        </Card>
       </div>
 
-      <div className="flex flex-col gap-2 p-4 bg-background border-t border-border mt-auto">
-        <Button onClick={handleApply} variant="gradient-teal" size="md" shimmer>
+      <Footer>
+        <Button onClick={handleApply} variant="primary" size="md" shimmer>
           Show Results
         </Button>
         {hasAnyFilter && (
@@ -381,7 +364,7 @@ export function ActionFiltersView() {
             Reset All Filters
           </button>
         )}
-      </div>
-    </div>
+      </Footer>
+    </Layout>
   );
 }

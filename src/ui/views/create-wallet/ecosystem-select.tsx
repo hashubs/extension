@@ -1,4 +1,5 @@
-import { Header } from '@/ui/components/header';
+import { Footer, Layout } from '@/ui/components/layout';
+import { LayoutHeading } from '@/ui/components/layout/heading';
 import { cn } from '@/ui/lib/utils';
 import { AnimatedCheckmark, Button, CardItem } from '@/ui/ui-kit';
 import { useState } from 'react';
@@ -66,19 +67,12 @@ export function EcosystemSelectView({
   };
 
   return (
-    <div className="flex flex-col h-full bg-background">
-      <Header title="Select Ecosystem" onBack={onBack} />
-
-      <div className="flex-1 p-4 space-y-4 flex flex-col no-scrollbar overflow-y-auto">
-        <div className="mb-6">
-          <h1 className="text-xl font-bold mb-2 tracking-tight">
-            Select your ecosystem
-          </h1>
-          <p className="text-sm text-muted-foreground leading-relaxed">
-            Choose the networks for your new recovery phrase. You can add more
-            later.
-          </p>
-        </div>
+    <Layout title="Select Ecosystem" onBack={onBack} wrapped={false}>
+      <div className="flex-1 space-y-4">
+        <LayoutHeading
+          title="Select your ecosystem"
+          description="Choose the networks for your new recovery phrase. You can add more later."
+        />
 
         <div className="flex justify-between items-center px-1 shrink-0">
           <span className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground/80">
@@ -92,7 +86,7 @@ export function EcosystemSelectView({
           </button>
         </div>
 
-        <div className="flex flex-col space-y-3 shrink-0">
+        <div className="flex flex-col space-y-4 shrink-0">
           {ecosystemsList.map(({ id, ...item }) => {
             const isSelected = ecosystems.has(id);
             return (
@@ -133,19 +127,18 @@ export function EcosystemSelectView({
             );
           })}
         </div>
-
-        <div className="mt-auto pt-6">
-          <Button
-            variant="primary"
-            size="md"
-            className="w-full"
-            disabled={ecosystems.size === 0}
-            onClick={handleNext}
-          >
-            Continue
-          </Button>
-        </div>
       </div>
-    </div>
+      <Footer>
+        <Button
+          variant="primary"
+          size="md"
+          className="w-full"
+          disabled={ecosystems.size === 0}
+          onClick={handleNext}
+        >
+          Continue
+        </Button>
+      </Footer>
+    </Layout>
   );
 }

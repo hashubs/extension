@@ -107,6 +107,10 @@ function ActContent({
   const incomingTransfers = transfers.filter((t) => t.direction === 'in');
   const outgoingTransfers = transfers.filter((t) => t.direction === 'out');
 
+  if (approvals.length === 0 && transfers.length === 0) {
+    return null;
+  }
+
   return (
     <Card className="py-2 divide-none">
       {showActType && (
@@ -206,7 +210,7 @@ export function ActionInfo({
         )}
       </div>
 
-      <Card>
+      <div className="flex flex-col divide-y divide-border">
         {addressAction.transaction && (
           <ExplorerComponent transaction={addressAction.transaction} />
         )}
@@ -217,7 +221,7 @@ export function ActionInfo({
         {addressAction.fee && <FeeComponent fee={addressAction.fee} />}
 
         <DateComponent timestamp={addressAction.timestamp} />
-      </Card>
+      </div>
     </div>
   );
 }

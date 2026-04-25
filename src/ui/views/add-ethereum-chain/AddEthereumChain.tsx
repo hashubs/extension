@@ -4,6 +4,7 @@ import { Networks } from '@/modules/networks/networks';
 import { walletPort, windowPort } from '@/shared/channel';
 import { normalizeChainId } from '@/shared/normalize-chain-id';
 import { SiteFaviconImg } from '@/ui/components/SiteFaviconImg';
+import { Layout } from '@/ui/components/layout';
 import { ViewLoading } from '@/ui/components/view-loading';
 import { useNetworks } from '@/ui/hooks/request/internal/useNetworks';
 import { CardItem } from '@/ui/ui-kit';
@@ -118,7 +119,7 @@ function AddOrUpdateChain({
   }
 
   return (
-    <div className="flex flex-col items-center h-full p-4 space-y-4 overflow-y-auto">
+    <Layout wrapped={false}>
       <div className="sticky top-0 bg-background w-full pb-4 mb-4 border-b border-border z-50">
         <CardItem
           item={{
@@ -164,7 +165,7 @@ function AddOrUpdateChain({
           disabledFields={null}
         />
       )}
-    </div>
+    </Layout>
   );
 }
 

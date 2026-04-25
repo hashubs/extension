@@ -3,6 +3,7 @@ import { getWindowType } from '@/shared/window-type';
 import { useEraseDataMutation } from '@/ui/hooks/request/internal/useEraseDataMutation';
 import { maybeOpenOnboarding } from '@/ui/views/onboarding/initialization';
 import { AiTwotoneAlert, AiTwotoneCheckCircle } from 'react-icons/ai';
+import { GoAlertFill } from 'react-icons/go';
 import { ConfirmationSheet } from '../confirmation';
 
 interface EraseDataProps {
@@ -41,7 +42,7 @@ export function EraseData({ open, onOpenChange }: EraseDataProps) {
       loadingText="Removing..."
       items={[
         {
-          icon: AiTwotoneAlert,
+          icon: GoAlertFill,
           title: 'Destructive Action',
           text: 'All Secret Recovery Phrases, Private Keys, and configurations will be permanently removed.',
         },

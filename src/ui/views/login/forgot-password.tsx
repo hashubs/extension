@@ -18,7 +18,11 @@ export function ForgotPassword({
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent className="border-none">
-        <Header title="Forgot password?" onBack={() => onOpenChange(false)} />
+        <Header
+          title="Forgot password?"
+          onBack={() => onOpenChange(false)}
+          className="px-4"
+        />
 
         <div className="space-y-2">
           <p className="text-muted-foreground">

@@ -63,7 +63,7 @@ export function ImportDecoration({ wallets, isLoading, loadingTitle }: Props) {
   return (
     <div className="flex h-full w-full items-center justify-center">
       {isLoading ? (
-        <ViewLoading loadingText={loadingTitle} size={28} />
+        <ViewLoading />
       ) : (
         <animated.div style={{ ...style, width: '100%', maxWidth: '325px' }}>
           <div className="bg-item p-4 rounded-3xl border border-muted-foreground/20 shadow-2xl flex flex-col items-center gap-2">

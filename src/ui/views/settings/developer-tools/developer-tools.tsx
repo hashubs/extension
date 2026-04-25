@@ -1,4 +1,4 @@
-import { Header } from '@/ui/components/header';
+import { Layout } from '@/ui/components/layout';
 import { usePreferences } from '@/ui/features/preferences';
 import { useGlobalPreferences } from '@/ui/features/preferences/usePreferences';
 import { Card, CardItem, ItemType } from '@/ui/ui-kit/card';
@@ -17,10 +17,7 @@ export function DeveloperToolsView() {
 
   const { globalPreferences, setGlobalPreferences } = useGlobalPreferences();
   const { preferences, setPreferences } = usePreferences();
-  const {
-    clearPendingTransactions,
-    isPending,
-  } = useClearPendingTransactions();
+  const { clearPendingTransactions, isPending } = useClearPendingTransactions();
 
   const navigations: navigationType[] = [
     {
@@ -111,23 +108,19 @@ export function DeveloperToolsView() {
   ];
 
   return (
-    <div className="flex flex-col h-full">
-      <Header
-        title="Developer Tools"
-        onBack={() => navigate('/settings', { state: { direction: 'back' } })}
-      />
-
-      <div className="flex-1 p-4 pt-0 space-y-4 no-scrollbar overflow-y-auto">
-        {navigations.map((section, i) => (
-          <div key={i}>
-            <Card title={section.title}>
-              {section.items.map((item, j) => (
-                <CardItem key={j} item={item} />
-              ))}
-            </Card>
-          </div>
-        ))}
-      </div>
-    </div>
+    <Layout
+      title="Developer Tools"
+      onBack={() => navigate('/settings', { state: { direction: 'back' } })}
+    >
+      {navigations.map((section, i) => (
+        <div key={i}>
+          <Card title={section.title}>
+            {section.items.map((item, j) => (
+              <CardItem key={j} item={item} />
+            ))}
+          </Card>
+        </div>
+      ))}
+    </Layout>
   );
 }

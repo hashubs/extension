@@ -1,5 +1,6 @@
 import { emitter } from '@/shared/events';
 import browser from 'webextension-polyfill';
+import { getWindowType } from '../window-type';
 import { initializeSidepanelMessaging } from './sidepanel-messaging.client';
 
 async function handleActiveTabChange() {
@@ -23,14 +24,16 @@ async function handleActiveTabChange() {
 }
 
 export function initializeSidepanelEvents() {
-  initializeSidepanelMessaging();
-  handleActiveTabChange();
+  const windowType = getWindowType();
+  if (windowType === 'sidepanel') {
+    initializeSidepanelMessaging();
+    handleActiveTabChange();
 
-  const params = new URL(window.location.href).searchParams;
-  if (params.get('openPanelOnActionClick') === 'true') {
-    // TODO: remove this param after we're done?
-    chrome.sidePanel.setPanelBehavior({
-      openPanelOnActionClick: true,
-    });
+    const params = new URL(window.location.href).searchParams;
+    if (params.get('openPanelOnActionClick') === 'true') {
+      chrome.sidePanel.setPanelBehavior({
+        openPanelOnActionClick: true,
+      });
+    }
   }
 }

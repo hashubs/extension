@@ -7,7 +7,7 @@ import { Networks } from '@/modules/networks/networks';
 import { walletPort } from '@/shared/channel';
 import { invariant } from '@/shared/invariant';
 import { FormField } from '@/ui/components/form';
-import { Header } from '@/ui/components/header';
+import { Layout } from '@/ui/components/layout';
 import { useNetworks } from '@/ui/hooks/request/internal/useNetworks';
 import { Button } from '@/ui/ui-kit';
 import { Card, CardItem } from '@/ui/ui-kit/card';
@@ -96,148 +96,144 @@ export function EditNetwork() {
   const isEip155 = Networks.isEip155(network);
 
   return (
-    <div className="flex flex-col h-full overflow-hidden relative">
-      <Header
-        title={network.name}
-        onBack={() => navigate(BACK_ROUTE, { state: { direction: 'back' } })}
-        renderElement={
-          isCustomNetworkId(network.id) && (
-            <Button
-              iconOnly
-              iconOnlySize="md"
-              variant="ghost"
-              onClick={() => removeMutation.mutate()}
-              className="text-destructive"
-            >
-              <IoTrashOutline size={20} />
-            </Button>
-          )
-        }
-      />
+    <Layout
+      title={network.name}
+      onBack={() => navigate(BACK_ROUTE, { state: { direction: 'back' } })}
+      renderHeaderElement={
+        isCustomNetworkId(network.id) && (
+          <Button
+            iconOnly
+            iconOnlySize="md"
+            variant="ghost"
+            onClick={() => removeMutation.mutate()}
+            className="text-destructive"
+          >
+            <IoTrashOutline size={20} />
+          </Button>
+        )
+      }
+    >
+      <Card className="border border-border divide-none">
+        <CardItem
+          item={{
+            label: 'Network Enabled',
+            subLabel: 'Show this network across the wallet',
+            onClick: () => {
+              const nextHidden = !network.hidden;
+              const newConfig = { ...localConfig, hidden: nextHidden };
+              setLocalConfig(newConfig);
+              toggleMutation.mutate(newConfig);
+            },
+            rightElement: (
+              <Switch
+                checked={!network.hidden}
+                onCheckedChange={(val: boolean) => {
+                  const newConfig = { ...localConfig, hidden: !val };
+                  setLocalConfig(newConfig);
+                  toggleMutation.mutate(newConfig);
+                }}
+              />
+            ),
+          }}
+        />
+      </Card>
 
-      <div className="flex-1 space-y-4 no-scrollbar px-4 overflow-y-auto">
-        <Card className="border border-border divide-none">
-          <CardItem
-            item={{
-              label: 'Network Enabled',
-              subLabel: 'Show this network across the wallet',
-              onClick: () => {
-                const nextHidden = !network.hidden;
-                const newConfig = { ...localConfig, hidden: nextHidden };
-                setLocalConfig(newConfig);
-                toggleMutation.mutate(newConfig);
-              },
-              rightElement: (
-                <Switch
-                  checked={!network.hidden}
-                  onCheckedChange={(val: boolean) => {
-                    const newConfig = { ...localConfig, hidden: !val };
-                    setLocalConfig(newConfig);
-                    toggleMutation.mutate(newConfig);
-                  }}
-                />
-              ),
-            }}
-          />
-        </Card>
-
-        <Card className="border border-border">
-          <FormField
-            label="Network Name"
-            wrapperClassName="p-3"
-            value={localConfig.chainName}
-            onChange={(e: any) =>
-              setLocalConfig({ ...localConfig, chainName: e.target.value })
-            }
-          />
-          {isEip155 && (
-            <FormField
-              label="Chain ID"
-              wrapperClassName="p-3"
-              value={String(parseInt(localConfig.chainId))}
-              disabled
-            />
-          )}
-          <div className="grid grid-cols-2">
-            <FormField
-              label="Symbol"
-              wrapperClassName="p-3"
-              value={localConfig.nativeCurrency.symbol}
-              onChange={(e: any) =>
-                setLocalConfig({
-                  ...localConfig,
-                  nativeCurrency: {
-                    ...localConfig.nativeCurrency,
-                    symbol: e.target.value,
-                  },
-                })
-              }
-            />
-            <FormField
-              label="Decimals"
-              wrapperClassName="p-3"
-              value={String(localConfig.nativeCurrency.decimals)}
-              disabled
-            />
-          </div>
-
-          <FormField
-            label="RPC URL"
-            wrapperClassName="p-3"
-            value={localConfig.rpcUrls[0] || ''}
-            onChange={(e: any) =>
-              setLocalConfig({
-                ...localConfig,
-                rpcUrls: [e.target.value],
-              })
-            }
-          />
-
-          <FormField
-            label="Explorer URL"
-            wrapperClassName="p-3"
-            value={localConfig.blockExplorerUrls?.[0] || ''}
-            onChange={(e: any) =>
-              setLocalConfig({
-                ...localConfig,
-                blockExplorerUrls: [e.target.value],
-              })
-            }
-          />
-
-          <CardItem
-            item={{
-              label: 'Testnet',
-              subLabel: 'Mark this as a test network',
-              onClick: () =>
-                setLocalConfig((prev) =>
-                  prev ? { ...prev, is_testnet: !prev.is_testnet } : null
-                ),
-              rightElement: (
-                <Switch
-                  checked={!!localConfig.is_testnet}
-                  onCheckedChange={() =>
-                    setLocalConfig((prev) =>
-                      prev ? { ...prev, is_testnet: !prev.is_testnet } : null
-                    )
-                  }
-                />
-              ),
-            }}
-          />
-        </Card>
-
-        <Button
-          variant="primary"
-          size="md"
-          onClick={() => saveMutation.mutate(localConfig)}
-          disabled={
-            !isDirty || saveMutation.isPending || toggleMutation.isPending
+      <Card className="border border-border">
+        <FormField
+          label="Network Name"
+          wrapperClassName="p-3"
+          value={localConfig.chainName}
+          onChange={(e: any) =>
+            setLocalConfig({ ...localConfig, chainName: e.target.value })
           }
-        >
-          {saveMutation.isPending ? 'Saving...' : 'Save Changes'}
-        </Button>
-      </div>
-    </div>
+        />
+        {isEip155 && (
+          <FormField
+            label="Chain ID"
+            wrapperClassName="p-3"
+            value={String(parseInt(localConfig.chainId))}
+            disabled
+          />
+        )}
+        <div className="grid grid-cols-2">
+          <FormField
+            label="Symbol"
+            wrapperClassName="p-3"
+            value={localConfig.nativeCurrency.symbol}
+            onChange={(e: any) =>
+              setLocalConfig({
+                ...localConfig,
+                nativeCurrency: {
+                  ...localConfig.nativeCurrency,
+                  symbol: e.target.value,
+                },
+              })
+            }
+          />
+          <FormField
+            label="Decimals"
+            wrapperClassName="p-3"
+            value={String(localConfig.nativeCurrency.decimals)}
+            disabled
+          />
+        </div>
+
+        <FormField
+          label="RPC URL"
+          wrapperClassName="p-3"
+          value={localConfig.rpcUrls[0] || ''}
+          onChange={(e: any) =>
+            setLocalConfig({
+              ...localConfig,
+              rpcUrls: [e.target.value],
+            })
+          }
+        />
+
+        <FormField
+          label="Explorer URL"
+          wrapperClassName="p-3"
+          value={localConfig.blockExplorerUrls?.[0] || ''}
+          onChange={(e: any) =>
+            setLocalConfig({
+              ...localConfig,
+              blockExplorerUrls: [e.target.value],
+            })
+          }
+        />
+
+        <CardItem
+          item={{
+            label: 'Testnet',
+            subLabel: 'Mark this as a test network',
+            onClick: () =>
+              setLocalConfig((prev) =>
+                prev ? { ...prev, is_testnet: !prev.is_testnet } : null
+              ),
+            rightElement: (
+              <Switch
+                checked={!!localConfig.is_testnet}
+                onCheckedChange={() =>
+                  setLocalConfig((prev) =>
+                    prev ? { ...prev, is_testnet: !prev.is_testnet } : null
+                  )
+                }
+              />
+            ),
+          }}
+        />
+      </Card>
+
+      <Button
+        variant="primary"
+        size="md"
+        onClick={() => saveMutation.mutate(localConfig)}
+        disabled={
+          !isDirty || saveMutation.isPending || toggleMutation.isPending
+        }
+      >
+        {saveMutation.isPending ? 'Saving...' : 'Save Changes'}
+      </Button>
+    </Layout>
   );
 }

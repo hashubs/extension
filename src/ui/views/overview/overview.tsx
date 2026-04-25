@@ -116,7 +116,6 @@ export function Overview() {
 
       <OverviewCard
         balance={balanceFormatted}
-        onMenuOpen={() => navigate('/settings')}
         onConnectionSite={handleConnectionSite}
       />
 

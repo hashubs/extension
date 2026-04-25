@@ -8,7 +8,7 @@ import {
 } from '@/shared/validation/password-strength';
 import { zeroizeAfterSubmission } from '@/shared/zeroize-submission';
 import { FormField } from '@/ui/components/form';
-import { Header } from '@/ui/components/header';
+import { Layout } from '@/ui/components/layout';
 import { StrengthIndicator } from '@/ui/components/strength-indicator';
 import { useGetExistingUser } from '@/ui/hooks/request/internal/useAccount';
 import { GET_PASSKEY_ENABLED_QUERY_KEY } from '@/ui/hooks/request/internal/usePasskey';
@@ -152,16 +152,15 @@ export function ChangePasswordView() {
     passwordsMatch;
 
   return (
-    <div className="flex flex-col h-full">
-      <Header
+    <>
+      <Layout
         title="Change Password"
         onBack={() =>
           navigate('/settings/security-privacy', {
             state: { direction: 'back' },
           })
         }
-      />
-      <div className="flex-1 p-4 pt-0 space-y-4 no-scrollbar overflow-y-auto">
+      >
         <div className="space-y-1">
           <h1 className="text-xl font-semibold text-foreground">
             Change Password
@@ -180,7 +179,7 @@ export function ChangePasswordView() {
             type="password"
             placeholder="••••••••"
             required
-            leftIcon={MdLock}
+            icon={MdLock}
           />
 
           <div className="space-y-1.5">
@@ -194,7 +193,7 @@ export function ChangePasswordView() {
               minLength={PASSWORD_MIN_LENGTH}
               value={newPassword}
               onChange={(e) => setNewPassword(e.target.value)}
-              leftIcon={MdLock}
+              icon={MdLock}
               isValid={newPassword.length > 0 && passwordsMatch}
             />
             {newPassword.length > 0 && <StrengthIndicator stats={stats} />}
@@ -211,7 +210,7 @@ export function ChangePasswordView() {
               minLength={PASSWORD_MIN_LENGTH}
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
-              leftIcon={MdLock}
+              icon={MdLock}
               isError={confirmPassword.length > 0 && !passwordsMatch}
               isValid={confirmPassword.length > 0 && passwordsMatch}
               status={passwordsMatch ? 'success' : 'error'}
@@ -240,7 +239,7 @@ export function ChangePasswordView() {
             Change Password
           </Button>
         </form>
-      </div>
+      </Layout>
 
       <Drawer open={weakDrawerOpen} onOpenChange={setWeakDrawerOpen}>
         <DrawerContent
@@ -276,6 +275,6 @@ export function ChangePasswordView() {
           </DrawerFooter>
         </DrawerContent>
       </Drawer>
-    </div>
+    </>
   );
 }

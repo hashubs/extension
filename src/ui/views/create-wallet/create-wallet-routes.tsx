@@ -19,7 +19,7 @@ export function CreateWalletRoutes() {
           <CreateWalletOptionsView
             onBack={() => navigate(-1)}
             onSelectNewPhrase={() =>
-              navigate(CREATE_WALLET_ROUTES.SELECT_ECOSYSTEM)
+              navigate(CREATE_WALLET_ROUTES.SELECT_GROUP)
             }
             onSelectExisting={() => navigate(IMPORT_ROUTES.ROOT)}
           />
@@ -31,11 +31,11 @@ export function CreateWalletRoutes() {
         element={
           <WalletGroupSelectView
             onBack={() => navigate(-1)}
-            onAddNewPhrase={() =>
-              navigate(CREATE_WALLET_ROUTES.SELECT_ECOSYSTEM)
-            }
             onAddWallet={(groupId) =>
               navigate(`/add-wallet?groupId=${groupId}`)
+            }
+            onAddNewPhrase={() =>
+              navigate(CREATE_WALLET_ROUTES.SELECT_ECOSYSTEM)
             }
           />
         }

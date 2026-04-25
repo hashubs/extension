@@ -13,7 +13,7 @@ import { BLOCKCHAIN_TYPES } from '@/shared/wallet/classifiers';
 import { BackupInfoNote, needsBackup } from '@/ui/components/backup-info-note';
 import { BlockieAddress } from '@/ui/components/blockie';
 import { ConfirmationSheet } from '@/ui/components/confirmation';
-import { Header } from '@/ui/components/header';
+import { Layout } from '@/ui/components/layout';
 import { ViewLoading } from '@/ui/components/view-loading';
 import { ViewNotFound } from '@/ui/components/view-not-found';
 import { getGroupDisplayName, WalletDisplayName } from '@/ui/components/wallet';
@@ -202,7 +202,7 @@ export function WalletGroupView() {
   });
 
   if (walletGroupIsLoading) {
-    return <ViewLoading onBack={() => navigate('/settings/manage-wallets')} />;
+    return <ViewLoading />;
   }
 
   if (!walletGroup) {
@@ -266,17 +266,15 @@ export function WalletGroupView() {
   ].filter(Boolean) as ItemType[];
 
   return (
-    <div className="flex flex-col h-full">
-      <Header
+    <>
+      <Layout
         title={getGroupDisplayName(walletGroup.name)}
         onBack={() =>
           navigate('/settings/manage-wallets', {
             state: { direction: 'back', openGroupId: walletGroup.id },
           })
         }
-      />
-
-      <div className="flex-1 p-4 pt-0! space-y-4 overflow-y-auto no-scrollbar">
+      >
         {isMnemonicGroup || isHardwareGroup ? (
           <InputDecorator
             label="Name"
@@ -299,7 +297,7 @@ export function WalletGroupView() {
             <CardItem key={i} item={item} />
           ))}
         </Card>
-      </div>
+      </Layout>
 
       <ConfirmationSheet
         open={removeGroupOpen}
@@ -329,6 +327,6 @@ export function WalletGroupView() {
           },
         ]}
       />
-    </div>
+    </>
   );
 }

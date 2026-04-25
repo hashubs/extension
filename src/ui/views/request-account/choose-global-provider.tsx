@@ -1,5 +1,7 @@
 import { windowPort } from '@/shared/channel';
+import { SiteFaviconImg } from '@/ui/components/SiteFaviconImg';
 import { BrandLogo } from '@/ui/components/svg';
+import { ViewLoading } from '@/ui/components/view-loading';
 import React from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { invariant } from 'src/shared/invariant';
@@ -22,9 +24,10 @@ export function ChooseGlobalProvider({
     useGlobalPreferences();
 
   if (!globalPreferences) {
-    // return <ViewLoading />;
-    return null;
+    return <ViewLoading />;
   }
+
+  const hostname = new URL(origin).hostname;
 
   return (
     <div className="flex flex-col flex-1 px-4 h-full">
@@ -32,42 +35,53 @@ export function ChooseGlobalProvider({
         className="grid h-full flex-1"
         style={{ gridTemplateRows: '1fr auto' }}
       >
-        <div className="self-center border border-gray-200 rounded-3xl p-10">
-          <div className="flex flex-col gap-6">
-            <h2 className="text-2xl font-bold text-center">
-              <div>Connect to</div>
-              <div className="text-gray-500">{new URL(origin).hostname}</div>
-            </h2>
-
-            <div className="flex flex-col gap-2">
-              <button
-                type="button"
-                onClick={() => onConfirm()}
-                className="flex items-center justify-center gap-2 w-full py-3 rounded-xl bg-blue-600 text-white text-sm font-semibold hover:bg-blue-700 transition-colors"
-              >
-                <BrandLogo style={{ width: 20, height: 20 }} />
-                <span>Continue with Selvo</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={async () => {
-                  await setGlobalPreferencesAsync(
-                    createInjectionPreference(globalPreferences, {
-                      origin,
-                      duration: TurnOffDuration.forever,
-                    })
-                  );
-                  // Give ContentScriptManager time to update
-                  await new Promise((r) => setTimeout(r, 100));
-                  onReject();
-                }}
-                className="w-full py-3 rounded-xl border border-gray-300 text-sm font-semibold text-gray-700 hover:bg-gray-50 transition-colors"
-              >
-                Use Other Wallet
-              </button>
+        <div className="self-center flex flex-col gap-7 border border-border/20 rounded-3xl p-8">
+          <div className="flex flex-col items-center gap-2.5">
+            <div className="w-13 h-13 rounded-[14px] bg-muted/40 border border-border/20 flex items-center justify-center">
+              <SiteFaviconImg url={origin} size={26} />
+            </div>
+            <p className="text-[11px] text-muted-foreground uppercase tracking-widest">
+              Connect to
+            </p>
+            <div className="flex items-center gap-1.5 bg-muted/40 border border-border/20 rounded-full px-3.5 py-1.5">
+              <span className="w-2 h-2 rounded-full bg-emerald-500 shrink-0" />
+              <span className="text-[13px] font-medium text-foreground">
+                {hostname}
+              </span>
             </div>
           </div>
+
+          <div className="flex flex-col gap-2">
+            <button
+              type="button"
+              onClick={onConfirm}
+              className="flex items-center justify-center gap-2 w-full py-3 rounded-xl bg-foreground text-background text-sm font-medium hover:opacity-85 transition-opacity"
+            >
+              <BrandLogo style={{ width: 17, height: 17 }} />
+              Continue with Selvo
+            </button>
+
+            <button
+              type="button"
+              onClick={async () => {
+                await setGlobalPreferencesAsync(
+                  createInjectionPreference(globalPreferences, {
+                    origin,
+                    duration: TurnOffDuration.forever,
+                  })
+                );
+                await new Promise((r) => setTimeout(r, 100));
+                onReject();
+              }}
+              className="w-full py-3 rounded-xl border border-border/40 text-sm font-medium text-muted-foreground hover:bg-muted/40 transition-colors"
+            >
+              Use other wallet
+            </button>
+          </div>
+
+          <p className="text-[11px] text-muted-foreground/60 text-center leading-relaxed">
+            Selvo will never request your seed phrase or private key.
+          </p>
         </div>
       </div>
     </div>

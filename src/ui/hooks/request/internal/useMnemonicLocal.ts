@@ -19,9 +19,7 @@ export function useMnenomicPhraseForLocation({
   const { value: phraseFromState } = useMemoryLocationState(locationStateStore);
   const [params] = useSearchParams();
   const groupId = params.get('groupId');
-  if (!phraseFromState && !groupId) {
-    throw new Error('View data expired');
-  }
+
   const getRecoveryPhraseQuery = useQuery({
     queryKey: [`getRecoveryPhrase(${groupId})`],
     queryFn: async () => {
@@ -33,12 +31,13 @@ export function useMnenomicPhraseForLocation({
       }
       return mnemonic.phrase;
     },
-    enabled: !phraseFromState,
+    enabled: !phraseFromState && !!groupId,
     retry: false,
     refetchOnMount: false,
     refetchOnWindowFocus: false,
     refetchOnReconnect: false,
   });
+
   if (phraseFromState) {
     return {
       phrase: phraseFromState,
@@ -46,12 +45,21 @@ export function useMnenomicPhraseForLocation({
       isError: false,
       error: null,
     };
-  } else {
+  }
+
+  if (!groupId) {
     return {
-      phrase: getRecoveryPhraseQuery.data,
-      isLoading: getRecoveryPhraseQuery.isLoading,
-      isError: getRecoveryPhraseQuery.isError,
-      error: getRecoveryPhraseQuery.error,
+      phrase: undefined,
+      isLoading: false,
+      isError: true,
+      error: new Error('Session expired'),
     };
   }
+
+  return {
+    phrase: getRecoveryPhraseQuery.data,
+    isLoading: getRecoveryPhraseQuery.isLoading,
+    isError: getRecoveryPhraseQuery.isError,
+    error: getRecoveryPhraseQuery.error,
+  };
 }

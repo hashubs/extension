@@ -4,6 +4,7 @@ export * from './button';
 export * from './collapsible';
 export * from './dialog';
 export * from './drawer';
+export * from './dropdown-menu';
 export * from './input/input';
 export * from './media-fallback';
 export * from './popover';

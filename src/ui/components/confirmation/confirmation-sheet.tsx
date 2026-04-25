@@ -72,7 +72,11 @@ export function ConfirmationSheet({
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent className="flex flex-col h-full">
-        <Header title={title} onBack={() => onOpenChange(false)} />
+        <Header
+          title={title}
+          onBack={() => onOpenChange(false)}
+          className="px-4"
+        />
 
         <div className="flex-1 flex flex-col justify-center p-4 pt-0 space-y-4 no-scrollbar overflow-y-auto">
           <div className="flex flex-col items-center text-center mt-2 mb-8">

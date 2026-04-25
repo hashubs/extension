@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { GlobalPreferences } from '@/shared/types/global-preferences';
-import { Header } from '@/ui/components/header';
+import { Layout } from '@/ui/components/layout';
 import { useGlobalPreferences } from '@/ui/features/preferences/usePreferences';
 import { Card, CardItem } from '@/ui/ui-kit';
 import { isTruthy } from 'is-truthy-ts';
@@ -50,30 +50,27 @@ export function AutoLockTimerView() {
   }, [mutation.isSuccess, navigate]);
 
   return (
-    <div className="flex flex-col h-full">
-      <Header
-        title="Auto-Lock Timer"
-        onBack={() => navigate(BACK_ROUTE, { state: { direction: 'back' } })}
-      />
-      <div className="flex-1 p-4 pt-0 space-y-4 no-scrollbar overflow-y-auto">
-        <Card title="Choose timer">
-          {AUTO_LOCK_TIMER_OPTIONS.map((option) => (
-            <CardItem
-              key={option.value}
-              item={{
-                label: option.title,
-                onClick: () =>
-                  setGlobalPreferences({ autoLockTimeout: option.value }),
-                iconRight:
-                  globalPreferences?.autoLockTimeout === option.value
-                    ? LuCheck
-                    : undefined,
-              }}
-            />
-          ))}
-        </Card>
-      </div>
-    </div>
+    <Layout
+      title="Auto-Lock Timer"
+      onBack={() => navigate(BACK_ROUTE, { state: { direction: 'back' } })}
+    >
+      <Card title="Choose timer">
+        {AUTO_LOCK_TIMER_OPTIONS.map((option) => (
+          <CardItem
+            key={option.value}
+            item={{
+              label: option.title,
+              onClick: () =>
+                setGlobalPreferences({ autoLockTimeout: option.value }),
+              iconRight:
+                globalPreferences?.autoLockTimeout === option.value
+                  ? LuCheck
+                  : undefined,
+            }}
+          />
+        ))}
+      </Card>
+    </Layout>
   );
 }
 

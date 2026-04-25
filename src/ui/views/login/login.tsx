@@ -1,5 +1,6 @@
 import { zeroizeAfterSubmission } from '@/shared/zeroize-submission';
 import { BlockieAddress } from '@/ui/components/blockie';
+import { Layout } from '@/ui/components/layout';
 import { BrandLogo } from '@/ui/components/svg';
 import { useGetExistingUser } from '@/ui/hooks/request/internal/useAccount';
 import { useLogin } from '@/ui/hooks/request/internal/useAuth';
@@ -45,8 +46,8 @@ export function LoginView() {
 
   return (
     <>
-      <div className="flex flex-col h-full bg-[#f8f8f8] dark:bg-[#202020] overflow-hidden relative">
-        <div className="flex-1 relative flex items-center justify-center min-h-[280px] overflow-hidden bg-[#f8f8f8] dark:bg-[#202020]">
+      <Layout className="relative p-0! overflow-hidden space-y-0 bg-[#f8f8f8] dark:bg-[#202020]">
+        <div className="relative flex items-center justify-center h-full overflow-hidden">
           <AnimatedBackground show={!!lastUsedAddress} />
 
           <div className="relative z-10 flex flex-col items-center gap-4">
@@ -84,7 +85,7 @@ export function LoginView() {
             size="lg"
             placeholder="Password"
             autoFocus={!isUserLoading}
-            leftIcon={RiLockPasswordLine}
+            icon={RiLockPasswordLine}
           />
           {!!loginMutation.error && (
             <p className="text-[#D4577A] text-xs mt-1.5">
@@ -115,7 +116,7 @@ export function LoginView() {
             </Button>
           </div>
         </div>
-      </div>
+      </Layout>
 
       <ForgotPassword
         open={forgotPasswordOpen}

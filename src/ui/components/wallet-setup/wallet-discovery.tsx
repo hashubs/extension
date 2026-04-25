@@ -38,9 +38,11 @@ import groupBy from 'lodash/groupBy';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { SiEthereum, SiSolana } from 'react-icons/si';
 
+import { Processing } from '@/ui/components/processing';
 import { useMnenomicPhraseForLocation } from '@/ui/hooks/request/internal/useMnemonicLocal';
 import { MemoryLocationState } from '@/ui/shared/memoryLocationState';
-import { Processing } from '@/ui/components/processing';
+import { Footer, Layout } from '../layout';
+import { LayoutHeading } from '../layout/heading';
 
 const ECOSYSTEM_META = {
   evm: {
@@ -241,6 +243,7 @@ function SelectMoreWalletsDialog({
         <Header
           title="Select Another Wallet"
           onBack={() => onOpenChange(false)}
+          className="px-4"
         />
 
         <Tabs
@@ -340,6 +343,8 @@ function WalletDiscoveryContent({
     [activeWallets, existingAddressesSet, wallets]
   );
 
+  console.log('suggestedWallets', suggestedWallets);
+
   const [selectedAddresses, setSelectedAddresses] = useState<Set<string>>(
     () => {
       return new Set(
@@ -414,113 +419,100 @@ function WalletDiscoveryContent({
   };
 
   return (
-    <div className="flex flex-col h-full bg-background overflow-hidden">
-      <Header title="Wallets Ready to Import" onBack={onBack} />
-
-      <div className="flex-1 flex flex-col p-4 pt-0 space-y-4 no-scrollbar overflow-y-auto">
-        <div className="text-center space-y-1">
-          {suggestedWallets.activeCount ? (
-            <h3 className="text-lg font-bold">
-              We found{' '}
-              {suggestedWallets.activeCount === 1
-                ? '1 active wallet'
-                : `${suggestedWallets.activeCount} active wallets`}
-            </h3>
-          ) : (
-            <>
-              <h3 className="text-lg font-bold">
-                We didn’t find any active wallets
-              </h3>
-              <p className="text-sm text-muted-foreground">
-                Start with these wallets associated with your recovery phrase
-              </p>
-            </>
-          )}
-        </div>
-
-        <div className="flex-1 space-y-4">
-          {displayGroups
-            .filter((group) => group.wallets.length > 0)
-            .map((group) => {
-              const meta = ECOSYSTEM_META[group.ecosystem as 'evm' | 'solana'];
-              return (
-                <Card
-                  key={group.ecosystem}
-                  title={meta.label}
-                  titleIconNode={
-                    <meta.Icon
-                      style={{ width: meta.iconSize, height: meta.iconSize }}
+    <Layout title="Wallets Ready to Import" onBack={onBack} wrapped={false}>
+      {suggestedWallets.activeCount ? (
+        <LayoutHeading
+          title="We found active wallets"
+          description={`${
+            suggestedWallets.activeCount === 1
+              ? '1 active wallet'
+              : `${suggestedWallets.activeCount} active wallets`
+          }`}
+        />
+      ) : (
+        <LayoutHeading
+          title="We didn’t find any active wallets"
+          description="Start with these wallets associated with your recovery phrase"
+        />
+      )}
+      <div className="flex-1 space-y-4">
+        {displayGroups
+          .filter((group) => group.wallets.length > 0)
+          .map((group) => {
+            const meta = ECOSYSTEM_META[group.ecosystem as 'evm' | 'solana'];
+            return (
+              <Card
+                key={group.ecosystem}
+                title={meta.label}
+                titleIconNode={
+                  <meta.Icon
+                    style={{ width: meta.iconSize, height: meta.iconSize }}
+                  />
+                }
+                className="bg-transparent"
+              >
+                {group.wallets.map((wallet) => {
+                  const isExisting = existingAddressesSet.has(
+                    normalizeAddress(wallet.address)
+                  );
+                  return (
+                    <CardItem
+                      key={wallet.address}
+                      item={{
+                        label: truncateAddress(wallet.address),
+                        subLabel: isExisting
+                          ? 'Already imported'
+                          : getValueAddress(wallet.address),
+                        disabled: isExisting,
+                        iconNode: (
+                          <BlockieAddress
+                            address={wallet.address}
+                            size={22}
+                            borderRadius={4}
+                          />
+                        ),
+                        onClick: isExisting
+                          ? undefined
+                          : () => {
+                              setSelectedAddresses((prev) => {
+                                const next = new Set(prev);
+                                if (next.has(wallet.address))
+                                  next.delete(wallet.address);
+                                else next.add(wallet.address);
+                                return next;
+                              });
+                            },
+                        rightElement: (
+                          <AnimatedCheckmark
+                            animate
+                            checked={selectedAddresses.has(wallet.address)}
+                            size={20}
+                            checkedColor="var(--muted-foreground)"
+                            uncheckedColor="var(--surface-container-highest)"
+                          />
+                        ),
+                      }}
                     />
-                  }
-                  className="bg-transparent"
-                >
-                  {group.wallets.map((wallet) => {
-                    const isExisting = existingAddressesSet.has(
-                      normalizeAddress(wallet.address)
-                    );
-                    return (
-                      <CardItem
-                        key={wallet.address}
-                        item={{
-                          label: truncateAddress(wallet.address),
-                          subLabel: isExisting
-                            ? 'Already imported'
-                            : getValueAddress(wallet.address),
-                          disabled: isExisting,
-                          iconNode: (
-                            <BlockieAddress
-                              address={wallet.address}
-                              size={22}
-                              borderRadius={4}
-                            />
-                          ),
-                          onClick: isExisting
-                            ? undefined
-                            : () => {
-                                setSelectedAddresses((prev) => {
-                                  const next = new Set(prev);
-                                  if (next.has(wallet.address))
-                                    next.delete(wallet.address);
-                                  else next.add(wallet.address);
-                                  return next;
-                                });
-                              },
-                          rightElement: (
-                            <AnimatedCheckmark
-                              animate
-                              checked={selectedAddresses.has(wallet.address)}
-                              size={20}
-                              checkedColor="var(--muted-foreground)"
-                              uncheckedColor="var(--surface-container-highest)"
-                            />
-                          ),
-                        }}
-                      />
-                    );
-                  })}
-                </Card>
-              );
-            })}
-        </div>
-
-        <div className="flex flex-col gap-3">
-          <Button
-            variant="ghost"
-            onClick={() => setIsSheetOpen(true)}
-            className="text-primary hover:text-primary/80 font-medium"
-          >
-            Select Another Wallet
-          </Button>
-          <Button
-            variant="primary"
-            disabled={selectedAddresses.size === 0}
-            onClick={() => handleSelect(selectedAddresses)}
-          >
-            Continue{' '}
-            {selectedAddresses.size ? ` (${selectedAddresses.size})` : ''}
-          </Button>
-        </div>
+                  );
+                })}
+              </Card>
+            );
+          })}
       </div>
+
+      <Footer>
+        <Button variant="ghost" onClick={() => setIsSheetOpen(true)}>
+          Select Another Wallet
+        </Button>
+        <Button
+          variant="primary"
+          disabled={selectedAddresses.size === 0}
+          onClick={() => handleSelect(selectedAddresses)}
+        >
+          Continue{' '}
+          {selectedAddresses.size ? ` (${selectedAddresses.size})` : ''}
+        </Button>
+      </Footer>
 
       <SelectMoreWalletsDialog
         isOpen={isSheetOpen}
@@ -531,7 +523,7 @@ function WalletDiscoveryContent({
         existingAddressesSet={existingAddressesSet}
         onSubmit={(v) => setSelectedAddresses(new Set(v))}
       />
-    </div>
+    </Layout>
   );
 }
 

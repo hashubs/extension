@@ -4,10 +4,10 @@ import { OnboardingInterrupt } from './errors';
 
 /**
  * Ensures the user is redirected to the onboarding flow if no account is detected.
- * This is primarily used in the Popup entry point to redirect new users to a 
+ * This is primarily used in the Popup entry point to redirect new users to a
  * full-tab setup experience (onboarding.html) for better UX.
- * 
- * It checks the current page context to prevent redirect loops when called 
+ *
+ * It checks the current page context to prevent redirect loops when called
  * from within the onboarding page itself.
  */
 export async function maybeOpenOnboarding() {

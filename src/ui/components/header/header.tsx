@@ -1,14 +1,21 @@
+import { cn } from '@/ui/lib/utils';
 import { LuChevronLeft } from 'react-icons/lu';
 
 interface Props {
   title?: string;
   onBack?: () => void;
   renderElement?: React.ReactNode;
+  className?: string;
 }
 
-export function Header({ title, onBack, renderElement }: Props) {
+export function Header({ title, onBack, renderElement, className }: Props) {
   return (
-    <div className="flex items-center justify-between sticky top-0 bg-background/80 backdrop-blur-md p-[16px] shrink-0 z-20 gap-2">
+    <div
+      className={cn(
+        'flex items-center justify-between sticky top-0 bg-background/80 backdrop-blur-md py-4 mb-0! shrink-0 z-20 gap-2',
+        className
+      )}
+    >
       {onBack && (
         <button
           type="button"

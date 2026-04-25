@@ -1,4 +1,4 @@
-import { Header } from '@/ui/components/header';
+import { Layout } from '@/ui/components/layout';
 import { preferenceStore, ThemePreference } from '@/ui/features/appearance';
 import { Card, CardItem } from '@/ui/ui-kit/card';
 import { useStore } from '@store-unit/react';
@@ -27,31 +27,27 @@ export function ThemeView() {
   };
 
   return (
-    <div className="flex flex-col h-full">
-      <Header
-        title="Theme"
-        onBack={() => navigate('/settings', { state: { direction: 'back' } })}
-      />
-
-      <div className="flex-1 p-4 pt-0 space-y-4 no-scrollbar overflow-y-auto">
-        <p className="text-sm text-muted-foreground mb-4">
-          Select your preferred theme for the interface.
-        </p>
-        <Card>
-          {themeOptions.map(({ value, icon: Icon, label }) => (
-            <CardItem
-              key={value}
-              item={{
-                icon: Icon,
-                label,
-                iconRight: mode === value ? Check : undefined,
-                onClick: () => setTheme(value),
-              }}
-            />
-          ))}
-        </Card>
-      </div>
-    </div>
+    <Layout
+      title="Theme"
+      onBack={() => navigate('/settings', { state: { direction: 'back' } })}
+    >
+      <p className="text-sm text-muted-foreground mb-4">
+        Select your preferred theme for the interface.
+      </p>
+      <Card>
+        {themeOptions.map(({ value, icon: Icon, label }) => (
+          <CardItem
+            key={value}
+            item={{
+              icon: Icon,
+              label,
+              iconRight: mode === value ? Check : undefined,
+              onClick: () => setTheme(value),
+            }}
+          />
+        ))}
+      </Card>
+    </Layout>
   );
 }
 

@@ -12,7 +12,7 @@ import {
 import { formatFiatToParts } from '@/shared/units/format-fiat';
 import { BlockieAddress } from '@/ui/components/blockie';
 import { ConfirmationSheet } from '@/ui/components/confirmation';
-import { Header } from '@/ui/components/header';
+import { Layout } from '@/ui/components/layout';
 import { useProfileName } from '@/ui/hooks/request/internal/useProfileName';
 import {
   QUERY_WALLET,
@@ -233,8 +233,8 @@ export function WalletAccountView() {
   ].filter(Boolean) as ItemType[];
 
   return (
-    <div className="flex flex-col h-full">
-      <Header
+    <>
+      <Layout
         title={displayName}
         onBack={() => {
           const backUrl = isFlat
@@ -248,9 +248,7 @@ export function WalletAccountView() {
             },
           });
         }}
-      />
-
-      <div className="flex-1 p-4 pt-0! space-y-4 overflow-y-auto no-scrollbar">
+      >
         <div className="flex items-center gap-2">
           <BlockieAddress address={address} size={52} borderRadius={6} />
           <div className="flex flex-col">
@@ -312,7 +310,7 @@ export function WalletAccountView() {
             <CardItem key={i} item={item} />
           ))}
         </Card>
-      </div>
+      </Layout>
 
       <ConfirmationSheet
         open={openConfirm}
@@ -342,6 +340,6 @@ export function WalletAccountView() {
           },
         ]}
       />
-    </div>
+    </>
   );
 }

@@ -35,7 +35,7 @@ export function ActionSearch({
       onChange={(event) => {
         debouncedHandleChange(event.currentTarget.value);
       }}
-      leftIcon={LuSearch}
+      icon={LuSearch}
     />
   );
 }

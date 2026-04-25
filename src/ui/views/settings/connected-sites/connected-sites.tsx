@@ -3,7 +3,7 @@ import {
   ConnectedSiteItem,
   getPermissionsWithWallets,
 } from '@/shared/request/internal/getPermissionsWithWallets';
-import { Header } from '@/ui/components/header';
+import { Layout } from '@/ui/components/layout';
 import { SiteFaviconImg } from '@/ui/components/SiteFaviconImg';
 import { truncateAddress } from '@/ui/lib/utils';
 import { Button, Input } from '@/ui/ui-kit';
@@ -161,7 +161,7 @@ function SearchBar({
           placeholder="Search sites…"
           value={value}
           onChange={(e) => handleChange(e.currentTarget.value)}
-          leftIcon={LuSearch}
+          icon={LuSearch}
         />
       )}
     />
@@ -255,51 +255,47 @@ export function ConnectedSitesView() {
   const siteCount = allSites?.length ?? 0;
 
   return (
-    <div className="flex flex-col h-full overflow-hidden bg-background">
-      <Header
-        title="Connected DApps"
-        onBack={() => navigate('/settings', { state: { direction: 'back' } })}
-      />
+    <Layout
+      title="Connected DApps"
+      onBack={() => navigate('/settings', { state: { direction: 'back' } })}
+    >
+      {siteCount > 0 && (
+        <SearchBar
+          inputRef={searchInputRef}
+          value={searchQuery}
+          onChange={setSearchQuery}
+        />
+      )}
 
-      <div className="flex flex-col flex-1 min-h-0 overflow-y-auto px-4 pb-4 space-y-4">
-        {siteCount > 0 && (
-          <SearchBar
-            inputRef={searchInputRef}
-            value={searchQuery}
-            onChange={setSearchQuery}
-          />
-        )}
+      {siteCount > 0 && !searchQuery && (
+        <div className="flex items-center justify-between ml-1 mb-2!">
+          <h2 className="text-[11px] font-semibold text-muted-foreground uppercase tracking-widest">
+            Active connections
+          </h2>
+          <span className="text-[10px] font-medium px-2 py-0.5 bg-muted/50 text-muted-foreground border border-border/30 rounded-full">
+            {siteCount}
+          </span>
+        </div>
+      )}
 
-        {siteCount > 0 && !searchQuery && (
-          <div className="flex items-center justify-between ml-1 mb-2!">
-            <h2 className="text-[11px] font-semibold text-muted-foreground uppercase tracking-widest">
-              Active connections
-            </h2>
-            <span className="text-[10px] font-medium px-2 py-0.5 bg-muted/50 text-muted-foreground border border-border/30 rounded-full">
-              {siteCount}
-            </span>
-          </div>
-        )}
-
-        {isLoading ? (
-          <LoadingSkeleton />
-        ) : filtered?.length ? (
-          <ConnectedSitesList
-            items={filtered}
-            showDisconnectAll={!searchQuery}
-            onRevokeAll={() => query.refetch()}
-          />
-        ) : (
-          <EmptyState
-            hasConnectedSites={siteCount > 0}
-            hasQuery={Boolean(searchQuery)}
-            onReset={() => {
-              searchInputRef.current?.setValue('');
-              setSearchQuery('');
-            }}
-          />
-        )}
-      </div>
-    </div>
+      {isLoading ? (
+        <LoadingSkeleton />
+      ) : filtered?.length ? (
+        <ConnectedSitesList
+          items={filtered}
+          showDisconnectAll={!searchQuery}
+          onRevokeAll={() => query.refetch()}
+        />
+      ) : (
+        <EmptyState
+          hasConnectedSites={siteCount > 0}
+          hasQuery={Boolean(searchQuery)}
+          onReset={() => {
+            searchInputRef.current?.setValue('');
+            setSearchQuery('');
+          }}
+        />
+      )}
+    </Layout>
   );
 }

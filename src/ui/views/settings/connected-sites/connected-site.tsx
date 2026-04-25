@@ -6,7 +6,7 @@ import { getPermissionsWithWallets } from '@/shared/request/internal/getPermissi
 import { ExternallyOwnedAccount } from '@/shared/types/externally-owned-account';
 import { BlockieAddress } from '@/ui/components/blockie';
 import { MetamaskMode } from '@/ui/components/ConnectedSite/MetamaskMode';
-import { Header } from '@/ui/components/header';
+import { Layout } from '@/ui/components/layout';
 import { ViewNotFound } from '@/ui/components/view-not-found';
 import { WalletDisplayName } from '@/ui/components/wallet';
 import { useRemovePermissionMutation } from '@/ui/hooks/request/internal/useRemovePermission';
@@ -210,7 +210,52 @@ export function ConnectedSiteView() {
   const title = getNameFromOrigin(connectedSite.origin);
 
   return (
-    <div className="flex flex-col h-full overflow-hidden bg-background">
+    <>
+      <Layout title={title} onBack={handleBack}>
+        <div className="flex flex-col gap-2">
+          <SectionLabel>DApp overview</SectionLabel>
+
+          {siteHref && <SiteLink label={title} href={siteHref.href} />}
+
+          <MetamaskMode originName={originName} />
+        </div>
+
+        {connectedSite.wallets.length > 0 && (
+          <div className="flex flex-col gap-2">
+            <SectionLabel badge={connectedSite.wallets.length}>
+              Connected addresses
+            </SectionLabel>
+
+            <div className="flex flex-col gap-1.5">
+              {connectedSite.wallets.map((wallet) => (
+                <WalletRow
+                  key={wallet.address}
+                  wallet={wallet}
+                  onDisconnect={() => setConfirmAddress(wallet.address)}
+                />
+              ))}
+            </div>
+
+            {connectedSite.wallets.length > 1 && (
+              <button
+                onClick={() => setConfirmAll(true)}
+                className="
+                    mt-1 w-full py-3 rounded-xl
+                    border border-danger/20 bg-danger/5
+                    text-sm font-medium text-danger
+                    hover:bg-danger/10 hover:border-danger/30
+                    transition-colors duration-150
+                  "
+              >
+                {allRemoveMutation.isPending
+                  ? 'Disconnecting…'
+                  : 'Disconnect all addresses'}
+              </button>
+            )}
+          </div>
+        )}
+      </Layout>
+
       <ConfirmDrawer
         open={confirmAddress !== null}
         onOpenChange={(open) => !open && setConfirmAddress(null)}
@@ -241,54 +286,6 @@ export function ConnectedSiteView() {
           setConfirmAll(false);
         }}
       />
-
-      <Header title={title} onBack={handleBack} />
-
-      <div className="flex-1 overflow-y-auto px-4 py-4 flex flex-col gap-5">
-        <section className="flex flex-col gap-2">
-          <SectionLabel>DApp overview</SectionLabel>
-
-          {siteHref && <SiteLink label={title} href={siteHref.href} />}
-
-          <MetamaskMode originName={originName} />
-        </section>
-
-        {connectedSite.wallets.length > 0 && (
-          <section className="flex flex-col gap-2">
-            <SectionLabel badge={connectedSite.wallets.length}>
-              Connected addresses
-            </SectionLabel>
-
-            <div className="flex flex-col gap-1.5">
-              {connectedSite.wallets.map((wallet) => (
-                <WalletRow
-                  key={wallet.address}
-                  wallet={wallet}
-                  onDisconnect={() => setConfirmAddress(wallet.address)}
-                />
-              ))}
-            </div>
-
-            {/* disconnect all — only visible when 2+ wallets */}
-            {connectedSite.wallets.length > 1 && (
-              <button
-                onClick={() => setConfirmAll(true)}
-                className="
-                  mt-1 w-full py-3 rounded-xl
-                  border border-danger/20 bg-danger/5
-                  text-sm font-medium text-danger
-                  hover:bg-danger/10 hover:border-danger/30
-                  transition-colors duration-150
-                "
-              >
-                {allRemoveMutation.isPending
-                  ? 'Disconnecting…'
-                  : 'Disconnect all addresses'}
-              </button>
-            )}
-          </section>
-        )}
-      </div>
-    </div>
+    </>
   );
 }

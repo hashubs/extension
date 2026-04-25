@@ -2,9 +2,8 @@ import { isCustomNetworkId } from '@/modules/ethereum/chains/helpers';
 import { getOriginUrlFromMetaData } from '@/modules/networks/helpers';
 import { NetworkConfig } from '@/modules/networks/network-config';
 import { NetworkConfigMetaData } from '@/modules/networks/networks';
-import { isSolanaAddress } from '@/modules/solana/shared';
 import { getAddressType } from '@/shared/wallet/classifiers';
-import { Header } from '@/ui/components/header';
+import { Layout } from '@/ui/components/layout';
 import { usePreferences } from '@/ui/features/preferences';
 import { useNetworks } from '@/ui/hooks/request/internal/useNetworks';
 import { useAddressParams } from '@/ui/hooks/request/internal/useWallet';
@@ -81,7 +80,6 @@ export function ManageNetwork() {
   const isTestnetMode = Boolean(preferences?.testnetMode?.on);
 
   const { singleAddress } = useAddressParams();
-  const isSolana = isSolanaAddress(singleAddress);
   const addressType = useMemo(
     () => (singleAddress ? getAddressType(singleAddress) : null),
     [singleAddress]
@@ -130,57 +128,50 @@ export function ManageNetwork() {
   );
 
   return (
-    <div className="flex flex-col h-full">
-      <Header
-        title="Network"
-        onBack={() => navigate('/settings', { state: { direction: 'back' } })}
-      />
-
-      <div className="flex-1 p-4 pt-0 space-y-4 no-scrollbar overflow-y-auto">
-        {!isSolana && (
-          <Card>
-            <CardItem
-              item={{
-                icon: IoAddOutline,
-                iconRight: IoChevronForwardOutline,
-                label: 'Add Network',
-                onClick: () => navigate('/settings/manage-networks/add'),
-                iconClassName:
-                  'bg-linear-to-br from-indigo-500/20 to-indigo-600/10 text-indigo-400 border border-indigo-500/10',
-              }}
-            />
-          </Card>
-        )}
-
-        <div className="space-y-4">
-          {groups.map((group) => {
-            return (
-              <div key={group.key}>
-                {group.name && (
-                  <h3 className="px-1 text-xs font-bold uppercase tracking-widest text-muted-foreground/80 pb-2">
-                    {group.name}
-                  </h3>
-                )}
-                <Card className="border border-border">
-                  {group.items.map((item) => (
-                    <NetworkRow
-                      key={item.id}
-                      item={item}
-                      isTestnetMode={isTestnetMode}
-                      metadata={metadataRecord[item.id]}
-                      groupKey={group.key}
-                      dateFormatter={dateFormatter}
-                      onClick={() =>
-                        navigate(`/settings/manage-networks/${item.id}`)
-                      }
-                    />
-                  ))}
-                </Card>
-              </div>
-            );
-          })}
-        </div>
+    <Layout
+      title="Network"
+      onBack={() => navigate('/settings', { state: { direction: 'back' } })}
+    >
+      <div className="space-y-4">
+        <Card>
+          <CardItem
+            item={{
+              icon: IoAddOutline,
+              iconRight: IoChevronForwardOutline,
+              label: 'Add Network',
+              onClick: () => navigate('/settings/manage-networks/add'),
+              iconClassName:
+                'bg-linear-to-br from-indigo-500/20 to-indigo-600/10 text-indigo-400 border border-indigo-500/10',
+            }}
+          />
+        </Card>
+        {groups.map((group) => {
+          return (
+            <div key={group.key}>
+              {group.name && (
+                <h3 className="px-1 text-xs font-bold uppercase tracking-widest text-muted-foreground/80 pb-2">
+                  {group.name}
+                </h3>
+              )}
+              <Card className="border border-border">
+                {group.items.map((item) => (
+                  <NetworkRow
+                    key={item.id}
+                    item={item}
+                    isTestnetMode={isTestnetMode}
+                    metadata={metadataRecord[item.id]}
+                    groupKey={group.key}
+                    dateFormatter={dateFormatter}
+                    onClick={() =>
+                      navigate(`/settings/manage-networks/${item.id}`)
+                    }
+                  />
+                ))}
+              </Card>
+            </div>
+          );
+        })}
       </div>
-    </div>
+    </Layout>
   );
 }

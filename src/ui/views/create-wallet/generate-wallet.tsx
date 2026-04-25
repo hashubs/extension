@@ -4,10 +4,8 @@ import { invariant } from '@/shared/invariant';
 import { queryClient } from '@/shared/query-client/queryClient';
 import { setCurrentAddress } from '@/shared/request/internal/setCurrentAddress';
 import { assertKnownEcosystems } from '@/shared/wallet/shared';
-import { Header } from '@/ui/components/header';
-import { ImportBackground, ImportDecoration } from '@/ui/components/wallet';
+import { WalletSetupStatusView } from '@/ui/components/wallet-setup/wallet-success';
 import { QUERY_WALLET } from '@/ui/hooks/request/internal/useWallet';
-import { Button } from '@/ui/ui-kit';
 import { useMutation } from '@tanstack/react-query';
 import { useEffect, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
@@ -80,39 +78,19 @@ export function GenerateWalletView({
   }, [isReady]);
 
   return (
-    <div className="flex flex-col h-full bg-background relative overflow-hidden">
-      <Header
-        title={isReady ? 'Wallet Created' : 'Generating...'}
-        onBack={onBack}
-      />
-      <div className="flex-1 p-4 relative flex flex-col items-center">
-        <div className="absolute inset-0 pointer-events-none">
-          <ImportBackground animate={isLoading} />
-        </div>
-
-        <div className="flex-1 w-full z-10">
-          <ImportDecoration
-            wallets={generatedWallets || []}
-            isLoading={isLoading}
-            loadingTitle="Creating secure phrase..."
-          />
-        </div>
-
-        {isReady && (
-          <div className="mt-auto w-full space-y-4 z-10 animate-in slide-in-from-bottom-4 duration-700">
-            <div className="text-center space-y-1">
-              <h2 className="text-xl font-bold">Successfully Created!</h2>
-              <p className="text-sm text-muted-foreground">
-                Your new recovery phrase is securely encrypted and stored.
-              </p>
-            </div>
-
-            <Button size="md" variant="primary" onClick={onSuccess}>
-              View Wallets
-            </Button>
-          </div>
-        )}
-      </div>
-    </div>
+    <WalletSetupStatusView
+      title={isReady ? 'Wallet Created' : 'Generating...'}
+      loadingTitle="Creating secure phrase..."
+      successTitle="Successfully Created!"
+      successDescription="Your new recovery phrase is securely encrypted and stored."
+      wallets={generatedWallets || []}
+      isPending={isLoading}
+      isSuccess={isReady}
+      isError={finalizeMutation.isError}
+      error={finalizeMutation.error}
+      onBack={onBack}
+      onContinue={onSuccess}
+      buttonText="View Wallets"
+    />
   );
 }

@@ -1,15 +1,14 @@
 import { cn } from '@/ui/lib/utils';
 import { GoGlobe } from 'react-icons/go';
-import { HiOutlineViewGrid } from 'react-icons/hi';
 import { useConnectionSite } from './connection-site/connection-site';
+import { MenuDropdown } from './menu-dropdown';
 import { WalletSelect } from './wallet-select';
 
 interface Props {
-  onMenuOpen?: () => void;
   onConnectionSite?: () => void;
 }
 
-export function OverviewHeader({ onMenuOpen, onConnectionSite }: Props) {
+export function OverviewHeader({ onConnectionSite }: Props) {
   const { isRevealable, isConnectedToActiveTab } = useConnectionSite();
   return (
     <div className="flex items-center justify-between border-b border-muted pb-2 mb-4">
@@ -27,12 +26,7 @@ export function OverviewHeader({ onMenuOpen, onConnectionSite }: Props) {
             <GoGlobe size={20} />
           </button>
         )}
-        <button
-          onClick={onMenuOpen}
-          className="hover:opacity-70 transition-opacity p-1 rounded-md"
-        >
-          <HiOutlineViewGrid size={20} />
-        </button>
+        <MenuDropdown />
       </div>
     </div>
   );

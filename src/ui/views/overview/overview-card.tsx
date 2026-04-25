@@ -23,14 +23,12 @@ interface Props {
   accountName?: string;
   balance?: string;
   balanceChange?: string;
-  onMenuOpen?: () => void;
   onConnectionSite?: () => void;
 }
 
 export function OverviewCard({
   balance = '$0.12',
   balanceChange = '+$35',
-  onMenuOpen,
   onConnectionSite,
 }: Props) {
   const navigate = useNavigate();
@@ -41,10 +39,7 @@ export function OverviewCard({
     <div className="p-1.5">
       <div className="p-1.5 rounded-[24px] bg-[#f6f6f8] dark:bg-[#1f1f1f]">
         <div className="bg-white dark:bg-[#171717] p-[14px] rounded-[20px]">
-          <OverviewHeader
-            onMenuOpen={onMenuOpen}
-            onConnectionSite={onConnectionSite}
-          />
+          <OverviewHeader onConnectionSite={onConnectionSite} />
 
           <div className="mb-3">
             <p className="text-sm font-medium text-muted-foreground">

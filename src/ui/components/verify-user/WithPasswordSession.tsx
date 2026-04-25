@@ -1,16 +1,16 @@
 import { accountPublicRPCPort } from '@/shared/channel';
 import { SessionExpired } from '@/shared/errors/errors';
-import { Header } from '@/ui/components/header';
 import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Layout } from '../layout';
 import { VerifyUser } from './verify-user';
 
 export function WithPasswordSession({
   text,
   children,
   buttonTitle,
-}: React.PropsWithChildren<{ text?: React.ReactNode; buttonTitle?: string }>) {
+}: React.PropsWithChildren<{ text?: string; buttonTitle?: string }>) {
   const navigate = useNavigate();
   const { data, isLoading } = useQuery({
     queryKey: ['passwordSessionData'],
@@ -36,15 +36,17 @@ export function WithPasswordSession({
 
   if (!hasActivePasswordSession && !verified) {
     return (
-      <div className="flex flex-col h-full">
-        <Header title="Enter Password" onBack={() => navigate(-1)} />
-
+      <Layout
+        title="Enter Password"
+        onBack={() => navigate(-1)}
+        wrapped={false}
+      >
         <VerifyUser
           text={text}
           buttonTitle={buttonTitle}
           onSuccess={() => setVerified(true)}
         />
-      </div>
+      </Layout>
     );
   } else {
     return children as JSX.Element;

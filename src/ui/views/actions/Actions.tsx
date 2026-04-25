@@ -1,5 +1,5 @@
 import type { AnyAddressAction } from '@/modules/ethereum/transactions/addressAction';
-import { Header } from '@/ui/components/header';
+import { Layout } from '@/ui/components/layout';
 import { useAddressParams } from '@/ui/hooks/request/internal/useWallet';
 import { useUnifiedActivity } from '@/ui/views/actions/useUnifiedActivity';
 import {
@@ -259,66 +259,64 @@ export function ActionsView() {
   }, [scrollElement]);
 
   return (
-    <div
+    <Layout
       ref={setScrollElement}
-      className="flex flex-col h-full w-full overflow-y-auto relative"
-    >
-      <Header
-        onBack={handleBack}
-        renderElement={
-          <>
+      onBack={handleBack}
+      className="px-0"
+      headerClassName="px-4"
+      renderHeaderElement={
+        <>
+          <div
+            className="relative flex-1 flex items-center justify-center overflow-hidden"
+            style={{ height: '32px' }}
+          >
+            <h1
+              className="absolute text-base font-semibold tracking-wide transition-all duration-300 ease-in-out whitespace-nowrap"
+              style={{
+                opacity: searchPinned ? 0 : 1,
+                transform: searchPinned
+                  ? 'translateY(-10px)'
+                  : 'translateY(0px)',
+                pointerEvents: searchPinned ? 'none' : 'auto',
+              }}
+            >
+              History
+            </h1>
+
             <div
-              className="relative flex-1 flex items-center justify-center overflow-hidden"
-              style={{ height: '36px' }}
+              className="absolute w-full transition-all duration-300 ease-in-out"
+              style={{
+                opacity: searchPinned ? 1 : 0,
+                transform: searchPinned
+                  ? 'translateY(0px)'
+                  : 'translateY(10px)',
+                pointerEvents: searchPinned ? 'auto' : 'none',
+              }}
             >
-              <h1
-                className="absolute text-base font-semibold tracking-wide transition-all duration-300 ease-in-out whitespace-nowrap"
-                style={{
-                  opacity: searchPinned ? 0 : 1,
-                  transform: searchPinned
-                    ? 'translateY(-10px)'
-                    : 'translateY(0px)',
-                  pointerEvents: searchPinned ? 'none' : 'auto',
-                }}
-              >
-                History
-              </h1>
-
-              <div
-                className="absolute w-full transition-all duration-300 ease-in-out"
-                style={{
-                  opacity: searchPinned ? 1 : 0,
-                  transform: searchPinned
-                    ? 'translateY(0px)'
-                    : 'translateY(10px)',
-                  pointerEvents: searchPinned ? 'auto' : 'none',
-                }}
-              >
-                <ActionSearch
-                  value={searchQuery}
-                  onChange={setSearchQuery}
-                  searchPinned={searchPinned}
-                />
-              </div>
+              <ActionSearch
+                value={searchQuery}
+                onChange={setSearchQuery}
+                searchPinned={searchPinned}
+              />
             </div>
-            <button
-              type="button"
-              className="size-[32px] rounded-[9px] flex items-center justify-center bg-muted hover:bg-muted/80 relative"
-              onClick={handleGoToFilter}
-              aria-label="Filters"
-            >
-              <LuListFilter size={15} />
-              {hasAnyFilter && (
-                <span className="absolute top-2 right-1.5 size-2 bg-blue-500 rounded-full ring-2 ring-background transition-transform" />
-              )}
-            </button>
-          </>
-        }
-      />
-
+          </div>
+          <button
+            type="button"
+            className="size-[32px] rounded-[9px] flex items-center justify-center bg-muted hover:bg-muted/80 relative"
+            onClick={handleGoToFilter}
+            aria-label="Filters"
+          >
+            <LuListFilter size={20} />
+            {hasAnyFilter && (
+              <span className="absolute top-2 right-1.5 size-2 bg-blue-500 rounded-full ring-2 ring-background transition-transform" />
+            )}
+          </button>
+        </>
+      }
+    >
       <div
         ref={searchRef}
-        className="px-4 pb-2 bg-background/50"
+        className="bg-background/50 px-4"
         style={{
           opacity: searchPinned ? 0 : 1,
           pointerEvents: searchPinned ? 'none' : 'auto',
@@ -360,6 +358,6 @@ export function ActionsView() {
       >
         {selectedTx && <ActionInfo addressAction={selectedTx} />}
       </Modal>
-    </div>
+    </Layout>
   );
 }

@@ -4,7 +4,7 @@ import type { BareWallet } from '@/shared/types/bare-wallet';
 import { DeviceAccount } from '@/shared/types/device';
 import { ExternallyOwnedAccount } from '@/shared/types/externally-owned-account';
 import type { BlockchainType } from '@/shared/wallet/classifiers';
-import { Header } from '@/ui/components/header';
+import { Layout } from '@/ui/components/layout';
 import { WalletList } from '@/ui/components/wallet/wallet-list/wallet-list';
 import {
   QUERY_WALLET,
@@ -103,30 +103,24 @@ export function WalletSelectorView() {
   const showSearch = totalWalletCount >= MIN_WALLETS_FOR_SEARCH;
 
   return (
-    <div className="flex flex-col h-full overflow-hidden bg-background">
-      <Header title="Select Wallet" onBack={handleBack} />
+    <Layout title="Select Wallet" onBack={handleBack} wrapped={false}>
+      <Input
+        type="search"
+        placeholder="Search wallets"
+        value={searchQuery}
+        onChange={(e) => setSearchQuery(e.currentTarget.value)}
+        size="md"
+        status="default"
+        icon={IoSearchOutline}
+        disabled={!showSearch}
+      />
 
-      <div className="px-4 pb-3 pt-0.5 border-b border-muted-foreground/10">
-        <Input
-          type="search"
-          placeholder="Search wallets"
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.currentTarget.value)}
-          size="md"
-          status="default"
-          leftIcon={IoSearchOutline}
-          disabled={!showSearch}
-        />
-      </div>
-
-      <div className="flex-1 overflow-y-auto no-scrollbar p-4">
-        <WalletList
-          selectedAddress={activeAddress}
-          walletGroups={walletGroups as any}
-          onSelect={onSelect}
-          predicate={isWalletMatchingFilter}
-        />
-      </div>
-    </div>
+      <WalletList
+        selectedAddress={activeAddress}
+        walletGroups={walletGroups as any}
+        onSelect={onSelect}
+        predicate={isWalletMatchingFilter}
+      />
+    </Layout>
   );
 }

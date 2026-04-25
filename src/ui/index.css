@@ -196,6 +196,13 @@
     width: var(--body-width);
     min-height: var(--body-height);
     margin-inline: auto;
+    /* overflow: hidden; */
+  }
+
+  html,
+  body,
+  #root {
+    height: 100%;
     overflow: hidden;
   }
 
@@ -205,6 +212,10 @@
     #root {
       width: 100% !important;
       height: 100% !important;
+    }
+
+    .onlyDesktop {
+      @apply hidden;
     }
   }
 

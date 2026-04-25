@@ -71,7 +71,9 @@ class WindowPort extends PortMessageChannel {
       console.error('Error in window confirm:', error);
     } finally {
       WindowPort.maybeRestoreRouteForSidepanel();
-      window.close();
+      if (getWindowType() !== 'sidepanel') {
+        window.close();
+      }
     }
   }
 
@@ -82,7 +84,9 @@ class WindowPort extends PortMessageChannel {
       ]);
     } finally {
       WindowPort.maybeRestoreRouteForSidepanel();
-      window.close();
+      if (getWindowType() !== 'sidepanel') {
+        window.close();
+      }
     }
   }
 }

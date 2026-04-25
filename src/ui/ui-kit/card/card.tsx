@@ -1,4 +1,5 @@
 import { cn } from '@/ui/lib/utils';
+import { forwardRef } from 'react';
 import type { IconType } from 'react-icons';
 
 type TitleIconProps =
@@ -33,19 +34,28 @@ type CardProps = {
   className?: string;
   title?: string;
   classNameTitle?: string;
-} & TitleIconProps;
+} & TitleIconProps &
+  React.ComponentPropsWithoutRef<'div'>;
 
-function TitleIcon({ props }: { props: CardProps }) {
+type ResolvedTitleIconProps = {
+  titleIcon?: IconType;
+  titleIconNode?: React.ReactNode;
+  titleIconUrl?: string;
+  titleIconAlt?: string;
+  titleIconClassName?: string;
+};
+
+function TitleIcon({ props }: { props: ResolvedTitleIconProps }) {
   const className = cn(
     'w-4 h-4 shrink-0 flex items-center justify-center',
     props.titleIconClassName
   );
 
-  if ('titleIconUrl' in props && props.titleIconUrl) {
+  if (props.titleIconUrl) {
     return (
       <img
         src={props.titleIconUrl}
-        alt={'titleIconAlt' in props ? props.titleIconAlt : undefined}
+        alt={props.titleIconAlt}
         className={cn(
           'w-4 h-4 rounded-sm object-cover shrink-0',
           props.titleIconClassName
@@ -54,11 +64,11 @@ function TitleIcon({ props }: { props: CardProps }) {
     );
   }
 
-  if ('titleIconNode' in props && props.titleIconNode) {
+  if (props.titleIconNode) {
     return <span className={className}>{props.titleIconNode}</span>;
   }
 
-  if ('titleIcon' in props && props.titleIcon) {
+  if (props.titleIcon) {
     const Icon = props.titleIcon;
     return (
       <Icon size={14} className={cn('shrink-0', props.titleIconClassName)} />
@@ -68,53 +78,57 @@ function TitleIcon({ props }: { props: CardProps }) {
   return null;
 }
 
-export function Card({
-  children,
-  className,
-  classNameTitle,
-  title,
-  ...props
-}: CardProps) {
-  const hasTitleIcon =
-    ('titleIcon' in props && props.titleIcon) ||
-    ('titleIconNode' in props && props.titleIconNode) ||
-    ('titleIconUrl' in props && props.titleIconUrl);
+export const Card = forwardRef<HTMLDivElement, CardProps>(
+  ({ children, className, classNameTitle, title, ...props }, ref) => {
+    const {
+      titleIcon,
+      titleIconNode,
+      titleIconUrl,
+      titleIconAlt,
+      titleIconClassName,
+      ...domProps
+    } = props as ResolvedTitleIconProps & React.ComponentPropsWithoutRef<'div'>;
 
-  return (
-    <>
-      {title && (
-        <div
-          className={cn(
-            'flex items-center gap-1.5 mb-1.5 ml-1',
-            classNameTitle
-          )}
-        >
-          {hasTitleIcon && (
-            <TitleIcon
-              props={
-                {
-                  children,
-                  className,
-                  title,
+    const hasTitleIcon = titleIcon || titleIconNode || titleIconUrl;
 
-                  ...props,
-                } as CardProps
-              }
-            />
-          )}
-          <h2 className="text-[11px] font-semibold text-muted-foreground uppercase tracking-widest">
-            {title}
-          </h2>
-        </div>
-      )}
-      <div
-        className={cn(
-          'bg-item overflow-hidden border border-border/20 rounded-xl divide-y divide-border/20',
-          className
+    return (
+      <>
+        {title && (
+          <div
+            className={cn(
+              'flex items-center gap-1.5 mb-1.5 ml-1',
+              classNameTitle
+            )}
+          >
+            {hasTitleIcon && (
+              <TitleIcon
+                props={{
+                  titleIcon,
+                  titleIconNode,
+                  titleIconUrl,
+                  titleIconAlt,
+                  titleIconClassName,
+                }}
+              />
+            )}
+            <h2 className="text-[11px] font-semibold text-muted-foreground uppercase tracking-widest">
+              {title}
+            </h2>
+          </div>
         )}
-      >
-        {children}
-      </div>
-    </>
-  );
-}
+        <div
+          ref={ref}
+          className={cn(
+            'bg-item overflow-hidden border border-border/20 rounded-xl divide-y divide-border/20',
+            className
+          )}
+          {...domProps}
+        >
+          {children}
+        </div>
+      </>
+    );
+  }
+);
+
+Card.displayName = 'Card';

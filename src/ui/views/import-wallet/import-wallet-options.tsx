@@ -1,4 +1,4 @@
-import { Header } from '@/ui/components/header';
+import { Layout } from '@/ui/components/layout';
 import { LedgerIcon } from '@/ui/components/svg/ledger';
 import { Card, CardItem } from '@/ui/ui-kit';
 import { ItemType } from '@/ui/ui-kit/card';
@@ -35,16 +35,12 @@ export function ImportWalletOptionsView() {
   ];
 
   return (
-    <div className="flex flex-col h-full bg-background">
-      <Header title="Add Existing Wallet" onBack={() => navigate(-1)} />
-
-      <div className="flex-1 p-4 pt-0 space-y-4 no-scrollbar overflow-y-auto">
-        <Card>
-          {items.map((item, i) => (
-            <CardItem key={i} item={item} />
-          ))}
-        </Card>
-      </div>
-    </div>
+    <Layout title="Add Existing Wallet" onBack={() => navigate(-1)}>
+      <Card>
+        {items.map((item, i) => (
+          <CardItem key={i} item={item} />
+        ))}
+      </Card>
+    </Layout>
   );
 }

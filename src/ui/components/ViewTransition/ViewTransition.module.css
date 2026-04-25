@@ -6,7 +6,6 @@
 }
 
 .layer {
-  height: 100vh;
   position: absolute;
   inset: 0;
   background-color: var(--color-background, white);

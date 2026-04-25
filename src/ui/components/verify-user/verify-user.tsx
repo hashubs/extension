@@ -4,16 +4,17 @@ import { zeroizeAfterSubmission } from '@/shared/zeroize-submission';
 import { useGetExistingUser } from '@/ui/hooks/request/internal/useAccount';
 import { Button, Input } from '@/ui/ui-kit';
 import { useMutation } from '@tanstack/react-query';
-import React, { useId, useRef, useState } from 'react';
-import { Header } from '../header';
+import { useEffect, useId, useRef, useState } from 'react';
+import { Layout } from '../layout';
+import { LayoutHeading } from '../layout/heading';
 
 export function VerifyUser({
   text,
   buttonTitle = 'Unlock',
   onSuccess,
 }: {
-  text?: React.ReactNode;
-  buttonTitle?: React.ReactNode;
+  text?: string;
+  buttonTitle?: string;
   onSuccess: () => void;
 }) {
   const { data: user } = useGetExistingUser();
@@ -37,30 +38,39 @@ export function VerifyUser({
     loginMutation.mutate({ user, password });
   };
 
-  return (
-    <div className="flex-1 flex flex-col h-full p-4 pt-0 space-y-4">
-      <div className="gap-2">
-        <h1 className="text-2xl font-medium">Enter Password</h1>
-        {text && <p className="text-sm text-muted-foreground">{text}</p>}
-      </div>
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      passwordRef.current?.focus();
+    }, 500);
+    return () => clearTimeout(timer);
+  }, []);
 
-      <div className="gap-1">
-        <Input
-          id={inputId}
-          ref={passwordRef}
-          type="password"
-          name="password"
-          placeholder="Enter password"
-          size="md"
-          isError={!!loginMutation.error}
-          onChange={(e) => setIsEmpty(e.target.value === '')}
-          onKeyDown={(e) => e.key === 'Enter' && handleSubmit()}
+  return (
+    <>
+      <div className="flex-1 space-y-4">
+        <LayoutHeading
+          title="Enter Password"
+          description={text || 'Enter your password to unlock your wallet.'}
         />
-        {loginMutation.error && (
-          <p className="text-xs text-destructive">
-            {(loginMutation.error as Error).message || 'Unknown error'}
-          </p>
-        )}
+
+        <div className="gap-1">
+          <Input
+            id={inputId}
+            ref={passwordRef}
+            type="password"
+            name="password"
+            placeholder="Enter password"
+            size="md"
+            isError={!!loginMutation.error}
+            onChange={(e) => setIsEmpty(e.target.value === '')}
+            onKeyDown={(e) => e.key === 'Enter' && handleSubmit()}
+          />
+          {loginMutation.error && (
+            <p className="text-xs text-destructive">
+              {(loginMutation.error as Error).message || 'Unknown error'}
+            </p>
+          )}
+        </div>
       </div>
       <Button
         variant="primary"
@@ -73,7 +83,7 @@ export function VerifyUser({
       >
         {buttonTitle}
       </Button>
-    </div>
+    </>
   );
 }
 
@@ -89,10 +99,8 @@ export function VerifyUserView({
   onSuccess: () => void;
 }) {
   return (
-    <div className="flex flex-col h-full">
-      <Header title="Enter Password" onBack={onBack} />
-
+    <Layout title="Enter Password" onBack={onBack} wrapped={false}>
       <VerifyUser text={text} buttonTitle={buttonTitle} onSuccess={onSuccess} />
-    </div>
+    </Layout>
   );
 }

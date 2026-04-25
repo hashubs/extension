@@ -7,7 +7,7 @@ interface Props {
   loadingText?: string;
 }
 
-export function ViewLoading({ size = 24, onBack, loadingText }: Props) {
+export function ViewLoading({ size = 28, onBack, loadingText }: Props) {
   return (
     <>
       {onBack && <Header onBack={onBack} />}

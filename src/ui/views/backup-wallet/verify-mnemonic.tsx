@@ -2,7 +2,7 @@ import { isSessionExpiredError } from '@/shared/isSessionExpiredError';
 import { apostrophe } from '@/shared/typography';
 import { decodeMasked } from '@/shared/wallet/encode-locally';
 import { zeroizeAfterSubmission } from '@/shared/zeroize-submission';
-import { Header } from '@/ui/components/header';
+import { Footer, Layout } from '@/ui/components/layout';
 import { SecretInput } from '@/ui/components/secret-input';
 import { useDeferredMount } from '@/ui/hooks/useDeferredMount';
 import {
@@ -68,9 +68,8 @@ export function VerifyMnemonicView({
   }, [recoveryPhraseMasked, value, onSuccess]);
 
   return (
-    <div className="flex flex-col h-full bg-background overflow-hidden">
-      <Header title="Verify Wallet" onBack={onBack} />
-      <div className="flex-1 flex flex-col p-4 pt-0 space-y-4 no-scrollbar overflow-y-auto">
+    <Layout title="Verify Wallet" onBack={onBack} wrapped={false}>
+      <div className="flex-1 space-y-2">
         <div className="inline-flex flex-col gap-1">
           <h2 className="text-lg font-semibold">Confirm Recovery Phrase</h2>
           <p className="text-muted-foreground">
@@ -98,7 +97,9 @@ export function VerifyMnemonicView({
             )
           }
         />
+      </div>
 
+      <Footer>
         <Button
           variant="primary"
           size="md"
@@ -107,7 +108,7 @@ export function VerifyMnemonicView({
         >
           Verify
         </Button>
-      </div>
-    </div>
+      </Footer>
+    </Layout>
   );
 }

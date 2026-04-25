@@ -1,15 +1,15 @@
-import { MaskedBareWallet } from '@/shared/types/bare-wallet';
-import { Header } from '@/ui/components/header';
+import { BareWallet, MaskedBareWallet } from '@/shared/types/bare-wallet';
 import { ImportBackground, ImportDecoration } from '@/ui/components/wallet';
 import { Button } from '@/ui/ui-kit';
 import { useEffect, useRef } from 'react';
+import { Footer, Layout } from '../layout';
 
 export interface WalletSetupStatusViewProps {
   title: string;
   loadingTitle?: string;
   successTitle?: string;
   successDescription?: string;
-  wallets: MaskedBareWallet[];
+  wallets: MaskedBareWallet[] | BareWallet[];
   isPending: boolean;
   isSuccess: boolean;
   isError: boolean;
@@ -43,13 +43,12 @@ export function WalletSetupStatusView({
   }, [isSuccess]);
 
   return (
-    <div className="flex flex-col h-full bg-background relative overflow-hidden">
-      <Header
-        title={isPending ? 'Processing...' : isSuccess ? 'Success' : title}
-        onBack={onBack}
-      />
-
-      <div className="flex-1 p-4 relative flex flex-col items-center">
+    <Layout
+      title={isPending ? 'Processing...' : isSuccess ? 'Success' : title}
+      onBack={onBack}
+      wrapped={false}
+    >
+      <div className="relative flex flex-col flex-1 justify-center items-center">
         <div className="absolute inset-0 pointer-events-none">
           <ImportBackground animate={isPending} />
         </div>
@@ -67,29 +66,29 @@ export function WalletSetupStatusView({
             {error.message}
           </div>
         ) : null}
-
-        {isSuccess && (
-          <div className="mt-auto w-full space-y-4 z-10 animate-in slide-in-from-bottom-4 duration-700">
-            <div className="text-center space-y-1">
-              <h2 className="text-xl font-bold">{successTitle}</h2>
-              <p className="text-sm text-muted-foreground">
-                {successDescription}
-              </p>
-            </div>
-
-            <Button
-              ref={autoFocusRef}
-              size="md"
-              variant="primary"
-              onClick={onContinue}
-              className="w-full"
-            >
-              {buttonText}
-            </Button>
-          </div>
-        )}
       </div>
-    </div>
+
+      {isSuccess && (
+        <Footer className="w-full animate-in slide-in-from-bottom-4 duration-700">
+          <div className="text-center space-y-1">
+            <h2 className="text-xl font-semibold">{successTitle}</h2>
+            <p className="text-sm text-muted-foreground">
+              {successDescription}
+            </p>
+          </div>
+
+          <Button
+            ref={autoFocusRef}
+            size="md"
+            variant="primary"
+            onClick={onContinue}
+            className="w-full"
+          >
+            {buttonText}
+          </Button>
+        </Footer>
+      )}
+    </Layout>
   );
 }
 
