@@ -14,7 +14,7 @@ import { QueryClientProvider } from '@tanstack/react-query';
 import { AreaProvider } from 'react-area';
 import { Route, HashRouter as Router, Routes } from 'react-router-dom';
 
-import { getWindowType } from '@/shared/window-type';
+import { urlContext } from '@/shared/UrlContext';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import { useMemo } from 'react';
@@ -37,24 +37,37 @@ dayjs.extend(relativeTime);
  * and orchestration for different extension views (Popup, Sidepanel).
  */
 export function App({ inspect, initialView }: AppProps) {
-  const windowType = getWindowType();
+  const { isFullPage } = urlContext;
+  const isOnboardingMode = urlContext.appMode === 'onboarding';
+  const isPageLayout = urlContext.windowLayout === 'page' || isFullPage;
 
   const bodyClassList = useMemo(() => {
     const result = [];
 
-    const isLayoutFullscreen = windowType === 'tab';
-    const isLayoutSidepanel = windowType === 'sidepanel';
+    const isDialog = urlContext.windowType === 'dialog';
+    const isTab = urlContext.windowType === 'tab';
+    const isSidepanel = urlContext.windowType === 'sidepanel';
 
-    if (isLayoutFullscreen) {
-      result.push(styles.layoutFullscreen);
-    } else if (isLayoutSidepanel) {
-      result.push(styles.layoutSidepanel);
+    if (isDialog) {
+      result.push(styles.isDialog);
+    } else if (isTab) {
+      result.push(styles.isTab);
+    } else if (isSidepanel) {
+      result.push(styles.isSidepanel);
     }
 
+    if (isOnboardingMode || isPageLayout) {
+      result.push(styles.pageLayout);
+    }
     return result;
-  }, [windowType]);
+  }, [isOnboardingMode, isPageLayout]);
 
   useApplyGlobalAnimationClass();
+
+  const isOnboardingView =
+    isOnboardingMode && initialView !== 'handshakeFailure';
+
+  const isFullPageView = isFullPage && !isOnboardingView;
 
   return (
     <AreaProvider>
@@ -71,8 +84,26 @@ export function App({ inspect, initialView }: AppProps) {
             </div>
           )}
           <VersionUpgrade>
-            {windowType === 'tab' ? (
+            {isOnboardingView ? (
               <FullPageRoutes />
+            ) : isFullPageView ? (
+              <Routes>
+                <Route
+                  path="*"
+                  element={
+                    <div className="flex h-full items-center justify-center p-10 text-center">
+                      <div className="max-w-md space-y-4">
+                        <h1 className="text-4xl font-bold">Dashboard</h1>
+                        <p className="text-muted-foreground">
+                          Halaman dashboard utama (Dexscreener style) sedang
+                          dalam pengembangan. Akses melalui popup untuk dompet
+                          Anda.
+                        </p>
+                      </div>
+                    </div>
+                  }
+                />
+              </Routes>
             ) : (
               <Routes>
                 <Route

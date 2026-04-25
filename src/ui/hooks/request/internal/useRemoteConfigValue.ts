@@ -1,5 +1,5 @@
 import type { RemoteConfig } from '@/modules/remote-config/types';
-import { walletPort } from '@/shared/channel';
+import { walletPort } from '@/shared/channels';
 import { useQuery } from '@tanstack/react-query';
 
 export function useRemoteConfigValue<K extends keyof RemoteConfig>(key: K) {

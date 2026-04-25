@@ -5,4 +5,5 @@ export const CURRENCIES = Object.entries(exchangeData).map(([id, data]) => ({
   name: data.name,
   symbol: data.ticker.toUpperCase(),
   currencySymbol: data.symbol,
+  flag: data.flag,
 }));

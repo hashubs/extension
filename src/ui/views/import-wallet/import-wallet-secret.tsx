@@ -1,5 +1,3 @@
-import { FEATURE_SOLANA } from '@/env/config';
-import { isSolanaPrivateKey } from '@/modules/solana/shared';
 import { prepareUserInputSeedOrPrivateKey } from '@/shared/prepareUserInputSeedOrPrivateKey';
 import { SeedType } from '@/shared/seed-type';
 import { ValidationResult } from '@/shared/validation/ValidationResult';
@@ -41,9 +39,6 @@ export function validate({
       return { valid: false, message: 'Invalid recovery phrase' };
     }
   } else {
-    if (FEATURE_SOLANA !== 'on' && isSolanaPrivateKey(recoveryInput)) {
-      return { valid: false, message: 'Solana support is coming soon' };
-    }
     if (isValidPrivateKey(recoveryInput)) {
       return { valid: true, message: '' };
     } else {

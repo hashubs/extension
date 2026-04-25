@@ -170,24 +170,19 @@ export class NotificationWindow extends PersistentStore<PendingState> {
     await this.removeStaleEntries();
   }
 
-  /**
-   * Closes a window by its internal request ID.
-   * Note: Window closing is already handled by the UI.
-   * @deprecated
-   */
-  // private closeWindowById(id: InternalRequestId) {
-  //   const windowId = this.getWindowIdByInternalId(id);
-  //   const isSidepanel = id.startsWith('sidepanel:');
-  //   if (windowId && !isSidepanel) {
-  //     browser.windows.remove(windowId);
-  //   } else if (isSidepanel) {
-  //     // For sidepanel, we maybe do not need to close it.
-  //     // Currently we only show Dapp Request in sidepanel if it already was open,
-  //     // so it doesn't need to be closed after. But if this pattern changes,
-  //     // this is the place to close it
-  //     // console.log('maybe close sidepanel');
-  //   }
-  // }
+  private closeWindowById(id: InternalRequestId) {
+    const windowId = this.getWindowIdByInternalId(id);
+    const isSidepanel = id.startsWith('sidepanel:');
+    if (windowId && !isSidepanel) {
+      browser.windows.remove(windowId);
+    } else if (isSidepanel) {
+      // For sidepanel, we maybe do not need to close it.
+      // Currently we only show Dapp Request in sidepanel if it already was open,
+      // so it doesn't need to be closed after. But if this pattern changes,
+      // this is the place to close it
+      // console.log('maybe close sidepanel');
+    }
+  }
 
   private closeWindow(windowId: number) {
     browser.windows.remove(windowId).catch(() => {
@@ -210,7 +205,7 @@ export class NotificationWindow extends PersistentStore<PendingState> {
       const id = idRaw as InternalRequestId;
       const status = 'fulfilled';
       setTimeout(() => {
-        // this.closeWindowById(id);
+        this.closeWindowById(id);
         this.events.emit('settle', { status, id, result });
       }, 16);
     });
@@ -218,7 +213,7 @@ export class NotificationWindow extends PersistentStore<PendingState> {
       const id = idRaw as InternalRequestId;
       const status = 'rejected';
       setTimeout(() => {
-        // this.closeWindowById(id);
+        this.closeWindowById(id);
         this.events.emit('settle', { status, id, error });
       }, 16);
     });
@@ -299,17 +294,14 @@ export class NotificationWindow extends PersistentStore<PendingState> {
     });
   }
 
-  /**
-   * @deprecated
-   */
-  // private getWindowIdByInternalId(value: InternalRequestId) {
-  //   const state = this.getState();
-  //   for (const { windowId, id } of Object.values(state)) {
-  //     if (id === value) {
-  //       return windowId;
-  //     }
-  //   }
-  // }
+  private getWindowIdByInternalId(value: InternalRequestId) {
+    const state = this.getState();
+    for (const { windowId, id } of Object.values(state)) {
+      if (id === value) {
+        return windowId;
+      }
+    }
+  }
 
   private getRequestId(id: InternalRequestId): DappRpcRequestId | undefined {
     const state = this.getState();

@@ -1,1 +1,5 @@
-export const icon = 'https://protocol-icons.s3.amazonaws.com/icons/solana.jpg';
+import type { WalletIcon } from '@zeriontech/solana-wallet-standard';
+
+import selvoLogoDataUrl from 'data-url:src/ui/assets/selvo-logo-teal.svg';
+
+export const icon: WalletIcon = selvoLogoDataUrl as WalletIcon;

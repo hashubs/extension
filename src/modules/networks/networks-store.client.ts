@@ -1,4 +1,4 @@
-import { walletPort } from '@/shared/channel';
+import { walletPort } from '@/shared/channels';
 import { getPreferences } from '@/ui/features/preferences/usePreferences';
 import { NetworksStore } from './networks-store';
 

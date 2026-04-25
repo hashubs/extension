@@ -1,4 +1,4 @@
-import { walletPort } from '@/shared/channel';
+import { walletPort } from '@/shared/channels';
 import { useToastStore } from '@/shared/store/useToastStore';
 import { useMutation } from '@tanstack/react-query';
 

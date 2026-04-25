@@ -1,4 +1,4 @@
-import { walletPort } from '@/shared/channel';
+import { walletPort } from '@/shared/channels';
 import { openInNewWindow } from '@/shared/open-in-new-window';
 import { useToastStore } from '@/shared/store/useToastStore';
 import { Button } from '@/ui/ui-kit';

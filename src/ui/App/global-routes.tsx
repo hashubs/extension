@@ -1,30 +1,26 @@
-import React from 'react';
-import { Navigate, Route, Routes } from 'react-router-dom';
-
 import { RouteRestoration } from '@/shared/RouteRestoration';
-import { getWindowType } from '@/shared/window-type';
+import { urlContext } from '@/shared/UrlContext';
 import {
   CustomTransition,
   ViewTransition,
 } from '@/ui/components/ViewTransition/ViewTransition';
-import { RequireAuth } from './auth';
-import { SomeKindOfResolver } from './resolver';
-
-import { HandshakeFailure } from '@/ui/views/handshake-failure';
-import { LoginView } from '@/ui/views/login';
-import { NetworkSelectorView } from '@/ui/views/network-selector';
-import { Overview } from '@/ui/views/overview';
-import { WalletSelectorView } from '@/ui/views/wallet-selector';
-
 import { ActionsRoutes } from '@/ui/views/actions';
 import { AddWalletRoutes } from '@/ui/views/add-wallet';
 import { BackupWalletRoutes } from '@/ui/views/backup-wallet';
 import { CreateWalletRoutes } from '@/ui/views/create-wallet';
 import { FungibleInfoView } from '@/ui/views/fungible-info';
+import { HandshakeFailure } from '@/ui/views/handshake-failure';
 import { ImportWalletRoutes } from '@/ui/views/import-wallet';
+import { LoginView } from '@/ui/views/login';
+import { NetworkSelectorView } from '@/ui/views/network-selector';
+import { NotFoundView } from '@/ui/views/not-found';
+import { Overview } from '@/ui/views/overview';
 import { RevealPrivateKeyRoutes } from '@/ui/views/reveal-private-key';
 import { SettingsRoutes } from '@/ui/views/settings';
 import { TestView } from '@/ui/views/tests/test-view';
+import { WalletSelectorView } from '@/ui/views/wallet-selector';
+import React from 'react';
+import { Navigate, Route, Routes } from 'react-router-dom';
 import { GlobalToast } from '../components/toast/GlobalToast';
 import { AddEthereumChain } from '../views/add-ethereum-chain';
 import {
@@ -35,6 +31,8 @@ import {
   RestoreDataView,
   useRedirectToRestoreView,
 } from '../views/restore-data';
+import { RequireAuth } from './auth';
+import { SomeKindOfResolver } from './resolver';
 
 function DefiSdkClientProvider({ children }: React.PropsWithChildren) {
   return <>{children}</>;
@@ -49,6 +47,15 @@ const animatedRoutes = [
   '/backup-wallet',
   '/create-wallet',
   '/reveal-private-key',
+];
+
+const excludedTransitionsFor404 = [
+  { from: '/overview', to: '*' },
+  { from: '/settings', to: '*' },
+  { from: '/actions', to: '*' },
+  { from: '*', to: '/overview' },
+  { from: '*', to: '/settings' },
+  { from: '*', to: '/actions' },
 ];
 
 const excludedTransitions = [
@@ -71,13 +78,16 @@ const customTransitions = [
 
 export function GlobalRoutes({ initialRoute }: { initialRoute?: string }) {
   useRedirectToRestoreView();
-  const isPopup = getWindowType() === 'popup';
+  const isPopup = urlContext.windowType === 'popup';
   return (
     <DefiSdkClientProvider>
       {isPopup ? <RouteRestoration /> : null}
       <ViewTransition
         animatedRoutes={animatedRoutes}
-        excludedTransitions={excludedTransitions}
+        excludedTransitions={[
+          ...excludedTransitions,
+          ...excludedTransitionsFor404,
+        ]}
         customTransitions={customTransitions}
       >
         {(location) => {
@@ -208,7 +218,7 @@ export function GlobalRoutes({ initialRoute }: { initialRoute?: string }) {
               <Route path="/restore-data" element={<RestoreDataView />} />
               <Route path="/test-view" element={<TestView />} />
               <Route path="/handshake-failure" element={<HandshakeFailure />} />
-              <Route path="*" element={<Navigate to="/" replace />} />
+              <Route path="*" element={<NotFoundView />} />
             </Routes>
           );
         }}

@@ -1,4 +1,4 @@
-import { accountPublicRPCPort } from '@/shared/channel';
+import { accountPublicRPCPort } from '@/shared/channels';
 import { useQuery } from '@tanstack/react-query';
 
 export const GET_EXISTING_USER_QUERY_KEY = ['account/getExistingUser'];

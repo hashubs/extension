@@ -3,8 +3,8 @@ import {
   testenvNetworksStore,
 } from '@/modules/networks/networks-store.client';
 
-export function updateNetworks() {
-  return Promise.all([
+export async function updateNetworks() {
+  await Promise.all([
     mainNetworksStore.update(),
     testenvNetworksStore.update(),
   ]);

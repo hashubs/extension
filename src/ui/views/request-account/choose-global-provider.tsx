@@ -1,4 +1,4 @@
-import { windowPort } from '@/shared/channel';
+import { windowPort } from '@/shared/channels';
 import { SiteFaviconImg } from '@/ui/components/SiteFaviconImg';
 import { BrandLogo } from '@/ui/components/svg';
 import { ViewLoading } from '@/ui/components/view-loading';

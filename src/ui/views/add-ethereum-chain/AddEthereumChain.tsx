@@ -1,7 +1,7 @@
 import { AddEthereumChainParameter } from '@/modules/ethereum/types/add-ethereum-chain-parameter';
 import { injectChainConfig } from '@/modules/networks/inject-chain-config';
 import { Networks } from '@/modules/networks/networks';
-import { walletPort, windowPort } from '@/shared/channel';
+import { walletPort, windowPort } from '@/shared/channels';
 import { normalizeChainId } from '@/shared/normalize-chain-id';
 import { SiteFaviconImg } from '@/ui/components/SiteFaviconImg';
 import { Layout } from '@/ui/components/layout';

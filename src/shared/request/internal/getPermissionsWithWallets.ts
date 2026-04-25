@@ -1,4 +1,4 @@
-import { walletPort } from '@/shared/channel';
+import { walletPort } from '@/shared/channels';
 import { isEthereumAddress } from '@/shared/is-ethereum-address';
 import { normalizeAddress } from '@/shared/normalize-address';
 import type { ExternallyOwnedAccount } from '@/shared/types/externally-owned-account';

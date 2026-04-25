@@ -4,8 +4,8 @@
   "description": "A web3 wallet extension",
   "scripts": {
     "start": "npm-run-all --parallel start:chrome type-check:watch",
-    "start:chrome": "rm -rf .parcel-cache dist && cp ./src/manifest-chrome.json ./src/manifest.json && PLATFORM=chrome parcel watch src/manifest.json --no-hmr --public-url ./ --no-content-hash --no-autoinstall",
-    "start:firefox": "rm -rf .parcel-cache dist-firefox && cp ./src/manifest-firefox.json ./src/manifest.json && PLATFORM=firefox parcel watch src/manifest.json --no-hmr --public-url ./ --no-content-hash --no-autoinstall --dist-dir dist-firefox",
+    "start:chrome": "node scripts/dev.js",
+    "start:firefox": "node scripts/dev-firefox.js",
     "build": "echo \"Please run 'npm run build:production' instead\" && exit 1",
     "build:chrome": "node scripts/build.js",
     "build:firefox": "node scripts/build-firefox.js",
@@ -120,6 +120,7 @@
     "@walletconnect/jsonrpc-provider": "^1.0.13",
     "@walletconnect/jsonrpc-utils": "^1.0.8",
     "@zeriontech/hardware-wallet-connection": "^2.0.0",
+    "@zeriontech/solana-wallet-standard": "1.0.0-alpha.2",
     "bignumber.js": "^9.1.1",
     "bip32": "^5.0.0-rc.0",
     "bip39": "^3.1.0",

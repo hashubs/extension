@@ -1,4 +1,4 @@
-import { accountPublicRPCPort } from '@/shared/channel';
+import { accountPublicRPCPort } from '@/shared/channels';
 import type { MutateOptions } from '@tanstack/react-query';
 import { useMutation } from '@tanstack/react-query';
 

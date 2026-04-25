@@ -1,8 +1,8 @@
-import { accountPublicRPCPort, walletPort } from '@/shared/channel';
+import { accountPublicRPCPort, walletPort } from '@/shared/channels';
 import { useMutation } from '@tanstack/react-query';
 import { useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
-import { getWindowType } from './window-type';
+import { urlContext } from './UrlContext';
 
 function useAuthenticatedAppOpened() {
   const { pathname } = useLocation();
@@ -38,7 +38,7 @@ function useScreenViewChange() {
         address,
         previous: previousPathname.current,
         screenSize: `${window.screen.width}x${window.screen.height}`,
-        windowType: getWindowType(),
+        windowType: urlContext.windowType,
       });
     },
     onSuccess() {

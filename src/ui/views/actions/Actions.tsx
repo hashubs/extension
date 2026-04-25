@@ -1,13 +1,16 @@
 import type { AnyAddressAction } from '@/modules/ethereum/transactions/addressAction';
 import { Layout } from '@/ui/components/layout';
+import {
+  PinnedSearchBody,
+  PinnedSearchHeader,
+} from '@/ui/components/Pinnedsearch/Pinnedsearch';
 import { useAddressParams } from '@/ui/hooks/request/internal/useWallet';
+import { usePinnedSearch } from '@/ui/hooks/usePinnedSearch';
 import { useUnifiedActivity } from '@/ui/views/actions/useUnifiedActivity';
 import {
   useCallback,
   useDeferredValue,
-  useEffect,
   useMemo,
-  useRef,
   useState,
 } from 'react';
 import { LuListFilter } from 'react-icons/lu';
@@ -131,13 +134,9 @@ export function ActionsView() {
   const [searchQuery, setSearchQuery] = useState<string>('');
   const deferredSearchQuery = useDeferredValue(searchQuery);
   const [selectedTx, setSelectedTx] = useState<AnyAddressAction | null>(null);
-  const [searchPinned, setSearchPinned] = useState(false);
 
-  const [scrollElement, setScrollElement] = useState<HTMLDivElement | null>(
-    null
-  );
-  const searchRef = useRef<HTMLDivElement>(null);
-  const filterOffsetTopRef = useRef<number>(0);
+  const { searchPinned, searchRef, scrollElement, setScrollElement } =
+    usePinnedSearch();
 
   const selectedChain = searchParams.chain || null;
 
@@ -240,24 +239,6 @@ export function ActionsView() {
     Boolean(searchParams.chain) ||
     Boolean(searchParams.date);
 
-  useEffect(() => {
-    if (searchRef.current) {
-      filterOffsetTopRef.current = searchRef.current.offsetTop;
-    }
-  }, []);
-
-  useEffect(() => {
-    if (!scrollElement) return;
-
-    const handleScroll = () => {
-      const isPinned = scrollElement.scrollTop >= filterOffsetTopRef.current;
-      setSearchPinned((prev) => (prev !== isPinned ? isPinned : prev));
-    };
-
-    scrollElement.addEventListener('scroll', handleScroll, { passive: true });
-    return () => scrollElement.removeEventListener('scroll', handleScroll);
-  }, [scrollElement]);
-
   return (
     <Layout
       ref={setScrollElement}
@@ -266,40 +247,13 @@ export function ActionsView() {
       headerClassName="px-4"
       renderHeaderElement={
         <>
-          <div
-            className="relative flex-1 flex items-center justify-center overflow-hidden"
-            style={{ height: '32px' }}
-          >
-            <h1
-              className="absolute text-base font-semibold tracking-wide transition-all duration-300 ease-in-out whitespace-nowrap"
-              style={{
-                opacity: searchPinned ? 0 : 1,
-                transform: searchPinned
-                  ? 'translateY(-10px)'
-                  : 'translateY(0px)',
-                pointerEvents: searchPinned ? 'none' : 'auto',
-              }}
-            >
-              History
-            </h1>
-
-            <div
-              className="absolute w-full transition-all duration-300 ease-in-out"
-              style={{
-                opacity: searchPinned ? 1 : 0,
-                transform: searchPinned
-                  ? 'translateY(0px)'
-                  : 'translateY(10px)',
-                pointerEvents: searchPinned ? 'auto' : 'none',
-              }}
-            >
-              <ActionSearch
-                value={searchQuery}
-                onChange={setSearchQuery}
-                searchPinned={searchPinned}
-              />
-            </div>
-          </div>
+          <PinnedSearchHeader searchPinned={searchPinned} title="History">
+            <ActionSearch
+              value={searchQuery}
+              onChange={setSearchQuery}
+              searchPinned={searchPinned}
+            />
+          </PinnedSearchHeader>
           <button
             type="button"
             className="size-[32px] rounded-[9px] flex items-center justify-center bg-muted hover:bg-muted/80 relative"
@@ -314,17 +268,9 @@ export function ActionsView() {
         </>
       }
     >
-      <div
-        ref={searchRef}
-        className="bg-background/50 px-4"
-        style={{
-          opacity: searchPinned ? 0 : 1,
-          pointerEvents: searchPinned ? 'none' : 'auto',
-          transition: 'opacity 0.25s ease',
-        }}
-      >
+      <PinnedSearchBody searchPinned={searchPinned} searchRef={searchRef}>
         <ActionSearch value={searchQuery} onChange={setSearchQuery} />
-      </div>
+      </PinnedSearchBody>
 
       {isLoading ? (
         <ActionsListSkeleton count={10} />

@@ -1,4 +1,4 @@
-import { accountPublicRPCPort } from '@/shared/channel';
+import { accountPublicRPCPort } from '@/shared/channels';
 import { Button } from '@/ui/ui-kit';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import React, { useState } from 'react';

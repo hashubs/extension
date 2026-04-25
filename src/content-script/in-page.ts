@@ -1,19 +1,18 @@
-import { FEATURE_SOLANA } from '@/env/config';
 import { Connection } from '@/modules/ethereum/connection';
 import { EthereumProvider } from '@/modules/ethereum/provider';
 import { SolanaProvider } from '@/modules/solana/solana-provider';
-import {
-  type Ghost,
-  initialize as initializeWalletStandard,
-} from '@/modules/solana/solana-wallet-standard';
 import { isMetamaskModeOn } from '@/shared/preferences-helpers';
 import type { GlobalPreferences } from '@/shared/types/global-preferences';
+import {
+  type Ghost,
+  initialize as initializeSolanaWalletStandard,
+} from '@zeriontech/solana-wallet-standard';
 import * as competingProviders from './competing-providers';
 import { dappsWithoutCorrectEIP1193Support } from './dapp-configs';
 import * as dappDetection from './dapp-detection';
 import { pageObserver } from './dapp-mutation';
 import { initializeEIP6963 } from './eip6963';
-import { popWalletChannelId } from './wallet-channel-id';
+import { popWalletChannelId } from './wallet-channel-id.in-page-script';
 
 declare global {
   interface Window {
@@ -28,12 +27,11 @@ const walletChannelId = popWalletChannelId();
 const broadcastChannel = new BroadcastChannel(walletChannelId);
 const connection = new Connection(broadcastChannel);
 const ethereumProvider = new EthereumProvider(connection);
-if (FEATURE_SOLANA === 'on') {
-  const solanaProvider = new SolanaProvider(connection);
-  initializeWalletStandard(solanaProvider);
-  Object.assign(ethereumProvider, { solana: solanaProvider });
-  window.solana = solanaProvider;
-}
+
+const solanaProvider = new SolanaProvider(connection);
+initializeSolanaWalletStandard(solanaProvider);
+Object.assign(ethereumProvider, { solana: solanaProvider });
+window.solana = solanaProvider;
 
 let isPaused = false;
 

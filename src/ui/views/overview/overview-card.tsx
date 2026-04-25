@@ -20,13 +20,14 @@ const ACTIONS: { key: ActionKey; label: string; icon: React.ReactNode }[] = [
   { key: 'actions', label: 'History', icon: <LuHistory size={18} /> },
 ];
 interface Props {
-  accountName?: string;
+  currency?: string;
   balance?: string;
   balanceChange?: string;
   onConnectionSite?: () => void;
 }
 
 export function OverviewCard({
+  currency = 'USD',
   balance = '$0.12',
   balanceChange = '+$35',
   onConnectionSite,
@@ -42,8 +43,8 @@ export function OverviewCard({
           <OverviewHeader onConnectionSite={onConnectionSite} />
 
           <div className="mb-3">
-            <p className="text-sm font-medium text-muted-foreground">
-              Wallet (USD)
+            <p className="text-sm font-medium text-muted-foreground uppercase">
+              Wallet ({currency})
             </p>
             <div className="text-[40px] font-bold leading-tight">{balance}</div>
             <p className="text-sm font-medium text-muted-foreground">

@@ -3,372 +3,434 @@
     "name": "US Dollar",
     "ticker": "usd",
     "symbol": "$",
-    "currencyType": "fiat"
+    "currencyType": "fiat",
+    "flag": "🇺🇸"
   },
   "aed": {
     "name": "United Arab Emirates Dirham",
     "ticker": "aed",
     "symbol": "د.إ",
-    "currencyType": "fiat"
+    "currencyType": "fiat",
+    "flag": "🇦🇪"
   },
   "ars": {
     "name": "Argentine Peso",
     "ticker": "ars",
     "symbol": "$",
-    "currencyType": "fiat"
+    "currencyType": "fiat",
+    "flag": "🇦🇷"
   },
   "aud": {
     "name": "Australian Dollar",
     "ticker": "aud",
     "symbol": "A$",
-    "currencyType": "fiat"
+    "currencyType": "fiat",
+    "flag": "🇦🇺"
   },
   "bdt": {
     "name": "Bangladeshi Taka",
     "ticker": "bdt",
     "symbol": "৳",
-    "currencyType": "fiat"
+    "currencyType": "fiat",
+    "flag": "🇧🇩"
   },
   "bhd": {
     "name": "Bahraini Dinar",
     "ticker": "bhd",
     "symbol": "BD",
-    "currencyType": "fiat"
+    "currencyType": "fiat",
+    "flag": "🇧🇭"
   },
   "bmd": {
     "name": "Bermudian Dollar",
     "ticker": "bmd",
     "symbol": "$",
-    "currencyType": "fiat"
+    "currencyType": "fiat",
+    "flag": "🇧🇲"
   },
   "brl": {
     "name": "Brazil Real",
     "ticker": "brl",
     "symbol": "R$",
-    "currencyType": "fiat"
+    "currencyType": "fiat",
+    "flag": "🇧🇷"
   },
   "cad": {
     "name": "Canadian Dollar",
     "ticker": "cad",
     "symbol": "CA$",
-    "currencyType": "fiat"
+    "currencyType": "fiat",
+    "flag": "🇨🇦"
   },
   "chf": {
     "name": "Swiss Franc",
     "ticker": "chf",
     "symbol": "Fr",
-    "currencyType": "fiat"
+    "currencyType": "fiat",
+    "flag": "🇨🇭"
   },
   "clp": {
     "name": "Chilean Peso",
     "ticker": "clp",
     "symbol": "CLP$",
-    "currencyType": "fiat"
+    "currencyType": "fiat",
+    "flag": "🇨🇱"
   },
   "cny": {
     "name": "Chinese Yuan",
     "ticker": "cny",
     "symbol": "¥",
-    "currencyType": "fiat"
+    "currencyType": "fiat",
+    "flag": "🇨🇳"
   },
   "czk": {
     "name": "Czech Koruna",
     "ticker": "czk",
     "symbol": "Kč",
-    "currencyType": "fiat"
+    "currencyType": "fiat",
+    "flag": "🇨🇿"
   },
   "dkk": {
     "name": "Danish Krone",
     "ticker": "dkk",
     "symbol": "kr",
-    "currencyType": "fiat"
+    "currencyType": "fiat",
+    "flag": "🇩🇰"
   },
   "eur": {
     "name": "Euro",
     "ticker": "eur",
     "symbol": "€",
-    "currencyType": "fiat"
+    "currencyType": "fiat",
+    "flag": "🇪🇺"
   },
   "gbp": {
     "name": "British Pound Sterling",
     "ticker": "gbp",
     "symbol": "£",
-    "currencyType": "fiat"
+    "currencyType": "fiat",
+    "flag": "🇬🇧"
   },
   "gel": {
     "name": "Georgian Lari",
     "ticker": "gel",
     "symbol": "₾",
-    "currencyType": "fiat"
+    "currencyType": "fiat",
+    "flag": "🇬🇪"
   },
   "hkd": {
     "name": "Hong Kong Dollar",
     "ticker": "hkd",
     "symbol": "HK$",
-    "currencyType": "fiat"
+    "currencyType": "fiat",
+    "flag": "🇭🇰"
   },
   "huf": {
     "name": "Hungarian Forint",
     "ticker": "huf",
     "symbol": "Ft",
-    "currencyType": "fiat"
+    "currencyType": "fiat",
+    "flag": "🇭🇺"
   },
   "idr": {
     "name": "Indonesian Rupiah",
     "ticker": "idr",
     "symbol": "Rp",
-    "currencyType": "fiat"
+    "currencyType": "fiat",
+    "flag": "🇮🇩"
   },
   "ils": {
     "name": "Israeli New Shekel",
     "ticker": "ils",
     "symbol": "₪",
-    "currencyType": "fiat"
+    "currencyType": "fiat",
+    "flag": "🇮🇱"
   },
   "inr": {
     "name": "Indian Rupee",
     "ticker": "inr",
     "symbol": "₹",
-    "currencyType": "fiat"
+    "currencyType": "fiat",
+    "flag": "🇮🇳"
   },
   "jpy": {
     "name": "Japanese Yen",
     "ticker": "jpy",
     "symbol": "¥",
-    "currencyType": "fiat"
+    "currencyType": "fiat",
+    "flag": "🇯🇵"
   },
   "krw": {
     "name": "South Korean Won",
     "ticker": "krw",
     "symbol": "₩",
-    "currencyType": "fiat"
+    "currencyType": "fiat",
+    "flag": "🇰🇷"
   },
   "kwd": {
     "name": "Kuwaiti Dinar",
     "ticker": "kwd",
     "symbol": "KD",
-    "currencyType": "fiat"
+    "currencyType": "fiat",
+    "flag": "🇰🇼"
   },
   "lkr": {
     "name": "Sri Lankan Rupee",
     "ticker": "lkr",
     "symbol": "Rs",
-    "currencyType": "fiat"
+    "currencyType": "fiat",
+    "flag": "🇱🇰"
   },
   "mmk": {
     "name": "Burmese Kyat",
     "ticker": "mmk",
     "symbol": "K",
-    "currencyType": "fiat"
+    "currencyType": "fiat",
+    "flag": "🇲🇲"
   },
   "mxn": {
     "name": "Mexican Peso",
     "ticker": "mxn",
     "symbol": "MX$",
-    "currencyType": "fiat"
+    "currencyType": "fiat",
+    "flag": "🇲🇽"
   },
   "myr": {
     "name": "Malaysian Ringgit",
     "ticker": "myr",
     "symbol": "RM",
-    "currencyType": "fiat"
+    "currencyType": "fiat",
+    "flag": "🇲🇾"
   },
   "ngn": {
     "name": "Nigerian Naira",
     "ticker": "ngn",
     "symbol": "₦",
-    "currencyType": "fiat"
+    "currencyType": "fiat",
+    "flag": "🇳🇬"
   },
   "nok": {
     "name": "Norwegian Krone",
     "ticker": "nok",
     "symbol": "kr",
-    "currencyType": "fiat"
+    "currencyType": "fiat",
+    "flag": "🇳🇴"
   },
   "nzd": {
     "name": "New Zealand Dollar",
     "ticker": "nzd",
     "symbol": "NZ$",
-    "currencyType": "fiat"
+    "currencyType": "fiat",
+    "flag": "🇳🇿"
   },
   "php": {
     "name": "Philippine Peso",
     "ticker": "php",
     "symbol": "₱",
-    "currencyType": "fiat"
+    "currencyType": "fiat",
+    "flag": "🇵🇭"
   },
   "pkr": {
     "name": "Pakistani Rupee",
     "ticker": "pkr",
     "symbol": "₨",
-    "currencyType": "fiat"
+    "currencyType": "fiat",
+    "flag": "🇵🇰"
   },
   "pln": {
     "name": "Polish Zloty",
     "ticker": "pln",
     "symbol": "zł",
-    "currencyType": "fiat"
+    "currencyType": "fiat",
+    "flag": "🇵🇱"
   },
   "rub": {
     "name": "Russian Ruble",
     "ticker": "rub",
     "symbol": "₽",
-    "currencyType": "fiat"
+    "currencyType": "fiat",
+    "flag": "🇷🇺"
   },
   "sar": {
     "name": "Saudi Riyal",
     "ticker": "sar",
     "symbol": "﷼",
-    "currencyType": "fiat"
+    "currencyType": "fiat",
+    "flag": "🇸🇦"
   },
   "sek": {
     "name": "Swedish Krona",
     "ticker": "sek",
     "symbol": "kr",
-    "currencyType": "fiat"
+    "currencyType": "fiat",
+    "flag": "🇸🇪"
   },
   "sgd": {
     "name": "Singapore Dollar",
     "ticker": "sgd",
     "symbol": "S$",
-    "currencyType": "fiat"
+    "currencyType": "fiat",
+    "flag": "🇸🇬"
   },
   "thb": {
     "name": "Thai Baht",
     "ticker": "thb",
     "symbol": "฿",
-    "currencyType": "fiat"
+    "currencyType": "fiat",
+    "flag": "🇹🇭"
   },
   "try": {
     "name": "Turkish Lira",
     "ticker": "try",
     "symbol": "₺",
-    "currencyType": "fiat"
+    "currencyType": "fiat",
+    "flag": "🇹🇷"
   },
   "twd": {
     "name": "New Taiwan Dollar",
     "ticker": "twd",
     "symbol": "NT$",
-    "currencyType": "fiat"
+    "currencyType": "fiat",
+    "flag": "🇹🇼"
   },
   "uah": {
     "name": "Ukrainian hryvnia",
     "ticker": "uah",
     "symbol": "₴",
-    "currencyType": "fiat"
+    "currencyType": "fiat",
+    "flag": "🇺🇦"
   },
   "vef": {
     "name": "Venezuelan bolívar fuerte",
     "ticker": "vef",
     "symbol": "Bs.F",
-    "currencyType": "fiat"
+    "currencyType": "fiat",
+    "flag": "🇻🇪"
   },
   "vnd": {
     "name": "Vietnamese đồng",
     "ticker": "vnd",
     "symbol": "₫",
-    "currencyType": "fiat"
+    "currencyType": "fiat",
+    "flag": "🇻🇳"
   },
   "zar": {
     "name": "South African Rand",
     "ticker": "zar",
     "symbol": "R",
-    "currencyType": "fiat"
+    "currencyType": "fiat",
+    "flag": "🇿🇦"
   },
   "xdr": {
     "name": "IMF Special Drawing Rights",
     "ticker": "xdr",
     "symbol": "SDR",
-    "currencyType": "fiat"
+    "currencyType": "fiat",
+    "flag": "🌐"
   },
   "xag": {
     "name": "Silver - Troy Ounce",
     "ticker": "xag",
     "symbol": "XAG",
-    "currencyType": "commodity"
+    "currencyType": "commodity",
+    "flag": "🥈"
   },
   "xau": {
     "name": "Gold - Troy Ounce",
     "ticker": "xau",
     "symbol": "XAU",
-    "currencyType": "commodity"
+    "currencyType": "commodity",
+    "flag": "🥇"
   },
   "cop": {
     "name": "Colombian Peso",
     "ticker": "cop",
     "symbol": "COL$",
-    "currencyType": "fiat"
+    "currencyType": "fiat",
+    "flag": "🇨🇴"
   },
   "kes": {
     "name": "Kenyan Shilling",
     "ticker": "kes",
     "symbol": "KSh",
-    "currencyType": "fiat"
+    "currencyType": "fiat",
+    "flag": "🇰🇪"
   },
   "ron": {
     "name": "Romanian Leu",
     "ticker": "ron",
     "symbol": "lei",
-    "currencyType": "fiat"
+    "currencyType": "fiat",
+    "flag": "🇷🇴"
   },
   "dop": {
     "name": "Dominican Peso",
     "ticker": "dop",
     "symbol": "RD$",
-    "currencyType": "fiat"
+    "currencyType": "fiat",
+    "flag": "🇩🇴"
   },
   "crc": {
     "name": "Costa Rican Colón",
     "ticker": "crc",
     "symbol": "₡",
-    "currencyType": "fiat"
+    "currencyType": "fiat",
+    "flag": "🇨🇷"
   },
   "hnl": {
     "name": "Honduran Lempira",
     "ticker": "hnl",
     "symbol": "L",
-    "currencyType": "fiat"
+    "currencyType": "fiat",
+    "flag": "🇭🇳"
   },
   "zmw": {
     "name": "Zambian Kwacha",
     "ticker": "zmw",
     "symbol": "ZK",
-    "currencyType": "fiat"
+    "currencyType": "fiat",
+    "flag": "🇿🇲"
   },
   "svc": {
     "name": "Salvadoran Colón",
     "ticker": "svc",
     "symbol": "₡",
-    "currencyType": "fiat"
+    "currencyType": "fiat",
+    "flag": "🇸🇻"
   },
   "bam": {
     "name": "Bosnia and Herzegovina Convertible Mark",
     "ticker": "bam",
     "symbol": "KM",
-    "currencyType": "fiat"
+    "currencyType": "fiat",
+    "flag": "🇧🇦"
   },
   "pen": {
     "name": "Peruvian Sol",
     "ticker": "pen",
     "symbol": "S/",
-    "currencyType": "fiat"
+    "currencyType": "fiat",
+    "flag": "🇵🇪"
   },
   "gtq": {
     "name": "Guatemalan Quetzal",
     "ticker": "gtq",
     "symbol": "Q",
-    "currencyType": "fiat"
+    "currencyType": "fiat",
+    "flag": "🇬🇹"
   },
   "lbp": {
     "name": "Lebanese Pound",
     "ticker": "lbp",
     "symbol": "ل.ل",
-    "currencyType": "fiat"
+    "currencyType": "fiat",
+    "flag": "🇱🇧"
   },
   "amd": {
     "name": "Armenian Dram",
     "ticker": "amd",
     "symbol": "֏",
-    "currencyType": "fiat"
+    "currencyType": "fiat",
+    "flag": "🇦🇲"
   }
 }

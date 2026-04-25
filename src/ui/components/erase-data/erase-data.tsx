@@ -1,5 +1,5 @@
 import { emitter } from '@/shared/events';
-import { getWindowType } from '@/shared/window-type';
+import { urlContext } from '@/shared/UrlContext';
 import { useEraseDataMutation } from '@/ui/hooks/request/internal/useEraseDataMutation';
 import { maybeOpenOnboarding } from '@/ui/views/onboarding/initialization';
 import { AiTwotoneAlert, AiTwotoneCheckCircle } from 'react-icons/ai';
@@ -12,11 +12,9 @@ interface EraseDataProps {
 }
 
 export function EraseData({ open, onOpenChange }: EraseDataProps) {
-  const windowType = getWindowType();
-
   const eraseAllData = useEraseDataMutation({
     onSuccess: () => {
-      const isTab = windowType === 'tab';
+      const isTab = urlContext.windowType === 'tab';
       if (isTab) {
         emitter.emit('reloadExtension');
       } else {

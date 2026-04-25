@@ -128,6 +128,7 @@ export function NetworkForm({
   onRemoveFromVisited,
   restrictedChainIds,
   disabledFields,
+  hiddenFields,
 }: {
   chain?: string | null;
   chainConfig: AddEthereumChainParameter;
@@ -139,6 +140,7 @@ export function NetworkForm({
   onRemoveFromVisited?: () => void;
   restrictedChainIds: Set<ChainId>;
   disabledFields: null | Set<string>;
+  hiddenFields?: null | Set<string>;
 }) {
   const id = useId();
 
@@ -157,6 +159,9 @@ export function NetworkForm({
 
   const [errors, setErrors] =
     useState<Record<string, string | undefined>>(EMPTY_OBJECT);
+
+  const isCardHidden =
+    disabledFields?.has('hidden') && disabledFields?.has('is_testnet');
 
   return (
     <form
@@ -195,6 +200,7 @@ export function NetworkForm({
           name="chainName"
           defaultValue={chainConfig.chainName}
           disabled={disabledFields?.has('chainName')}
+          hidden={hiddenFields?.has('chainName')}
           required
         />
         <FormField
@@ -205,6 +211,7 @@ export function NetworkForm({
           defaultValue={chainConfig.rpcUrls[0] || ''}
           error={errors['rpcUrls[]']}
           disabled={disabledFields?.has('rpcUrls[]')}
+          hidden={hiddenFields?.has('rpcUrls[]')}
           required
         />
         <FormField
@@ -223,6 +230,7 @@ export function NetworkForm({
           }
           onInput={(e) => e.currentTarget.setCustomValidity('')}
           disabled={disabledFields?.has('chainId')}
+          hidden={hiddenFields?.has('chainId')}
           required
         />
         <div className="grid grid-cols-2 gap-4">
@@ -233,6 +241,7 @@ export function NetworkForm({
             error={errors['nativeCurrency.symbol']}
             onInput={(e) => e.currentTarget.setCustomValidity('')}
             disabled={disabledFields?.has('nativeCurrency.symbol')}
+            hidden={hiddenFields?.has('nativeCurrency.symbol')}
             required
           />
           <FormField
@@ -244,6 +253,7 @@ export function NetworkForm({
             pattern="\d+"
             defaultValue={chainConfig.nativeCurrency.decimals || ''}
             disabled={disabledFields?.has('nativeCurrency.decimals')}
+            hidden={hiddenFields?.has('nativeCurrency.decimals')}
             required={false}
           />
         </div>
@@ -256,31 +266,34 @@ export function NetworkForm({
           placeholder="https://..."
           defaultValue={chainConfig.blockExplorerUrls?.[0] || ''}
           disabled={disabledFields?.has('blockExplorerUrls[]')}
+          hidden={hiddenFields?.has('blockExplorerUrls[]')}
           required={false}
         />
       </div>
 
-      <Card className="border border-border mt-4">
-        {!disabledFields?.has('hidden') && (
-          <NetworkHiddenFieldLine
-            name="hidden"
-            defaultChecked={chainConfig.hidden}
-          />
-        )}
+      {!isCardHidden && (
+        <Card className="border border-border mt-4">
+          {!disabledFields?.has('hidden') && (
+            <NetworkHiddenFieldLine
+              name="hidden"
+              defaultChecked={chainConfig.hidden}
+            />
+          )}
 
-        {!disabledFields?.has('is_testnet') && (
-          <NetworkTestnetFieldLine
-            name="is_testnet"
-            defaultChecked={chainConfig.is_testnet}
-          />
-        )}
-      </Card>
+          {!disabledFields?.has('is_testnet') && (
+            <NetworkTestnetFieldLine
+              name="is_testnet"
+              defaultChecked={chainConfig.is_testnet}
+            />
+          )}
+        </Card>
+      )}
 
       {onReset ? (
         <button
           type="button"
           onClick={onReset}
-          className="mt-6 w-full text-center text-xs font-medium text-indigo-600 dark:text-indigo-400 hover:underline"
+          className="w-full text-center text-xs font-medium text-teal-600 dark:text-teal-400 hover:underline"
         >
           Reset to Default
         </button>
@@ -288,7 +301,7 @@ export function NetworkForm({
         <button
           type="button"
           onClick={onRemoveFromVisited}
-          className="mt-6 w-full text-center text-xs font-medium text-indigo-600 dark:text-indigo-400 hover:underline"
+          className="w-full text-center text-xs font-medium text-teal-600 dark:text-teal-400 hover:underline"
         >
           Remove from the list
         </button>

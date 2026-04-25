@@ -1,4 +1,4 @@
-import { walletPort } from '@/shared/channel';
+import { walletPort } from '@/shared/channels';
 import { useQuery } from '@tanstack/react-query';
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';

@@ -10,7 +10,6 @@ export const API_URL =
   process.env.API_URL || 'https://wallet-server-v1.hashubs.workers.dev';
 export const TESTNET_API_URL =
   process.env.TESTNET_API_URL || 'https://testnet.youno.id';
-export const FEATURE_SOLANA = 'on';
 export const SLOW_MODE = false;
 export const CRAWLER_API_URL =
   process.env.CRAWLER_API_URL ||

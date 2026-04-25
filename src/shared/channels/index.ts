@@ -5,7 +5,7 @@ import { PortMessageChannel } from '@/shared/port-message-channel';
 import type { AccountPublicRPC } from '@/shared/types/account-public-rpc';
 import type { MemoryCacheRPC } from '@/shared/types/memory-cache-rpc';
 import type { Wallet } from '@/shared/types/wallet';
-import { getWindowType } from '@/shared/window-type';
+import { urlContext } from '@/shared/UrlContext';
 import browser from 'webextension-polyfill';
 // import type { DnaService } from '../../modules/dna-service/dna.background';
 // import { initDnaApi } from '../../modules/dna-service/dna.client';
@@ -52,13 +52,13 @@ export const currencyPort = new PortMessageChannel({
 
 class WindowPort extends PortMessageChannel {
   static maybeRestoreRouteForSidepanel() {
-    if (getWindowType() === 'sidepanel') {
+    if (urlContext.windowType === 'sidepanel') {
       // TODO: navigate to location that user was on before opening the request view?
       navigateProgrammatically({ pathname: '/' });
     }
   }
 
-  async confirm<T>(
+  confirm<T>(
     windowId: string,
     // result MUST NOT be undefined, otherwise the payload will not be interpreter
     // as JsonRpcResult or RpcResult, because `undefined` properties get removed
@@ -66,27 +66,17 @@ class WindowPort extends PortMessageChannel {
     result: T
   ) {
     try {
-      return await this.request('resolve', [{ windowId, result }]);
-    } catch (error: any) {
-      console.error('Error in window confirm:', error);
+      return this.request('resolve', [{ windowId, result }]);
     } finally {
       WindowPort.maybeRestoreRouteForSidepanel();
-      if (getWindowType() !== 'sidepanel') {
-        window.close();
-      }
     }
   }
 
-  async reject(windowId: string) {
+  reject(windowId: string) {
     try {
-      return await this.request('reject', [
-        { windowId, error: new UserRejected() },
-      ]);
+      return this.request('reject', [{ windowId, error: new UserRejected() }]);
     } finally {
       WindowPort.maybeRestoreRouteForSidepanel();
-      if (getWindowType() !== 'sidepanel') {
-        window.close();
-      }
     }
   }
 }
@@ -101,7 +91,6 @@ export function initialize() {
   windowPort.initialize();
   // dnaServicePort.initialize();
   sessionCacheService.initialize();
-  currencyPort.initialize();
   // initDnaApi();
 
   walletPort.emitter.on('message', (msg) => {

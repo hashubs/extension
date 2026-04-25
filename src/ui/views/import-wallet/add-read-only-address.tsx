@@ -1,6 +1,6 @@
 import { hasChecksumError } from '@/modules/ethereum/to-checksum-address';
 import { isSolanaAddress } from '@/modules/solana/shared';
-import { accountPublicRPCPort, walletPort } from '@/shared/channel';
+import { accountPublicRPCPort, walletPort } from '@/shared/channels';
 import { getError } from '@/shared/errors/get-error';
 import { isEthereumAddress } from '@/shared/is-ethereum-address';
 import { queryClient } from '@/shared/query-client/queryClient';

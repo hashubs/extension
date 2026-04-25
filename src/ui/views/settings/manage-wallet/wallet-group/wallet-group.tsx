@@ -1,4 +1,4 @@
-import { walletPort } from '@/shared/channel';
+import { walletPort } from '@/shared/channels';
 import { invariant } from '@/shared/invariant';
 import { queryClient } from '@/shared/query-client/queryClient';
 import { useToastStore } from '@/shared/store/useToastStore';

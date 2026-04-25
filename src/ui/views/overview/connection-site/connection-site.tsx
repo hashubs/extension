@@ -1,6 +1,6 @@
 import { INTERNAL_ORIGIN } from '@/background/constants';
 import { isSolanaAddress } from '@/modules/solana/shared';
-import { walletPort } from '@/shared/channel';
+import { walletPort } from '@/shared/channels';
 import { isEthereumAddress } from '@/shared/is-ethereum-address';
 import { isConnectableDapp } from '@/shared/isConnectableDapp';
 import { requestChainForOrigin } from '@/shared/request/internal/requestChainForOrigin';

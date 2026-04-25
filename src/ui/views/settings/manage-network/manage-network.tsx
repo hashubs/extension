@@ -1,7 +1,8 @@
 import { isCustomNetworkId } from '@/modules/ethereum/chains/helpers';
 import { getOriginUrlFromMetaData } from '@/modules/networks/helpers';
 import { NetworkConfig } from '@/modules/networks/network-config';
-import { NetworkConfigMetaData } from '@/modules/networks/networks';
+import { NetworkConfigMetaData, Networks } from '@/modules/networks/networks';
+import { intersperce } from '@/shared/intersperce';
 import { getAddressType } from '@/shared/wallet/classifiers';
 import { Layout } from '@/ui/components/layout';
 import { usePreferences } from '@/ui/features/preferences';
@@ -18,43 +19,75 @@ const compareNetworks = (a: any, b: any) => {
   return aString < bString ? -1 : aString > bString ? 1 : 0;
 };
 
+function NetworkCaption({
+  metadataRecord,
+  network,
+}: {
+  metadataRecord: Record<string, NetworkConfigMetaData | undefined>;
+  network: NetworkConfig;
+}) {
+  const metadata = metadataRecord[network.id];
+  const originUrl = useMemo(() => {
+    return metadata ? getOriginUrlFromMetaData(metadata) : null;
+  }, [metadata]);
+
+  if (!network.id || !metadata) {
+    return null;
+  }
+
+  const { created, updated } = metadata;
+  const createdFormatted = new Intl.DateTimeFormat('en', {
+    dateStyle: 'medium',
+    timeStyle: 'medium',
+  }).format(created);
+  const updatedFormatted = new Intl.DateTimeFormat('en', {
+    dateStyle: 'medium',
+    timeStyle: 'medium',
+  }).format(updated);
+
+  return (
+    <caption className="text-muted-foreground/50">
+      {intersperce(
+        [
+          originUrl ? (
+            <span key={0}>
+              {isCustomNetworkId(network.id) ? 'Added' : 'Set'} by{' '}
+              <span style={{ color: 'var(--teal-500)' }}>{originUrl}</span>
+            </span>
+          ) : created && created === updated ? (
+            <span key={0} title={createdFormatted}>
+              {isCustomNetworkId(network.id) ? 'Created' : 'Saved'}{' '}
+              {createdFormatted}
+            </span>
+          ) : null,
+          updated && updated !== created ? (
+            <span key={1} title={updatedFormatted}>
+              Edited {updatedFormatted}
+            </span>
+          ) : null,
+        ],
+        (key) => (
+          <span key={key}> · </span>
+        )
+      )}
+    </caption>
+  );
+}
+
 const NetworkRow = React.memo(
   ({
+    networks,
     item,
-    isTestnetMode,
-    metadata,
-    groupKey,
-    dateFormatter,
     onClick,
   }: {
+    networks: Networks | null;
     item: NetworkConfig;
-    isTestnetMode: boolean;
-    metadata?: NetworkConfigMetaData;
-    groupKey: string;
-    dateFormatter: Intl.DateTimeFormat;
     onClick: () => void;
   }) => {
-    let subLabel =
-      item.native_asset?.symbol || (isTestnetMode ? 'Testnet' : 'Mainnet');
-
-    if (groupKey === 'other' && metadata) {
-      const { created, updated } = metadata;
-      const originUrl = getOriginUrlFromMetaData(metadata);
-      const parts: string[] = [];
-
-      if (originUrl) {
-        parts.push(`Added by ${originUrl}`);
-      }
-
-      const createdStr = dateFormatter.format(created);
-      if (!updated || updated === created) {
-        parts.push(`Created ${createdStr}`);
-      } else {
-        parts.push(`Edited ${dateFormatter.format(updated)}`);
-      }
-
-      subLabel = parts.join(' • ');
-    }
+    const metadataRecord = useMemo(
+      () => networks?.getNetworksMetaData(),
+      [networks]
+    );
 
     return (
       <CardItem
@@ -62,7 +95,12 @@ const NetworkRow = React.memo(
         item={{
           imgUrl: item.icon_url,
           label: item.name,
-          subLabel,
+          subLabelElement: (
+            <NetworkCaption
+              metadataRecord={metadataRecord || {}}
+              network={item}
+            />
+          ),
           iconRight: IoChevronForwardOutline,
           onClick,
           className: 'border-border',
@@ -113,20 +151,6 @@ export function ManageNetwork() {
     ].filter((g) => g.items.length > 0);
   }, [networks, isTestnetMode, addressType]);
 
-  const metadataRecord = useMemo(
-    () => networks?.getNetworksMetaData() || {},
-    [networks]
-  );
-
-  const dateFormatter = useMemo(
-    () =>
-      new Intl.DateTimeFormat('en', {
-        dateStyle: 'medium',
-        timeStyle: 'medium',
-      }),
-    []
-  );
-
   return (
     <Layout
       title="Network"
@@ -158,10 +182,7 @@ export function ManageNetwork() {
                   <NetworkRow
                     key={item.id}
                     item={item}
-                    isTestnetMode={isTestnetMode}
-                    metadata={metadataRecord[item.id]}
-                    groupKey={group.key}
-                    dateFormatter={dateFormatter}
+                    networks={networks}
                     onClick={() =>
                       navigate(`/settings/manage-networks/${item.id}`)
                     }

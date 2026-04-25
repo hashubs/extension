@@ -1,7 +1,13 @@
 import browser from 'webextension-polyfill';
-import { getOnboardingUrl } from './get-browser-url';
+import { getIndexUrl } from './get-browser-url';
+import { setUrlContext } from './setUrlContext';
 
 export function openOnboarding() {
-  const onboardingUrl = getOnboardingUrl();
-  browser.tabs.create({ url: onboardingUrl.toString() });
+  const indexUrl = getIndexUrl();
+  indexUrl.hash = '/onboarding';
+  setUrlContext(indexUrl.searchParams, {
+    appMode: 'onboarding',
+    windowType: 'tab',
+  });
+  browser.tabs.create({ url: indexUrl.toString() });
 }

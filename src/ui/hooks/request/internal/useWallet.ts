@@ -1,5 +1,5 @@
 import { pushUnique, removeFromArray } from '@/shared/array-mutations';
-import { walletPort } from '@/shared/channel';
+import { walletPort } from '@/shared/channels';
 import { invariant } from '@/shared/invariant';
 import { checkForTestAddress } from '@/shared/meta-app-state';
 import { normalizeAddress } from '@/shared/normalize-address';

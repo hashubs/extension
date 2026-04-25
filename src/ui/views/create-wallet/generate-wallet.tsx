@@ -1,4 +1,4 @@
-import { accountPublicRPCPort, walletPort } from '@/shared/channel';
+import { accountPublicRPCPort, walletPort } from '@/shared/channels';
 import { IdempotentRequest } from '@/shared/IdempotentRequest';
 import { invariant } from '@/shared/invariant';
 import { queryClient } from '@/shared/query-client/queryClient';

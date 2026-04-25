@@ -1,4 +1,4 @@
-import { walletPort } from '@/shared/channel';
+import { walletPort } from '@/shared/channels';
 import {
   ConnectedSiteItem,
   getPermissionsWithWallets,
@@ -178,7 +178,7 @@ function EmptyState({
   onReset(): void;
 }) {
   return (
-    <div className="flex flex-col items-center justify-center gap-3 py-16 text-center">
+    <div className="flex flex-col h-full items-center justify-center gap-3 py-16 text-center">
       <div className="size-12 rounded-full bg-muted/30 flex items-center justify-center">
         <LuWifi className="size-5 text-muted-foreground/50" />
       </div>
@@ -257,7 +257,8 @@ export function ConnectedSitesView() {
   return (
     <Layout
       title="Connected DApps"
-      onBack={() => navigate('/settings', { state: { direction: 'back' } })}
+      onBack={() => navigate(-1)}
+      classNameWrapper="h-full"
     >
       {siteCount > 0 && (
         <SearchBar

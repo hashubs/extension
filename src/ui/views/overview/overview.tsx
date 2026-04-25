@@ -115,6 +115,7 @@ export function Overview() {
       <ConnectionSite isHidden={!isConnectionSite} />
 
       <OverviewCard
+        currency={defaultCurrency}
         balance={balanceFormatted}
         onConnectionSite={handleConnectionSite}
       />

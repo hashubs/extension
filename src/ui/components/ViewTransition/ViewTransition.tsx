@@ -74,6 +74,26 @@ export function ViewTransition({
     const nFrom = normalizePath(from);
     const nTo = normalizePath(to);
     return excludedTransitions.some((t) => {
+      if (t.to === '*') {
+        const exFrom = normalizePath(t.from);
+        if (
+          (nFrom === exFrom ||
+            (exFrom !== '/' && nFrom.startsWith(exFrom + '/'))) &&
+          !matchesRoute(nTo)
+        ) {
+          return true;
+        }
+      }
+      if (t.from === '*') {
+        const exTo = normalizePath(t.to);
+        if (
+          (nTo === exTo || (exTo !== '/' && nTo.startsWith(exTo + '/'))) &&
+          !matchesRoute(nFrom)
+        ) {
+          return true;
+        }
+      }
+
       const exFrom = normalizePath(t.from);
       const exTo = normalizePath(t.to);
       const matchesFrom =

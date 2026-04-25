@@ -1,4 +1,4 @@
-import { accountPublicRPCPort, walletPort } from '@/shared/channel';
+import { accountPublicRPCPort, walletPort } from '@/shared/channels';
 import { queryClient } from '@/shared/query-client/queryClient';
 import { PublicUser } from '@/shared/types/User';
 import { wait } from '@/shared/wait';
@@ -8,14 +8,18 @@ export const AUTH_STATE_QUERY_KEY = ['authState'];
 
 export const useAuthState = () => {
   const { data, isFetching } = useQuery({
-    queryKey: AUTH_STATE_QUERY_KEY,
+    queryKey: ['authState'],
     queryFn: async () => {
       const [isAuthenticated, existingUser, wallet] = await Promise.all([
         accountPublicRPCPort.request('isAuthenticated'),
         accountPublicRPCPort.request('getExistingUser'),
         walletPort.request('uiGetCurrentWallet'),
       ]);
-      return { isAuthenticated, existingUser, wallet };
+      return {
+        isAuthenticated,
+        existingUser,
+        wallet,
+      };
     },
     retry: false,
     refetchOnWindowFocus: false,

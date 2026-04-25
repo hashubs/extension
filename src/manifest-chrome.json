@@ -52,15 +52,7 @@
   ],
   "web_accessible_resources": [
     {
-      "resources": [
-        "content-script/in-page.ts",
-        "index.html",
-        "notification.html",
-        "*.js",
-        "*.css",
-        "*.woff2",
-        "images/*"
-      ],
+      "resources": ["content-script/in-page.ts"],
       "matches": ["<all_urls>"]
     }
   ],

@@ -1,4 +1,3 @@
-import { FEATURE_SOLANA } from '@/env/config';
 import type { EthereumChainConfig } from '@/modules/ethereum/chains/types';
 import type { AddEthereumChainParameter } from '@/modules/ethereum/types/add-ethereum-chain-parameter';
 import { normalizeChainId } from '@/shared/normalize-chain-id';
@@ -134,9 +133,6 @@ export class Networks {
     this.ethereumChainConfigs = ethereumChainConfigs;
     this.networks = injectChainConfigs(networks, ethereumChainConfigs);
     this.networks = this.networks.filter(Networks.isSupportedEcosystem);
-    if (FEATURE_SOLANA !== 'on') {
-      this.networks = this.networks.filter((n) => n.standard === 'eip155');
-    }
     this.evmNetworks = this.networks.filter((n) => n.standard === 'eip155');
     this.solanaNetworks = this.networks.filter(
       (n) => n.id.toLowerCase().includes('solana') // TODO: filter by n['standard'] when backend updates

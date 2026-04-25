@@ -1,4 +1,4 @@
-import { walletPort } from '@/shared/channel';
+import { walletPort } from '@/shared/channels';
 import { isSessionExpiredError } from '@/shared/isSessionExpiredError';
 import { getWalletGroupByAddress } from '@/shared/request/internal/getWalletGroupByAddress';
 import { wait } from '@/shared/wait';

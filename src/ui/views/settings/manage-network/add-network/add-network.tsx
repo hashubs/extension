@@ -2,7 +2,7 @@ import { INTERNAL_ORIGIN } from '@/background/constants';
 import { toCustomNetworkId } from '@/modules/ethereum/chains/helpers';
 import { type AddEthereumChainParameter } from '@/modules/ethereum/types/add-ethereum-chain-parameter';
 import { Networks as NetworksModule } from '@/modules/networks/networks';
-import { walletPort } from '@/shared/channel';
+import { walletPort } from '@/shared/channels';
 import { collectData, type Parsers } from '@/shared/form-data';
 import { normalizeChainId } from '@/shared/normalize-chain-id';
 import { FormField } from '@/ui/components/form';

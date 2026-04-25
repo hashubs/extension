@@ -1,5 +1,5 @@
 import browser from 'webextension-polyfill';
-import { getWindowType } from '../window-type';
+import { urlContext } from '../UrlContext';
 import { browserState } from './BrowserState';
 import { isSidepanelMessageRequest } from './types';
 
@@ -8,7 +8,7 @@ export function initializeSidepanelMessaging() {
     if (isSidepanelMessageRequest(request)) {
       if (request.payload.method === 'is-sidepanel-open') {
         const { initialWindowId } = browserState;
-        const isSidepanel = getWindowType() === 'sidepanel';
+        const isSidepanel = urlContext.windowType === 'sidepanel';
         const { windowId } = request.payload.params;
         const isTargetWindow =
           windowId == null ? true : windowId === initialWindowId;

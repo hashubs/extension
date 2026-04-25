@@ -1,7 +1,7 @@
 import type {
   ExtractChannelMethods,
   RPCApi,
-} from '@/shared/channel/channels.types';
+} from '@/shared/channels/channels.types';
 import { formatJsonRpcRequestPatched } from '@/shared/custom-rpc/format-json-rpc-request-patched';
 import type { Wallet } from '@/shared/types/wallet';
 import type {

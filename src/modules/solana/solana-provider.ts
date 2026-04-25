@@ -1,5 +1,4 @@
-import { formatJsonRpcRequestPatched } from '@/shared/custom-rpc/format-json-rpc-request-patched';
-import { invariant } from '@/shared/invariant';
+import EventEmitter from 'events';
 import type {
   SolanaSignInInput,
   SolanaSignInOutput,
@@ -10,13 +9,14 @@ import type {
   VersionedTransaction,
 } from '@solana/web3.js';
 import { PublicKey } from '@solana/web3.js';
-import EventEmitter from 'events';
+import type { Ghost } from '@zeriontech/solana-wallet-standard';
+import { invariant } from 'src/shared/invariant';
 import { base64ToUint8Array, uint8ArrayToBase64 } from '../crypto/convert';
 import type { Connection } from '../ethereum/connection';
 import { icon } from './icon';
 import { isSolanaAddress } from './shared';
-import type { Ghost } from './solana-wallet-standard';
 import { solFromBase64, solToBase64 } from './transactions/create';
+import { formatJsonRpcRequestPatched } from '@/shared/custom-rpc/format-json-rpc-request-patched';
 
 export class SolanaProvider extends EventEmitter implements Ghost {
   name = 'Selvo';

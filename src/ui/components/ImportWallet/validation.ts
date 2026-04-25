@@ -1,5 +1,3 @@
-import { FEATURE_SOLANA } from '@/env/config';
-import { isSolanaPrivateKey } from '@/modules/solana/shared';
 import { isValidMnemonic, isValidPrivateKey } from '@/shared/validation/wallet';
 
 export interface ValidationResult {
@@ -20,9 +18,6 @@ export function validateMnemonicOrPrivateKey({
       return { valid: false, message: 'Invalid recovery phrase' };
     }
   } else {
-    if (FEATURE_SOLANA !== 'on' && isSolanaPrivateKey(recoveryInput)) {
-      return { valid: false, message: 'Solana support is coming soon' };
-    }
     if (isValidPrivateKey(recoveryInput)) {
       return { valid: true, message: '' };
     } else {

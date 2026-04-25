@@ -1,11 +1,10 @@
 import { INTERNAL_ORIGIN } from '@/background/constants';
-import { knownDappOrigins } from '@/shared/dapps/known-dapps';
-import { getIndexUrl } from '@/shared/get-browser-url';
 import { prepareForHref } from '@/shared/prepare-for-href';
 import {
   ApiBackground,
   type ApiBackgroundType,
 } from '@/shared/request/api.background';
+import { setUrlContext } from '@/shared/setUrlContext';
 import browser from 'webextension-polyfill';
 
 export type DappSecurityStatus =
@@ -16,13 +15,12 @@ export type DappSecurityStatus =
   | 'error';
 
 class PhishingDefence {
-  private whitelistedWebsites: Set<string>;
+  private whitelistedWebsites: Set<string> = new Set();
   private websiteStatus: Record<string, DappSecurityStatus> = {};
-  private apiBackground: ApiBackgroundType;
+  apiClient: ApiBackgroundType;
 
-  constructor(api: ApiBackgroundType) {
-    this.apiBackground = api;
-    this.whitelistedWebsites = new Set(knownDappOrigins);
+  constructor(apiClient: ApiBackgroundType) {
+    this.apiClient = apiClient;
   }
 
   private getSafeOrigin(url: string) {
@@ -34,9 +32,14 @@ class PhishingDefence {
     const tabs = await browser.tabs.query({});
     for (const tab of tabs) {
       if (tab?.url && this.getSafeOrigin(tab.url) === origin) {
-        const warningUrl = getIndexUrl();
-        warningUrl.hash = `/phishing-warning?url=${origin}`;
-        browser.tabs.update(tab.id, { url: warningUrl.toString() });
+        const rawPopupUrl = browser.runtime.getManifest().action?.default_popup;
+        if (!rawPopupUrl) {
+          return;
+        }
+        const popupUrl = new URL(browser.runtime.getURL(rawPopupUrl));
+        popupUrl.hash = `/phishing-warning?url=${origin}`;
+        setUrlContext(popupUrl.searchParams, { windowType: 'tab' });
+        browser.tabs.update(tab.id, { url: popupUrl.toString() });
       }
     }
   }
@@ -70,17 +73,15 @@ class PhishingDefence {
 
     if (isWhitelisted) {
       return {
-        status: existingStatus === 'unknown' ? 'ok' : existingStatus,
+        status: existingStatus,
         isWhitelisted,
       };
     }
     this.websiteStatus[origin] = 'loading';
-
     try {
-      const result = await this.apiBackground.securityCheckUrl({ url });
+      const result = await this.apiClient.securityCheckUrl({ url });
       const status = result.data?.flags.isMalicious ? 'phishing' : 'ok';
       this.websiteStatus[origin] = status;
-
       return { status, isWhitelisted };
     } catch {
       this.websiteStatus[origin] = 'error';
@@ -97,32 +98,17 @@ class PhishingDefence {
         isWhitelisted: false,
       };
     }
-
     const origin = url ? this.getSafeOrigin(url) : null;
-    const isWhitelisted = origin ? this.whitelistedWebsites.has(origin) : false;
-
-    if (origin && !isWhitelisted) {
-      const status = this.websiteStatus[origin] || 'unknown';
-
-      // TRIGGER: If status is unknown or missing, initiate investigation in background
-      if (status === 'unknown') {
-        this.checkDapp(url).catch((e) =>
-          console.error('[Phishing Defence] checkDapp background error:', e)
-        );
-      } else if (status === 'error') {
-        this.checkDapp(url).catch((e) =>
-          console.error('[Phishing Defence] checkDapp re-trigger error:', e)
-        );
-      }
+    // we can get the error status if the request was blocked by Cloudflare
+    // to provide the correct data after passing the captcha we need to check the status again
+    if (origin && this.websiteStatus[origin] === 'error') {
+      await this.checkDapp(url);
     }
-
-    const currentStatus = (origin && this.websiteStatus[origin]) || 'unknown';
-
-    return {
-      status:
-        isWhitelisted && currentStatus === 'unknown' ? 'ok' : currentStatus,
-      isWhitelisted,
+    const result = {
+      status: (origin && this.websiteStatus[origin]) || 'unknown',
+      isWhitelisted: origin ? this.whitelistedWebsites.has(origin) : false,
     };
+    return result;
   }
 }
 

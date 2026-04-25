@@ -1,4 +1,4 @@
-import { walletPort } from '@/shared/channel';
+import { walletPort } from '@/shared/channels';
 import { useQuery } from '@tanstack/react-query';
 
 export function usePrivateKey(address: string) {

@@ -6,7 +6,7 @@ import {
   getRandomUint8Array,
   utf8ToUint8Array,
 } from '@/modules/crypto';
-import { accountPublicRPCPort } from '@/shared/channel';
+import { accountPublicRPCPort } from '@/shared/channels';
 
 const isDev = process.env.NODE_ENV === 'development';
 
@@ -235,11 +235,11 @@ export async function setupAccountPasskey(password: string) {
   try {
     cred = await navigator.credentials.create({
       publicKey: {
-        rp: { name: 'Zerion' },
+        rp: { name: 'Selvo' },
         user: {
           id: getRandomUint8Array(32),
-          name: 'zerion',
-          displayName: 'Zerion Wallet',
+          name: 'selvo',
+          displayName: 'Selvo Wallet',
         },
         // ES256 (-7) + RS256 (-257) for broader authenticator compatibility
         pubKeyCredParams: [

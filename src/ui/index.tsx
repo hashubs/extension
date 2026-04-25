@@ -1,7 +1,5 @@
-import '@/ui/index.css';
-
 import { applyDrawFix } from '@/shared/apply-draw-fix';
-import { initialize as initializeChannels } from '@/shared/channel';
+import { initialize as initializeChannels } from '@/shared/channels';
 import { BackgroundScriptUpdateHandler } from '@/shared/core/background-script-update-handler';
 import { runtimeStore } from '@/shared/core/runtime-store';
 import { HandshakeFailed } from '@/shared/errors/errors';
@@ -10,8 +8,9 @@ import { queryClient } from '@/shared/query-client/queryClient';
 import { persistQueryClient } from '@/shared/query-client/queryClientPersistence';
 import { restoreRoute } from '@/shared/RouteRestoration';
 import { initializeSidepanelEvents } from '@/shared/sidepanel/initialize.client';
-import { getWindowType } from '@/shared/window-type';
+import { urlContext } from '@/shared/UrlContext';
 import { getPreferences } from '@/ui/features/preferences/usePreferences';
+import '@/ui/index.css';
 import { OnboardingInterrupt } from '@/ui/views/onboarding/errors';
 import { maybeOpenOnboarding } from '@/ui/views/onboarding/initialization';
 import React from 'react';
@@ -63,7 +62,7 @@ function renderApp({ initialView, inspect }: AppProps) {
   );
 }
 
-const isPopup = getWindowType() === 'popup';
+const isPopup = urlContext.windowType === 'popup';
 
 let isFirstLoad = true;
 async function initializeUI({

@@ -1,4 +1,4 @@
-import { walletPort } from '@/shared/channel';
+import { walletPort } from '@/shared/channels';
 import { prepareForHref } from '@/shared/prepare-for-href';
 import { useMemo } from 'react';
 import { LuTriangleAlert } from 'react-icons/lu';

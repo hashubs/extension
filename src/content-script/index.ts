@@ -7,7 +7,7 @@ import {
 } from '@walletconnect/jsonrpc-utils';
 import browser from 'webextension-polyfill';
 import { initializeInDappNotifications } from './in-dapp-notifications';
-import { setChannelIdInDom } from './wallet-channel-id';
+import { setChannelIdInDom } from './wallet-channel-id.content-script';
 
 const walletChannelId = setChannelIdInDom();
 const broadcastChannel = new BroadcastChannel(walletChannelId);

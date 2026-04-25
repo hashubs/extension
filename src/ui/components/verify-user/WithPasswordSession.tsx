@@ -1,4 +1,4 @@
-import { accountPublicRPCPort } from '@/shared/channel';
+import { accountPublicRPCPort } from '@/shared/channels';
 import { SessionExpired } from '@/shared/errors/errors';
 import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';

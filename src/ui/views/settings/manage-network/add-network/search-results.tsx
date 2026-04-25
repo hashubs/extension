@@ -2,7 +2,7 @@ import { INTERNAL_ORIGIN } from '@/background/constants';
 import { toCustomNetworkId } from '@/modules/ethereum/chains/helpers';
 import { Networks as NetworksModule } from '@/modules/networks/networks';
 import { getChainLogo } from '@/shared/chains/chain-logos';
-import { walletPort } from '@/shared/channel';
+import { walletPort } from '@/shared/channels';
 import { normalizeChainId } from '@/shared/normalize-chain-id';
 import {
   type EVMChainDataResponse,

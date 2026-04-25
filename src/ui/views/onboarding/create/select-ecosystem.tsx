@@ -1,4 +1,4 @@
-import { accountPublicRPCPort, walletPort } from '@/shared/channel';
+import { accountPublicRPCPort, walletPort } from '@/shared/channels';
 import { isSessionExpiredError } from '@/shared/isSessionExpiredError';
 import { zeroizeAfterSubmission } from '@/shared/zeroize-submission';
 import { cn } from '@/ui/lib/utils';

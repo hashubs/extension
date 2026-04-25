@@ -15,7 +15,7 @@ import type { AddEthereumChainParameter } from '@/modules/ethereum/types/add-eth
 import type { NetworksSource } from '@/shared/request/shared';
 import type { QuoteErrorContext } from '@/shared/types/quote-error-context';
 import type { SignTransactionResult } from '@/shared/types/sign-transaction-result';
-import type { WindowType } from '@/shared/window-type';
+import type { WindowType } from '@/shared/types/UrlContext';
 import type { State as GlobalPreferencesState } from './wallet/global-preferences';
 import type { WalletContainer } from './wallet/model/types';
 import type { WalletOrigin } from './wallet/model/wallet-origin';

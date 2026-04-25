@@ -1,4 +1,4 @@
-import { walletPort } from '@/shared/channel';
+import { walletPort } from '@/shared/channels';
 import { invariant } from '@/shared/invariant';
 import { isSessionExpiredError } from '@/shared/isSessionExpiredError';
 import { queryClient } from '@/shared/query-client/queryClient';

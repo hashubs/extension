@@ -1,4 +1,4 @@
-import { walletPort } from '@/shared/channel';
+import { walletPort } from '@/shared/channels';
 import { queryClient } from '@/shared/query-client/queryClient';
 import type { GlobalPreferences } from '@/shared/types/global-preferences';
 import type { WalletRecord } from '@/shared/types/wallet-record';

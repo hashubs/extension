@@ -1,4 +1,4 @@
-import { walletPort } from '@/shared/channel';
+import { walletPort } from '@/shared/channels';
 import { getActiveTabOrigin } from '@/shared/request/internal/getActiveTabOrigin';
 import { useQuery } from '@tanstack/react-query';
 

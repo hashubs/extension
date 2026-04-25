@@ -1,4 +1,4 @@
-import { walletPort } from '@/shared/channel';
+import { walletPort } from '@/shared/channels';
 import { useQuery } from '@tanstack/react-query';
 
 export function usePhishingDefenceStatus(origin?: string | null) {
@@ -11,6 +11,9 @@ export function usePhishingDefenceStatus(origin?: string | null) {
     },
     gcTime: 0,
     refetchInterval: (query) =>
-      query.state.data?.status === 'loading' || query.state.data?.status === 'unknown' ? 100 : false,
+      query.state.data?.status === 'loading' ||
+      query.state.data?.status === 'unknown'
+        ? 100
+        : false,
   });
 }

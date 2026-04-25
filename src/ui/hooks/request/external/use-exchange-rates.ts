@@ -1,4 +1,4 @@
-import { currencyPort } from '@/shared/channel';
+import { currencyPort } from '@/shared/channels';
 import { useCurrency } from '@/ui/features/appearance';
 import { useQuery } from '@tanstack/react-query';
 

@@ -1,6 +1,6 @@
 import type { AnyAddressAction } from '@/modules/ethereum/transactions/addressAction';
-import type { BridgeFormState } from '@/ui/pages/bridge-form/types';
-import type { SwapFormState } from '@/ui/pages/swap-form/types';
+import type { BridgeFormState } from '@/ui/views/bridge-form';
+import type { SwapFormState } from '@/ui/views/swap-form';
 import type { Quote2 } from './quote';
 
 type ClientScope = string | 'Swap' | 'Bridge' | 'Send' | 'External Dapp';

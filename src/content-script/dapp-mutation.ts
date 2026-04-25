@@ -1,4 +1,4 @@
-import logo from 'data-url:@/ui/assets/selvo-logo-teal.svg';
+import selvoLogoDataUrl from 'data-url:src/ui/assets/selvo-logo-teal.svg';
 
 function visitTextNodes(node: Element, cb: (node: Node) => boolean) {
   const walker = document.createTreeWalker(node, NodeFilter.SHOW_TEXT);
@@ -79,9 +79,9 @@ function replaceButtonImage(node: HTMLElement, context: Context) {
   }
   element.dataset.selvoReplaced = 'true';
   if (element.nodeName === 'IMG') {
-    (element as HTMLImageElement).src = logo;
+    (element as HTMLImageElement).src = selvoLogoDataUrl;
   } else {
-    element.style.background = `url("${logo}") no-repeat center/contain`;
+    element.style.background = `url("${selvoLogoDataUrl}") no-repeat center/contain`;
     for (const child of element.children) {
       if (child instanceof HTMLElement || child instanceof SVGElement) {
         child.style.display = 'none';

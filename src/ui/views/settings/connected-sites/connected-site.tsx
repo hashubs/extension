@@ -192,16 +192,11 @@ export function ConnectedSiteView() {
   const allRemoveMutation = useRemovePermissionMutation({
     onSuccess: () => {
       refetch();
-      navigate('/settings/connected-sites', {
-        state: { direction: 'back' },
-      });
+      navigate(-1);
     },
   });
 
-  const handleBack = useCallback(
-    () => navigate('/settings', { state: { direction: 'back' } }),
-    [navigate]
-  );
+  const handleBack = useCallback(() => navigate(-1), [navigate]);
 
   if (!connectedSite) {
     return <ViewNotFound onBack={handleBack} />;

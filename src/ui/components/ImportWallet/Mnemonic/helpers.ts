@@ -1,5 +1,4 @@
 import groupBy from 'lodash/groupBy';
-import { FEATURE_SOLANA } from 'src/env/config';
 import { isSolanaAddress } from 'src/modules/solana/shared';
 import { isEthereumAddress } from 'src/shared/is-ethereum-address';
 import { normalizeAddress } from 'src/shared/normalize-address';
@@ -20,19 +19,11 @@ export async function prepareWalletsToImport(phrase: LocallyEncoded): Promise<{
   addressesToCheck: string[];
 } | void> {
   const fn = mnemonicNDerivation;
-  const solanaEnabled = FEATURE_SOLANA === 'on';
   const [eth, sol1, sol2, sol3] = await Promise.all([
     fn({ phrase, n: 30, curve: 'ecdsa' }),
-    /** We want to explore all derivation paths in case there are active addresses */
-    solanaEnabled
-      ? fn({ phrase, n: 30, curve: 'ed25519', pathType: 'solanaBip44Change' })
-      : Promise.resolve([]),
-    solanaEnabled
-      ? fn({ phrase, n: 30, curve: 'ed25519', pathType: 'solanaBip44' })
-      : Promise.resolve([]),
-    solanaEnabled
-      ? fn({ phrase, n: 30, curve: 'ed25519', pathType: 'solanaDeprecated' })
-      : Promise.resolve([]),
+    fn({ phrase, n: 30, curve: 'ed25519', pathType: 'solanaBip44Change' }),
+    fn({ phrase, n: 30, curve: 'ed25519', pathType: 'solanaBip44' }),
+    fn({ phrase, n: 30, curve: 'ed25519', pathType: 'solanaDeprecated' }),
   ]);
 
   const derivedWallets = [

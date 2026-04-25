@@ -1,1 +1,1 @@
-1. Custom network belum bisa di hapus
+1. Failed to set window.ethereum ketika berada di Dapp Solana

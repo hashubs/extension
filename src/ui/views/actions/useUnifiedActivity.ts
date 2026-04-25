@@ -16,7 +16,7 @@ interface UseUnifiedActivityParams {
 /**
  * useUnifiedActivity
  *
- * Server-only for now. Flattens paginated Zerion actions
+ * Server-only for now
  * and deduplicates by transaction hash.
  */
 export function useUnifiedActivity(params: UseUnifiedActivityParams) {

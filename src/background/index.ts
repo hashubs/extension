@@ -8,6 +8,7 @@ import { runtimeStore } from '@/shared/core/runtime-store';
 import { openOnboarding } from '@/shared/open-onboarding';
 import { ORIGIN_PROTOCOL } from '@/shared/origin-protocol';
 import { initializeSidepanel } from '@/shared/sidepanel/initialize.background';
+import { UrlContextParam } from '@/shared/types/UrlContext';
 import { ContentScriptManager } from './content-script-manager';
 import { emitter } from './events';
 import { initialize } from './initialize';
@@ -53,7 +54,10 @@ function isOnboardingMode(port: RuntimePort) {
   if (!port.sender?.url) {
     return false;
   }
-  return port.sender.url.includes('#/onboarding');
+  const portSenderUrl = new URL(port.sender.url);
+  return (
+    portSenderUrl.searchParams.get(UrlContextParam.appMode) === 'onboarding'
+  );
 }
 
 function verifyPort(port: RuntimePort) {
@@ -121,20 +125,24 @@ browser.alarms.onAlarm.addListener(userActivity.handleAlarm);
 browser.alarms.onAlarm.addListener(ContentScriptManager.handleAlarm);
 browser.alarms.onAlarm.addListener(TransactionService.handleAlarm);
 
+console.time('bg initialize'); // eslint-disable-line no-console
+
 browser.runtime.onStartup.addListener(() => {
   runtimeStore.handleStartupEvent();
 });
 
 initialize().then((values) => {
-  const account = values.account;
-  const accountPublicRPC = values.accountPublicRPC;
-  // const dnaService = values.dnaService;
-  const notificationWindow = values.notificationWindow;
+  console.timeEnd('bg initialize'); // eslint-disable-line no-console
+  const {
+    account,
+    accountPublicRPC,
+    // dnaService,
+    notificationWindow,
+  } = values;
   emitter.emit('backgroundScriptInitialized');
   notifyContentScriptsAndUIAboutInitialization();
   // const httpConnection = new HttpConnection(() => account.getCurrentWallet());
   const memoryCacheRPC = new MemoryCacheRPC();
-  const currencyController = values.currencyController;
 
   new ContentScriptManager().removeExpiredRecords().activate();
 
@@ -168,12 +176,6 @@ initialize().then((values) => {
     createPortMessageHandler({
       check: (port) => port.name === 'sessionCacheService',
       controller: new SessionCacheService(),
-    })
-  );
-  portRegistry.addMessageHandler(
-    createPortMessageHandler({
-      check: (port) => port.name === 'currencyPort',
-      controller: currencyController,
     })
   );
   portRegistry.addMessageHandler(

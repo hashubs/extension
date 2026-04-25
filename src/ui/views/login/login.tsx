@@ -46,7 +46,10 @@ export function LoginView() {
 
   return (
     <>
-      <Layout className="relative p-0! overflow-hidden space-y-0 bg-[#f8f8f8] dark:bg-[#202020]">
+      <Layout
+        className="relative p-0! overflow-hidden space-y-0 bg-[#f8f8f8] dark:bg-[#202020]"
+        wrapped={false}
+      >
         <div className="relative flex items-center justify-center h-full overflow-hidden">
           <AnimatedBackground show={!!lastUsedAddress} />
 

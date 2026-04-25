@@ -9,7 +9,10 @@ interface FormFieldProps extends InputProps {
 }
 
 export const FormField = forwardRef<HTMLInputElement, FormFieldProps>(
-  ({ label, error, wrapperClassName, ...props }: FormFieldProps, ref) => {
+  (
+    { label, error, wrapperClassName, hidden, ...props }: FormFieldProps,
+    ref
+  ) => {
     const id = useId();
     return (
       <div
@@ -17,6 +20,7 @@ export const FormField = forwardRef<HTMLInputElement, FormFieldProps>(
           'flex flex-col gap-1.5 focus-within:text-primary transition-colors',
           wrapperClassName
         )}
+        hidden={hidden}
       >
         <label
           htmlFor={id}

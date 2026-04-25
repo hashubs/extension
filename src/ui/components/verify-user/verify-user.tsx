@@ -1,4 +1,4 @@
-import { accountPublicRPCPort } from '@/shared/channel';
+import { accountPublicRPCPort } from '@/shared/channels';
 import { PublicUser } from '@/shared/types/User';
 import { zeroizeAfterSubmission } from '@/shared/zeroize-submission';
 import { useGetExistingUser } from '@/ui/hooks/request/internal/useAccount';

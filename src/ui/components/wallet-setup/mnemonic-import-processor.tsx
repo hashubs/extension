@@ -1,4 +1,4 @@
-import { accountPublicRPCPort, walletPort } from '@/shared/channel';
+import { accountPublicRPCPort, walletPort } from '@/shared/channels';
 import { IdempotentRequest } from '@/shared/IdempotentRequest';
 import { isSessionExpiredError } from '@/shared/isSessionExpiredError';
 import { queryClient } from '@/shared/query-client/queryClient';

@@ -1,11 +1,5 @@
 import browser from 'webextension-polyfill';
 
-export function getOnboardingUrl() {
-  const url = getIndexUrl();
-  url.hash = '/onboarding';
-  return url;
-}
-
 export function getPopupUrl() {
   const popupUrl = browser.runtime.getManifest().action?.default_popup;
   if (!popupUrl) {
@@ -21,11 +15,6 @@ export function getSidepanelUrl() {
     throw new Error('sidepanelUrl not found');
   }
   return new URL(browser.runtime.getURL(sidepanelUrl));
-}
-
-export function getNotificationUrl() {
-  const notificationPath = 'notification.html';
-  return new URL(browser.runtime.getURL(notificationPath));
 }
 
 export function getIndexUrl() {

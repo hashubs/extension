@@ -9,7 +9,7 @@ import {
   hydrate,
 } from '@tanstack/react-query';
 import throttle from 'lodash/throttle';
-import { sessionCacheService } from '../channel';
+import { sessionCacheService } from '../channels';
 
 interface PersistedClient {
   timestamp: number;

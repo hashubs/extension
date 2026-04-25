@@ -1,4 +1,4 @@
-import { accountPublicRPCPort, walletPort } from '@/shared/channel';
+import { accountPublicRPCPort, walletPort } from '@/shared/channels';
 import { isSolanaPath } from '@/shared/wallet/derivation-paths';
 import {
   preferenceStore,

@@ -1,5 +1,5 @@
 import { createChain } from '@/modules/networks/chain';
-import { walletPort } from '@/shared/channel';
+import { walletPort } from '@/shared/channels';
 import type { BlockchainType } from 'src/shared/wallet/classifiers';
 
 export function requestChainForOrigin(

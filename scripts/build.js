@@ -16,7 +16,7 @@ async function build() {
     [
       'build',
       'src/manifest.json',
-      // 'src/ui/hardware-wallet/ledger.html',
+      'src/index.html',
       '--no-content-hash',
       '--no-source-maps',
     ],

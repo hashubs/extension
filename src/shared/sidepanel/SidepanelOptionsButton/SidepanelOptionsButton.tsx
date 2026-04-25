@@ -1,4 +1,4 @@
-import { getWindowType } from '@/shared/window-type';
+import { urlContext } from '@/shared/UrlContext';
 import { PopupIcon } from '@/ui/components/svg/popup';
 import { SidepannelIcon } from '@/ui/components/svg/sidepannel';
 import { DropdownMenuItem } from '@/ui/ui-kit';
@@ -7,7 +7,7 @@ import { openSidePanel } from '../sidepanel-apis';
 import { isSidepanelSupported } from '../sidepanel-support';
 
 function closeIfNotInTab() {
-  if (getWindowType() !== 'tab') {
+  if (urlContext.windowType !== 'tab') {
     window.close();
   }
 }
@@ -19,7 +19,7 @@ interface SidepanelOptionsButtonComponentProps {
 function SidepanelOptionsButtonComponent({
   as: Component = DropdownMenuItem,
 }: SidepanelOptionsButtonComponentProps) {
-  const isSidepanel = getWindowType() === 'sidepanel';
+  const isSidepanel = urlContext.windowType === 'sidepanel';
 
   return (
     <Component

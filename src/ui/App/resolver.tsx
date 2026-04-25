@@ -13,9 +13,17 @@ export function SomeKindOfResolver({
 }) {
   const { isLoading, isAuthenticated, existingUser, hasWallet } =
     useAuthState();
-  if (isLoading) return null;
-  if (!existingUser) return noUser;
-  if (!isAuthenticated) return notAuthenticated;
-  if (!hasWallet) return noWallet;
+  if (isLoading) {
+    return null;
+  }
+  if (!existingUser) {
+    return noUser;
+  }
+  if (!isAuthenticated) {
+    return notAuthenticated;
+  }
+  if (!hasWallet) {
+    return noWallet;
+  }
   return authenticated;
 }

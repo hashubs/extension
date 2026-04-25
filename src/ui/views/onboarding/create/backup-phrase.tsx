@@ -1,4 +1,4 @@
-import { accountPublicRPCPort, walletPort } from '@/shared/channel';
+import { accountPublicRPCPort, walletPort } from '@/shared/channels';
 import { isSessionExpiredError } from '@/shared/isSessionExpiredError';
 import { setCurrentAddress } from '@/shared/request/internal/setCurrentAddress';
 import { decodeMasked } from '@/shared/wallet/encode-locally';

@@ -1,4 +1,4 @@
-import { walletPort } from '@/shared/channel';
+import { walletPort } from '@/shared/channels';
 
 export function getWalletGroupByAddress(address: string) {
   return walletPort.request('getWalletGroupByAddress', { address });

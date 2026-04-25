@@ -1,4 +1,4 @@
-import { accountPublicRPCPort } from '@/shared/channel';
+import { accountPublicRPCPort } from '@/shared/channels';
 import { SidepanelOptionsButton } from '@/shared/sidepanel/SidepanelOptionsButton';
 import {
   DropdownMenu,
