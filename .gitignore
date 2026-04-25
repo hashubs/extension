@@ -6,7 +6,6 @@ dist-firefox
 .parcel-cache
 .referensi
 .backup
-.modules
 @deprecated
 /test-results/
 /e2e-report/
